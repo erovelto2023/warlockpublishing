@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Warlock Publishing
 
-## Getting Started
+A digital product marketplace built with Next.js, Shadcn UI, Clerk, and MongoDB.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Product Management**: Add and manage digital products.
+- **GrooveSell Integration**: Automatic tracking pixel injection and embed code support.
+- **Amazon Affiliate Support**: Link products to Amazon.
+- **Custom Sales Pages**: Use custom HTML for product pages.
+- **Authentication**: Secure user authentication with Clerk.
+- **Search**: Find products by title, description, or category.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  **Clone the repository**.
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+3.  **Environment Variables**:
+    Create a `.env.local` file in the root directory with the following variables:
+    ```env
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+    CLERK_SECRET_KEY=sk_test_...
+    MONGODB_URI=mongodb://localhost:27017/warlock_publishing
+    ```
+4.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Admin Access
 
-## Learn More
+Navigate to `/admin` to manage products. You must be signed in.
 
-To learn more about Next.js, take a look at the following resources:
+## GrooveSell Integration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+When adding a product, you can provide:
+- **GrooveSell Tracking ID**: The ID from the tracking pixel URL (e.g., `85437`).
+- **GrooveSell Embed Code**: The full embed code for the checkout button/form.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Custom HTML
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You can provide custom HTML content for a product page. This will override the standard layout, allowing you to build custom sales pages, upsell pages, or thank you pages.

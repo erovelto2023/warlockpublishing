@@ -1,0 +1,225 @@
+.homeWrapper {
+    --color-bg-deep: #1a202c;
+    --color-bg-panel: #2d3748;
+    --color-silver: #e2e8f0;
+    --color-silver-dim: #a0aec0;
+    --color-accent-glow: rgba(226, 232, 240, 0.15);
+
+    --font-header: var(--font-sans);
+    --font-body: var(--font-sans);
+
+    --border-ornate: 1px solid var(--color-silver-dim);
+
+    background-color: #0f1319;
+    color: var(--color-silver);
+    font-family: var(--font-body);
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.homeWrapper * {
+    box-sizing: border-box;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.homeWrapper h1,
+.homeWrapper h2,
+.homeWrapper h3 {
+    font-family: var(--font-header);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-silver);
+}
+
+/* --- BUTTONS & INPUTS --- */
+.btnPrimary {
+    display: inline-block;
+    border: 1px solid var(--color-silver);
+    padding: 15px 40px;
+    font-family: var(--font-header);
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--color-silver);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btnPrimary:hover {
+    background: var(--color-silver);
+    color: #0f1319;
+    box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+.searchContainer {
+    display: flex;
+    max-width: 500px;
+    margin: 30px auto;
+    border: 1px solid var(--color-silver-dim);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.searchInput {
+    flex: 1;
+    padding: 15px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+.searchInput:focus {
+    outline: none;
+}
+
+.searchBtn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-left: 1px solid var(--color-silver-dim);
+    color: var(--color-silver);
+    padding: 0 20px;
+    cursor: pointer;
+    font-family: var(--font-header);
+    font-size: 1.2rem;
+}
+
+.searchBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- NAV --- */
+.header {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 19, 25, 0.95);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navBrand {
+    font-family: var(--font-header);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--color-silver);
+    text-decoration: none;
+}
+
+.heroTagline {
+    gap: 40px;
+}
+
+.featureCard {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 40px 30px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    position: relative;
+}
+
+.featureCard:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-silver);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.featureCard::before {
+    content: '✦';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--color-silver-dim);
+    font-size: 1rem;
+    opacity: 0.5;
+}
+
+.iconLarge {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: block;
+    color: var(--color-silver);
+}
+
+.featureCard h3 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.featureCard p {
+    font-size: 0.95rem;
+    color: var(--color-silver-dim);
+}
+
+/* --- FINAL CTA --- */
+.ctaSection {
+    padding: 100px 0;
+    text-align: center;
+    background: linear-gradient(to bottom, #0f1319, #151a21);
+}
+
+.ctaSection h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.ctaSection p {
+    margin-bottom: 40px;
+    color: var(--color-silver-dim);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- FOOTER --- */
+.footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-silver-dim);
+    font-size: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0a0d11;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero {
+        padding: 40px 0;
+    }
+
+    .heroTagline {
+        font-size: 1rem;
+    }
+
+    .searchContainer {
+        flex-direction: column;
+    }
+
+    .searchBtn {
+        border-left: none;
+        border-top: 1px solid var(--color-silver-dim);
+        padding: 10px;
+    }
+}
