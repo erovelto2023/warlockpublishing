@@ -18,8 +18,4 @@ const PenNameSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-if (mongoose.models.PenName) {
-    delete mongoose.models.PenName;
-}
-
 export default mongoose.models.PenName || mongoose.model("PenName", PenNameSchema);

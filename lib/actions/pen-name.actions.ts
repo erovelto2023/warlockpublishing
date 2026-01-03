@@ -40,14 +40,20 @@ export async function createPenName(data: {
     // Simple check for uniqueness could be added here, but relying on unique index for now
     // Ideally we'd append a number if it exists, but let's stick to the core requirement first.
 
-    const newPenName = await PenName.create({
-        ...data,
-        slug,
-        userId,
-    });
-
-    revalidatePath("/admin/pen-names");
-    return JSON.parse(JSON.stringify(newPenName));
+    console.log("Creating PenName with data:", data);
+    try {
+        const newPenName = await PenName.create({
+            ...data,
+            slug,
+            userId,
+        });
+        console.log("PenName created:", newPenName);
+        revalidatePath("/admin/pen-names");
+        return JSON.parse(JSON.stringify(newPenName));
+    } catch (error) {
+        console.error("Error creating PenName:", error);
+        throw error;
+    }
 }
 
 export async function getPenNames() {

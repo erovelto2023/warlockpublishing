@@ -27,10 +27,6 @@ const ProductSchema = new Schema({
 });
 
 // Force re-compilation of the model if it already exists to pick up schema changes
-if (models.Product) {
-    delete models.Product;
-}
-
 const Product = models.Product || model('Product', ProductSchema);
 
 export default Product;

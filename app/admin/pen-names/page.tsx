@@ -32,6 +32,13 @@ export default async function PenNamesPage() {
                         <User className="h-12 w-12 mx-auto mb-4 opacity-20" />
                         <p className="text-lg font-medium">No pen names found</p>
                         <p className="text-sm">Create your first pen name to get started.</p>
+                        <div className="mt-6">
+                            <Link href="/admin/pen-names/new">
+                                <Button>
+                                    <Plus className="h-4 w-4 mr-2" /> Create Pen Name
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 ) : (
                     penNames.map((penName: any) => (

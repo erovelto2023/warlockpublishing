@@ -59,16 +59,23 @@ export async function createProduct(data: any) {
         }
     });
 
-    const newProduct = await Product.create({
-        ...sanitizedData,
-        slug,
-        userId,
-    });
+    console.log("Creating Product with data:", sanitizedData);
+    try {
+        const newProduct = await Product.create({
+            ...sanitizedData,
+            slug,
+            userId,
+        });
+        console.log("Product created:", newProduct);
 
-    revalidatePath("/products");
-    revalidatePath("/admin");
+        revalidatePath("/products");
+        revalidatePath("/admin");
 
-    return JSON.parse(JSON.stringify(newProduct));
+        return JSON.parse(JSON.stringify(newProduct));
+    } catch (error) {
+        console.error("Error creating Product:", error);
+        throw error;
+    }
 }
 
 export async function updateProduct(id: string, data: any) {

@@ -72,7 +72,14 @@ export default async function AdminPage() {
                         {products.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
-                                    No products found. Create one to get started.
+                                    <div className="flex flex-col items-center gap-4">
+                                        <p>No products found. Create one to get started.</p>
+                                        <Link href="/admin/products/new">
+                                            <Button className="gap-2 bg-cyan-600 hover:bg-cyan-700 text-white border-none">
+                                                <Plus className="h-4 w-4" /> Add Product
+                                            </Button>
+                                        </Link>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ) : (

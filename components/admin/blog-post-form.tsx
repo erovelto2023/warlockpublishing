@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { createPost, updatePost } from "@/lib/actions/blog"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { IBlogPost } from "@/lib/models/BlogPost"
+import type { IBlogPost } from "@/lib/models/BlogPost"
 
 const formSchema = z.object({
     title: z.string().min(2, {
