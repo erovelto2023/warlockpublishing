@@ -9,6 +9,7 @@ import { SoftwareTemplateRenderer } from "@/components/templates/software/Softwa
 import { EbookTemplateRenderer } from "@/components/templates/ebook/EbookTemplateRenderer";
 import { CourseTemplateRenderer } from "@/components/templates/course/CourseTemplateRenderer";
 import { ThankYouTemplateRenderer } from "@/components/templates/thankyou/ThankYouTemplateRenderer";
+import { AmazonTemplateRenderer } from "@/components/templates/amazon/AmazonTemplateRenderer";
 
 export const dynamic = 'force-dynamic';
 
@@ -73,6 +74,16 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                 <ThankYouTemplateRenderer contentData={product.contentData} />
             </>
         );
+    }
+
+    // Check for Amazon Product Template
+    if (product.productType === 'amazon') {
+        return (
+            <>
+                {/* Amazon pages typically don't need GrooveSell tracking, but kept for consistency if needed */}
+                <AmazonTemplateRenderer contentData={product.contentData} amazonLink={product.amazonLink} />
+            </>
+        )
     }
 
     return (

@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { WizardData } from "./ProductWizard"
 import { useEffect } from "react"
 
@@ -134,12 +135,13 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                 )}
                 <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
-                    <Input
+                    <Label htmlFor="description">Description (Markdown Supported)</Label>
+                    <Textarea
                         id="description"
-                        className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
+                        className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400 min-h-[150px] font-mono text-sm"
                         value={data.description}
                         onChange={(e) => updateData({ description: e.target.value })}
-                        placeholder="Product description"
+                        placeholder="# Product Description&#10;&#10;Write your description here using **markdown**..."
                     />
                 </div>
 
