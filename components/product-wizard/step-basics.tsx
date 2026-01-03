@@ -30,6 +30,13 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
         }
     }, [data.pageType, data.description, data.category, data.format, data.imageUrl, data.title, updateData]);
 
+    // Auto-set License Type for Amazon Products
+    useEffect(() => {
+        if (data.productType === 'amazon' && data.licenseType === 'PLR') {
+            updateData({ licenseType: "Personal Use" });
+        }
+    }, [data.productType, data.licenseType, updateData]);
+
     return (
         <div className="space-y-6 max-w-2xl mx-auto">
             <div className="space-y-2">
@@ -180,15 +187,34 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="imageUrl">Cover Image URL</Label>
-                        <Input
-                            id="imageUrl"
-                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
-                            value={data.imageUrl}
-                            onChange={(e) => updateData({ imageUrl: e.target.value })}
-                            placeholder="https://..."
-                        />
+                        <Label htmlFor="licenseType">License Type</Label>
+                        <Select
+                            value={data.licenseType}
+                            onValueChange={(val) => updateData({ licenseType: val })}
+                        >
+                            <SelectTrigger className="text-white bg-slate-800 border-slate-700">
+                                <SelectValue placeholder="Select license" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                <SelectItem value="PLR" className="focus:bg-slate-700 focus:text-white">PLR (Private Label Rights)</SelectItem>
+                                <SelectItem value="MRR" className="focus:bg-slate-700 focus:text-white">MRR (Master Resell Rights)</SelectItem>
+                                <SelectItem value="RR" className="focus:bg-slate-700 focus:text-white">RR (Resell Rights)</SelectItem>
+                                <SelectItem value="Personal Use" className="focus:bg-slate-700 focus:text-white">Personal Use</SelectItem>
+                                <SelectItem value="Commercial Use" className="focus:bg-slate-700 focus:text-white">Commercial Use</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="imageUrl">Cover Image URL</Label>
+                    <Input
+                        id="imageUrl"
+                        className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
+                        value={data.imageUrl}
+                        onChange={(e) => updateData({ imageUrl: e.target.value })}
+                        placeholder="https://..."
+                    />
                 </div>
             </div>
         </div>
