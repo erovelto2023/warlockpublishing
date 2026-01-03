@@ -14,7 +14,7 @@ export default async function NewProductPage() {
 
     return (
         <div className="container py-10 px-4">
-            <h1 className="text-3xl font-bold mb-8 text-center">Create New Product</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center text-white">Create New Product</h1>
             <ProductWizard penNames={penNames} />
         </div>
     );

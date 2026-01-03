@@ -18,7 +18,7 @@ export default async function PenNamesPage() {
     return (
         <div className="container py-10 px-4">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold">Pen Names</h1>
+                <h1 className="text-3xl font-bold text-white">Pen Names</h1>
                 <Link href="/admin/pen-names/new">
                     <Button className="gap-2">
                         <Plus className="h-4 w-4" /> Create Pen Name
