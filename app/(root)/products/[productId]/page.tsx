@@ -77,11 +77,19 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
     }
 
     // Check for Amazon Product Template
+    // Check for Amazon Product Template
     if (product.productType === 'amazon') {
+
         return (
             <>
                 {/* Amazon pages typically don't need GrooveSell tracking, but kept for consistency if needed */}
-                <AmazonTemplateRenderer contentData={product.contentData} amazonLink={product.amazonLink} />
+                <AmazonTemplateRenderer
+                    contentData={product.contentData}
+                    amazonLink={product.amazonLink}
+                    title={product.title}
+                    description={product.description}
+                    imageUrl={product.imageUrl}
+                />
             </>
         )
     }

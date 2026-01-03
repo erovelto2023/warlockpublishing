@@ -7,14 +7,15 @@ import ReactMarkdown from "react-markdown";
 interface AmazonTemplateRendererProps {
     contentData: any;
     amazonLink: string;
+    title: string;
+    description: string;
+    imageUrl: string;
 }
 
-export function AmazonTemplateRenderer({ contentData, amazonLink }: AmazonTemplateRendererProps) {
+export function AmazonTemplateRenderer({ contentData, amazonLink, title, description, imageUrl }: AmazonTemplateRendererProps) {
     // Default data if contentData is missing or partial
     const data = {
-        headline: contentData?.headline || "Product Headline Goes Here",
         subheadline: contentData?.subheadline || "A compelling subtitle that explains the main benefit.",
-        description: contentData?.description || "Product description goes here. Explain why this product is amazing.",
         features: contentData?.features || ["Feature 1", "Feature 2", "Feature 3"],
         rating: contentData?.rating || 4.5,
         reviewCount: contentData?.reviewCount || 120,
@@ -38,8 +39,18 @@ export function AmazonTemplateRenderer({ contentData, amazonLink }: AmazonTempla
                     <div className="grid md:grid-cols-2 gap-0">
                         {/* Image Section */}
                         <div className="bg-slate-100 p-8 flex items-center justify-center min-h-[400px]">
-                            {/* Placeholder for product image logic - typically passed down or handled separately */}
-                            <div className="text-slate-400 font-medium">Product Image Container</div>
+                            {imageUrl ? (
+                                <div className="relative w-full h-[400px] shadow-lg rounded-lg overflow-hidden">
+                                    <Image
+                                        src={imageUrl}
+                                        alt={title}
+                                        fill
+                                        className="object-contain" // Use contain for book covers to show full image
+                                    />
+                                </div>
+                            ) : (
+                                <div className="text-slate-400 font-medium">No Image Available</div>
+                            )}
                         </div>
 
                         {/* Content Section */}
@@ -54,7 +65,7 @@ export function AmazonTemplateRenderer({ contentData, amazonLink }: AmazonTempla
                             </div>
 
                             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">
-                                {data.headline}
+                                {title}
                             </h1>
                             <p className="text-lg text-slate-600 mb-8 leading-relaxed">
                                 {data.subheadline}
@@ -89,7 +100,7 @@ export function AmazonTemplateRenderer({ contentData, amazonLink }: AmazonTempla
                     <div className="p-8 md:p-12 border-t border-slate-100 bg-slate-50/50">
                         <h2 className="text-2xl font-bold text-slate-900 mb-6">Our Verdict</h2>
                         <div className="prose max-w-none text-slate-700">
-                            <ReactMarkdown>{data.description}</ReactMarkdown>
+                            <ReactMarkdown>{description}</ReactMarkdown>
                         </div>
                     </div>
                 </div>
