@@ -43,12 +43,12 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         value={data.penNameId}
                         onValueChange={(val) => updateData({ penNameId: val })}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className="text-white bg-slate-800 border-slate-700">
                             <SelectValue placeholder="Select an author" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
                             {penNames.map((penName) => (
-                                <SelectItem key={penName._id} value={penName._id}>
+                                <SelectItem key={penName._id} value={penName._id} className="focus:bg-slate-700 focus:text-white">
                                     {penName.name}
                                 </SelectItem>
                             ))}
@@ -60,7 +60,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                     <Label htmlFor="title">Product Title</Label>
                     <Input
                         id="title"
-                        className="text-slate-900"
+                        className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
                         value={data.title}
                         onChange={(e) => updateData({ title: e.target.value })}
                         placeholder="Enter product title"
@@ -74,14 +74,14 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                             value={data.productType}
                             onValueChange={(val: any) => updateData({ productType: val })}
                         >
-                            <SelectTrigger className="text-slate-900">
+                            <SelectTrigger className="text-white bg-slate-800 border-slate-700">
                                 <SelectValue placeholder="Select type" />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="ebook">Ebook</SelectItem>
-                                <SelectItem value="software">Software</SelectItem>
-                                <SelectItem value="amazon">Amazon Product</SelectItem>
-                                <SelectItem value="course">Course</SelectItem>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                <SelectItem value="ebook" className="focus:bg-slate-700 focus:text-white">Ebook</SelectItem>
+                                <SelectItem value="software" className="focus:bg-slate-700 focus:text-white">Software</SelectItem>
+                                <SelectItem value="amazon" className="focus:bg-slate-700 focus:text-white">Amazon Product</SelectItem>
+                                <SelectItem value="course" className="focus:bg-slate-700 focus:text-white">Course</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -92,23 +92,43 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                             value={data.pageType}
                             onValueChange={(val: any) => updateData({ pageType: val })}
                         >
-                            <SelectTrigger className="text-slate-900">
+                            <SelectTrigger className="text-white bg-slate-800 border-slate-700">
                                 <SelectValue placeholder="Select page type" />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="sales">Sales Page</SelectItem>
-                                <SelectItem value="upsell">Upsell Page</SelectItem>
-                                <SelectItem value="downsell">Downsell Page</SelectItem>
-                                <SelectItem value="thankyou">Thank You Page</SelectItem>
-                                <SelectItem value="custom_html">Custom HTML / Pure Code</SelectItem>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                <SelectItem value="sales" className="focus:bg-slate-700 focus:text-white">Sales Page</SelectItem>
+                                <SelectItem value="upsell" className="focus:bg-slate-700 focus:text-white">Upsell Page</SelectItem>
+                                <SelectItem value="downsell" className="focus:bg-slate-700 focus:text-white">Downsell Page</SelectItem>
+                                <SelectItem value="thankyou" className="focus:bg-slate-700 focus:text-white">Thank You Page</SelectItem>
+                                <SelectItem value="custom_html" className="focus:bg-slate-700 focus:text-white">Custom HTML / Pure Code</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
 
+                {/* Amazon Link Field - Only visible when Product Type is Amazon */}
+                {data.productType === 'amazon' && (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <Label htmlFor="amazonLink" className="text-cyan-400 font-bold flex items-center gap-2">
+                            Amazon Product Link (Affiliate URL)
+                            <span className="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Required</span>
+                        </Label>
+                        <Input
+                            id="amazonLink"
+                            className="text-white bg-slate-800 border-cyan-600 focus:border-cyan-400 placeholder:text-slate-400 ring-offset-slate-900"
+                            value={data.amazonLink}
+                            onChange={(e) => updateData({ amazonLink: e.target.value })}
+                            placeholder="https://amzn.to/..."
+                        />
+                        <p className="text-xs text-slate-400">
+                            This link will be used for the "Buy on Amazon" button.
+                        </p>
+                    </div>
+                )}
+
                 {/* Auto-fill logic for Thank You Page */}
                 {data.pageType === 'thankyou' && (
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-700 mb-4">
+                    <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-900/50 text-sm text-blue-200 mb-4">
                         <p><strong>Note:</strong> Some fields have been auto-filled for the Thank You page template. You can edit them if needed.</p>
                     </div>
                 )}
@@ -116,7 +136,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                     <Label htmlFor="description">Description</Label>
                     <Input
                         id="description"
-                        className="text-slate-900"
+                        className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
                         value={data.description}
                         onChange={(e) => updateData({ description: e.target.value })}
                         placeholder="Product description"
@@ -129,7 +149,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         <Input
                             id="price"
                             type="number"
-                            className="text-slate-900"
+                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
                             value={data.price}
                             onChange={(e) => updateData({ price: e.target.value })}
                         />
@@ -138,7 +158,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         <Label htmlFor="category">Category</Label>
                         <Input
                             id="category"
-                            className="text-slate-900"
+                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
                             value={data.category}
                             onChange={(e) => updateData({ category: e.target.value })}
                             placeholder="e.g. Productivity"
@@ -151,7 +171,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         <Label htmlFor="format">Format</Label>
                         <Input
                             id="format"
-                            className="text-slate-900"
+                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
                             value={data.format}
                             onChange={(e) => updateData({ format: e.target.value })}
                             placeholder="e.g. PDF"
@@ -161,7 +181,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         <Label htmlFor="imageUrl">Cover Image URL</Label>
                         <Input
                             id="imageUrl"
-                            className="text-slate-900"
+                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
                             value={data.imageUrl}
                             onChange={(e) => updateData({ imageUrl: e.target.value })}
                             placeholder="https://..."
