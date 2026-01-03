@@ -27,9 +27,17 @@ export default async function PenNamesPage() {
         <div className="container py-10 px-4">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-white">Pen Names</h1>
+            </div>
+
+            {/* Permanent Action Button */}
+            <div className="mb-8 p-6 bg-slate-900/50 border border-slate-800 rounded-lg flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-semibold text-white">Manage Author Identities</h2>
+                    <p className="text-slate-400">Add a new pen name to publish under multiple aliases.</p>
+                </div>
                 <Link href="/admin/pen-names/new">
-                    <Button className="gap-2">
-                        <Plus className="h-4 w-4" /> Create Pen Name
+                    <Button size="lg" className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-8 shadow-lg shadow-cyan-900/20">
+                        Create New Pen Name
                     </Button>
                 </Link>
             </div>
