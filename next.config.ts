@@ -15,4 +15,5 @@ const nextConfig: NextConfig = {
   },
 };
 
+// Forced rebuild for Vercel
 export default nextConfig;
