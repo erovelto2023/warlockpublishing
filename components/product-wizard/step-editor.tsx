@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useEffect } from "react"
 import { EbookTemplateRenderer } from "../templates/ebook/EbookTemplateRenderer"
 import { ThankYouTemplateRenderer } from "../templates/thankyou/ThankYouTemplateRenderer"
+import { AmazonTemplateRenderer } from "../templates/amazon/AmazonTemplateRenderer"
 import { TEMPLATE_CONFIGS } from "./ebook-templates-config"
 
 interface StepEditorProps {
@@ -245,9 +246,23 @@ const THANK_YOU_BLOCKS = [
     },
 ]
 
+// Default configuration for Amazon Product Template
+const AMAZON_BLOCKS = [
+    {
+        id: "details", label: "Amazon Details", fields: [
+            { name: "subheadline", label: "Subheadline", type: "textarea", default: "" },
+            { name: "rating", label: "Rating (0-5)", type: "text", default: "4.5" },
+            { name: "reviewCount", label: "Review Count", type: "text", default: "120" },
+            { name: "features", label: "Key Features (One per line)", type: "textarea", default: "" },
+        ]
+    }
+]
+
 export function StepEditor({ data, updateData }: StepEditorProps) {
     // Determine which blocks to use based on product type
-    let currentBlocksConfig = data.productType === 'ebook' ? EBOOK_BLOCKS : SOFTWARE_BLOCKS;
+    let currentBlocksConfig = data.productType === 'ebook' ? EBOOK_BLOCKS :
+        data.productType === 'amazon' ? AMAZON_BLOCKS :
+            SOFTWARE_BLOCKS;
 
     // Check if a specific template config exists
     if (data.productType === 'ebook' && data.templateId && TEMPLATE_CONFIGS[data.templateId]) {
@@ -261,7 +276,7 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
 
     // Initialize or sync contentData
     useEffect(() => {
-        if (data.productType === 'software' || data.productType === 'ebook' || data.pageType === 'thankyou') {
+        if (data.productType === 'software' || data.productType === 'ebook' || data.productType === 'amazon' || data.pageType === 'thankyou') {
             const currentBlocks = data.contentData?.blocks || [];
 
             // Map over the CONFIG to ensure we have all blocks in the correct order
@@ -335,10 +350,10 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
         )
     }
 
-    if (data.productType !== 'software' && data.productType !== 'ebook' && data.pageType !== 'thankyou') {
+    if (data.productType !== 'software' && data.productType !== 'ebook' && data.productType !== 'amazon' && data.pageType !== 'thankyou') {
         return (
             <div className="text-center py-12">
-                <p className="text-slate-500">Visual editor is currently only available for Software, Ebook, and Thank You page templates.</p>
+                <p className="text-slate-500">Visual editor is currently only available for Software, Ebook, Amazon, and Thank You page templates.</p>
                 <p className="text-sm text-slate-400 mt-2">You can continue to the next step.</p>
             </div>
         )
@@ -429,6 +444,15 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
                         <ThankYouTemplateRenderer contentData={data.contentData} />
                     ) : data.productType === 'ebook' ? (
                         <EbookTemplateRenderer contentData={data.contentData} />
+                    ) : data.productType === 'amazon' ? (
+                        // Mocking image/title/desc here as they are top-level wizard fields, not block fields
+                        <AmazonTemplateRenderer
+                            contentData={data.contentData?.blocks?.find((b: any) => b.id === 'details')?.data || {}}
+                            amazonLink={data.amazonLink}
+                            title={data.title || "Product Title"}
+                            description={data.description || "Product description..."}
+                            imageUrl={data.imageUrl}
+                        />
                     ) : (
                         /* Placeholder for software preview or fallback */
                         <div className="p-8 text-center space-y-8">
