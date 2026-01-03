@@ -13,14 +13,21 @@ interface AmazonTemplateRendererProps {
 }
 
 export function AmazonTemplateRenderer({ contentData, amazonLink, title, description, imageUrl }: AmazonTemplateRendererProps) {
-    // Default data if contentData is missing or partial
+    // Default data if contentData is missing or partial, but NO default values for fields user wants to control
     const data = {
-        subheadline: contentData?.subheadline || "A compelling subtitle that explains the main benefit.",
-        features: contentData?.features || ["Feature 1", "Feature 2", "Feature 3"],
-        rating: contentData?.rating || 4.5,
-        reviewCount: contentData?.reviewCount || 120,
+        subheadline: contentData?.subheadline || "",
+        features: contentData?.features || [],
+        rating: contentData?.rating || "",
+        reviewCount: contentData?.reviewCount || "",
         ...contentData
     };
+
+    // Parse features if it's a string (from textarea)
+    const featuresList = Array.isArray(data.features)
+        ? data.features
+        : typeof data.features === 'string'
+            ? data.features.split('\n').filter((f: string) => f.trim() !== '')
+            : [];
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
@@ -55,32 +62,43 @@ export function AmazonTemplateRenderer({ contentData, amazonLink, title, descrip
 
                         {/* Content Section */}
                         <div className="p-8 md:p-12 flex flex-col justify-center">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="flex text-yellow-400">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`w-5 h-5 ${i < Math.floor(data.rating) ? "fill-current" : "text-slate-300"}`} />
-                                    ))}
+
+                            {/* Reviews - Conditional */}
+                            {(data.reviewCount || data.rating) && (
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="flex text-yellow-400">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star key={i} className={`w-5 h-5 ${i < Math.floor(Number(data.rating || 0)) ? "fill-current" : "text-slate-300"}`} />
+                                        ))}
+                                    </div>
+                                    {data.reviewCount && <span className="text-sm text-slate-500 font-medium">({data.reviewCount} reviews)</span>}
                                 </div>
-                                <span className="text-sm text-slate-500 font-medium">({data.reviewCount} reviews)</span>
-                            </div>
+                            )}
 
                             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">
                                 {title}
                             </h1>
-                            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                                {data.subheadline}
-                            </p>
 
-                            <div className="space-y-3 mb-8">
-                                {data.features.map((feature: string, idx: number) => (
-                                    <div key={idx} className="flex items-start gap-3">
-                                        <div className="mt-1 bg-green-100 text-green-700 rounded-full p-1">
-                                            <Check className="w-3 h-3" />
+                            {/* Subheadline - Conditional */}
+                            {data.subheadline && (
+                                <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                                    {data.subheadline}
+                                </p>
+                            )}
+
+                            {/* Features - Conditional */}
+                            {featuresList.length > 0 && (
+                                <div className="space-y-3 mb-8">
+                                    {featuresList.map((feature: string, idx: number) => (
+                                        <div key={idx} className="flex items-start gap-3">
+                                            <div className="mt-1 bg-green-100 text-green-700 rounded-full p-1">
+                                                <Check className="w-3 h-3" />
+                                            </div>
+                                            <span className="text-slate-700">{feature}</span>
                                         </div>
-                                        <span className="text-slate-700">{feature}</span>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
 
                             <div className="pt-6 border-t border-slate-100">
                                 <Link href={amazonLink || "#"} target="_blank" className="block">
@@ -98,7 +116,7 @@ export function AmazonTemplateRenderer({ contentData, amazonLink, title, descrip
 
                     {/* Description / Review Body */}
                     <div className="p-8 md:p-12 border-t border-slate-100 bg-slate-50/50">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6">Our Verdict</h2>
+                        {/* 'Our Verdict' removed as requested */}
                         <div className="prose max-w-none text-slate-700">
                             <ReactMarkdown>{description}</ReactMarkdown>
                         </div>
