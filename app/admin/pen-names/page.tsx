@@ -51,8 +51,8 @@ export default async function PenNamesPage() {
                                     <div className="flex flex-col items-center gap-4">
                                         <p className="text-lg font-medium text-slate-300">No pen names found.</p>
                                         <Link href="/admin/pen-names/new">
-                                            <Button variant="outline" className="gap-2 border-slate-700 text-slate-200 hover:bg-slate-800 hover:text-white">
-                                                <Plus className="h-4 w-4" /> Create your first pen name
+                                            <Button size="lg" className="gap-2 bg-gradient-to-r from-cyan-600 to-purple-600 text-white font-bold px-8 py-6 text-lg hover:from-cyan-500 hover:to-purple-500 shadow-lg shadow-cyan-900/20">
+                                                <Plus className="h-6 w-6" /> Create Your First Pen Name
                                             </Button>
                                         </Link>
                                     </div>
