@@ -329,6 +329,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                             </td>
                                             <td className="px-6 py-4 font-bold text-slate-700">${product.price}</td>
                                             <td className="px-6 py-4 text-right space-x-2">
+                                                <a href={`/products/${product.slug}`} target="_blank" className="inline-block p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"><Eye size={16} /></a>
                                                 <button onClick={() => copyToClipboard(`${window.location.origin}/products/${product.slug}`)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><LinkIcon size={16} /></button>
                                                 <button onClick={() => router.push(`/admin/products/${product._id}/edit`)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"><Edit size={16} /></button>
                                                 <button onClick={() => handleDelete('product', product._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
