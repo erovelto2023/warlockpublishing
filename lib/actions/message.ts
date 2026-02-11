@@ -139,6 +139,14 @@ export async function markMessageAsRead(messageId: string) {
     revalidatePath('/dashboard');
 }
 
+export async function updateMessage(messageId: string, data: any) {
+    await connectToDatabase();
+    const updated = await Message.findByIdAndUpdate(messageId, data, { new: true });
+    revalidatePath('/admin/messages');
+    revalidatePath('/dashboard');
+    return serializeMessage(updated);
+}
+
 export async function deleteMessage(messageId: string) {
     await connectToDatabase();
     await Message.findByIdAndDelete(messageId);

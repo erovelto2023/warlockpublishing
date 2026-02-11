@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare,
-    Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check
+    Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check, X, Mail
 } from 'lucide-react';
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage } from '@/lib/actions/sales-page.actions';
+import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 
 interface AdminDashboardProps {
     products: any[];
@@ -29,12 +30,17 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const totalViews = offers.reduce((acc, curr) => acc + (curr.views || 0), 0);
     const totalProducts = products.length;
     const totalPosts = blogPosts.length;
-    const pendingMessages = messages.filter(m => !m.read).length;
+    const pendingMessages = messages.filter(m => !m.isRead).length;
 
     // View State for Sub-Tabs
     const [offerView, setOfferView] = useState<'list' | 'create'>('list');
 
-    const handleDelete = async (type: 'product' | 'post' | 'pen_name' | 'offer', id: string) => {
+    // Message View State
+    const [viewingMessage, setViewingMessage] = useState<any | null>(null);
+    const [isEditingMessage, setIsEditingMessage] = useState(false);
+    const [editMessageContent, setEditMessageContent] = useState('');
+
+    const handleDelete = async (type: 'product' | 'post' | 'pen_name' | 'offer' | 'message', id: string) => {
         if (!confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) return;
 
         try {
@@ -42,6 +48,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             if (type === 'post') await deletePost(id);
             if (type === 'pen_name') await deletePenName(id);
             if (type === 'offer') await deleteSalesPage(id);
+            if (type === 'message') {
+                await deleteMessage(id);
+                if (viewingMessage?._id === id) setViewingMessage(null);
+            }
             alert('Deleted successfully');
             router.refresh();
         } catch (e) {
@@ -52,6 +62,34 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         alert('Copied to clipboard!');
+    };
+
+    const handleViewMessage = async (msg: any) => {
+        setViewingMessage(msg);
+        setIsEditingMessage(false);
+        if (!msg.isRead) {
+            await markMessageAsRead(msg._id);
+            router.refresh();
+        }
+    };
+
+    const handleEditMessage = (msg: any) => {
+        setViewingMessage(msg);
+        setEditMessageContent(msg.content);
+        setIsEditingMessage(true);
+    };
+
+    const handleSaveMessage = async () => {
+        if (!viewingMessage) return;
+        try {
+            await updateMessage(viewingMessage._id, { content: editMessageContent });
+            alert('Message updated successfully');
+            setIsEditingMessage(false);
+            setViewingMessage({ ...viewingMessage, content: editMessageContent });
+            router.refresh();
+        } catch (e) {
+            alert('Error updating message');
+        }
     };
 
     return (
@@ -316,7 +354,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </button>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {penNames.map(pen => (
+                            {penNames.map((pen: any) => (
                                 <div key={pen._id} className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow group relative">
                                     <div className="w-20 h-20 bg-slate-100 rounded-full mb-4 overflow-hidden border-2 border-white shadow-sm group-hover:scale-105 transition-transform">
                                         {pen.avatarUrl ? (
@@ -393,21 +431,93 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">From</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Subject</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Date</th>
+                                        <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {messages.map((msg: any) => (
-                                        <tr key={msg._id} className="hover:bg-slate-50/80 transition-colors">
+                                        <tr key={msg._id} className={`hover:bg-slate-50/80 transition-colors ${!msg.isRead ? 'bg-blue-50/30' : ''}`}>
                                             <td className="px-6 py-4 font-medium text-slate-900">
-                                                {msg.senderName}
-                                                <div className="text-[10px] text-slate-400 font-normal">{msg.senderEmail}</div>
+                                                <div className="flex items-center gap-2">
+                                                    {!msg.isRead && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                                                    <div>
+                                                        {msg.senderName}
+                                                        <div className="text-[10px] text-slate-400 font-normal">{msg.senderEmail}</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 text-slate-700 text-sm">{msg.subject}</td>
+                                            <td className="px-6 py-4 text-slate-700 text-sm font-medium">{msg.subject}</td>
                                             <td className="px-6 py-4 text-slate-500 text-sm">{new Date(msg.createdAt).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-right space-x-2">
+                                                <button onClick={() => handleViewMessage(msg)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Read Message">
+                                                    <Eye size={16} />
+                                                </button>
+                                                <button onClick={() => handleEditMessage(msg)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all" title="Edit Message Content">
+                                                    <Edit size={16} />
+                                                </button>
+                                                <button onClick={() => handleDelete('message', msg._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Delete Message">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Message Detail Modal */}
+                {viewingMessage && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+                            <div className="p-6 border-b border-slate-100 flex justify-between items-start">
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-900 mb-1">{isEditingMessage ? 'Edit Message' : viewingMessage.subject}</h3>
+                                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                                        <Mail size={14} />
+                                        <span>{viewingMessage.senderName} &lt;{viewingMessage.senderEmail}&gt;</span>
+                                        <span className="text-slate-300">•</span>
+                                        <span>{new Date(viewingMessage.createdAt).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                <button onClick={() => { setViewingMessage(null); setIsEditingMessage(false); }} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="p-6 flex-1 text-slate-700 whitespace-pre-wrap leading-relaxed">
+                                {isEditingMessage ? (
+                                    <textarea
+                                        className="w-full h-64 p-4 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none font-mono text-sm"
+                                        value={editMessageContent}
+                                        onChange={(e) => setEditMessageContent(e.target.value)}
+                                    />
+                                ) : (
+                                    viewingMessage.content
+                                )}
+                            </div>
+
+                            <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                                {isEditingMessage ? (
+                                    <>
+                                        <button onClick={() => setIsEditingMessage(false)} className="px-4 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 rounded-lg transition-colors">Cancel</button>
+                                        <button onClick={handleSaveMessage} className="px-4 py-2 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">Save Changes</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button onClick={() => handleDelete('message', viewingMessage._id)} className="px-4 py-2 text-red-600 font-bold text-sm hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2">
+                                            <Trash2 size={16} /> Delete
+                                        </button>
+                                        <button onClick={() => handleEditMessage(viewingMessage)} className="px-4 py-2 text-slate-600 font-bold text-sm hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-2">
+                                            <Edit size={16} /> Edit
+                                        </button>
+                                        <button onClick={() => { setViewingMessage(null); }} className="px-4 py-2 bg-slate-900 text-white font-bold text-sm rounded-lg hover:bg-slate-800 transition-colors">
+                                            Close
+                                        </button>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
