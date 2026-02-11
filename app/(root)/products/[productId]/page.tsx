@@ -28,10 +28,21 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
     // Check for Custom HTML first
     if (product.htmlContent) {
         return (
-            <div className="container py-10 px-4">
+            <>
+                {/* 
+                  This style tag is a server-side hack to hide the LayoutShell chrome 
+                  specifically for this page type, without needing complex layout restructuring.
+                  It targets the IDs added to LayoutShell.
+                */}
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    #site-navbar-wrapper, #site-footer-wrapper { display: none !important; }
+                    main { flex: 1 1 auto; display: block; width: 100%; }
+                `}} />
+
                 <GrooveSellTracking id={product.grooveSellId} />
                 <div dangerouslySetInnerHTML={{ __html: product.htmlContent }} />
-            </div>
+            </>
         );
     }
 
