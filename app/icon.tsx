@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 // Route segment config
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 // Image metadata
 export const size = {
@@ -9,6 +9,7 @@ export const size = {
     height: 32,
 }
 export const contentType = 'image/png'
+export const alt = 'Warlock Publishing Favicon'
 
 // Image generation
 export default function Icon() {
