@@ -1,4 +1,4 @@
-import SalesPageForm from '@/components/admin/SalesPageForm';
+import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import { getSalesPageById } from '@/lib/actions/sales-page.actions';
 import { isAdmin } from '@/lib/admin';
 import { notFound, redirect } from 'next/navigation';
@@ -15,7 +15,11 @@ export default async function EditOfferPage({ params }: { params: Promise<{ id: 
     return (
         <div className="container py-10">
             <h1 className="text-3xl font-bold mb-8">Edit Offer: {page.title}</h1>
-            <SalesPageForm initialData={page} />
+            {/* 
+              User requested to keep the simple "Offer Builder" form for editing.
+              We are using SimplePageBuilder with initialData.
+            */}
+            <SimplePageBuilder initialData={page} />
         </div>
     );
 }

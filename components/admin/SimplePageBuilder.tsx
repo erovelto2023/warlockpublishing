@@ -1,30 +1,51 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createOrUpdateSalesPage } from '@/lib/actions/sales-page.actions';
-import { Info, Plus, Loader2 } from 'lucide-react';
+import { Info, Plus, Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-export default function SimplePageBuilder({ onSuccess }: { onSuccess: () => void }) {
-    const [slug, setSlug] = useState('');
-    const [content, setContent] = useState('');
+interface SimplePageBuilderProps {
+    onSuccess?: () => void; // Made optional
+    initialData?: {
+        _id?: string;
+        title?: string;
+        slug?: string;
+        bodyCode?: string;
+    };
+}
+
+export default function SimplePageBuilder({ onSuccess, initialData }: SimplePageBuilderProps) {
+    const [slug, setSlug] = useState(initialData?.slug || '');
+    const [content, setContent] = useState(initialData?.bodyCode || '');
     const [isSaving, setIsSaving] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (initialData) {
+            setSlug(initialData.slug || '');
+            setContent(initialData.bodyCode || '');
+        }
+    }, [initialData]);
 
     const handlePublish = async () => {
         if (!content) return alert("Please add some content.");
 
         setIsSaving(true);
         try {
-            // Auto-generate title from H1 if present, else use slug
-            let title = slug || 'Untitled Offer';
-            const h1Match = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
-            if (h1Match) title = h1Match[1];
+            // Auto-generate title from H1 if present, else use slug, or keep existing title
+            let title = initialData?.title || slug || 'Untitled Offer';
+
+            // Only try to extract H1 if we don't have a title or if we are creating new
+            if (!initialData?.title) {
+                const h1Match = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
+                if (h1Match) title = h1Match[1];
+            }
 
             // Clean slug
             const finalSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || title.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
-            const result = await createOrUpdateSalesPage(null, {
+            const result = await createOrUpdateSalesPage(initialData?._id || null, {
                 title,
                 slug: finalSlug,
                 bodyCode: content,
@@ -33,10 +54,17 @@ export default function SimplePageBuilder({ onSuccess }: { onSuccess: () => void
             });
 
             if (result.success) {
-                alert(`✅ Page published: /offers/${finalSlug}`);
-                setSlug('');
-                setContent('');
-                onSuccess();
+                alert(initialData?._id ? '✅ Offer updated successfully!' : `✅ Page published: /offers/${finalSlug}`);
+                if (!initialData) {
+                    setSlug('');
+                    setContent('');
+                }
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    router.refresh();
+                    router.push('/admin'); // Redirect back to admin on save if no onSuccess provided
+                }
             } else {
                 alert("Error: " + result.error);
             }
@@ -49,12 +77,14 @@ export default function SimplePageBuilder({ onSuccess }: { onSuccess: () => void
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             {/* Info Banner */}
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
                 <Info className="text-blue-600 shrink-0 mt-0.5" size={18} />
                 <div>
-                    <h4 className="text-sm font-bold text-blue-800">Instant Publish Mode</h4>
+                    <h4 className="text-sm font-bold text-blue-800">
+                        {initialData ? 'Simple Editor Mode' : 'Instant Publish Mode'}
+                    </h4>
                     <p className="text-xs text-blue-600 mt-1">
                         Offers are stored in the database and published instantly. No build required. Supports full HTML content.
                     </p>
@@ -99,9 +129,9 @@ export default function SimplePageBuilder({ onSuccess }: { onSuccess: () => void
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 shadow-lg shadow-blue-200"
                 >
                     {isSaving ? (
-                        <><Loader2 size={16} className="animate-spin" /> Publishing...</>
+                        <><Loader2 size={16} className="animate-spin" /> {initialData ? 'Saving...' : 'Publishing...'}</>
                     ) : (
-                        <><Plus size={16} /> Publish Page</>
+                        <>{initialData ? <Save size={16} /> : <Plus size={16} />} {initialData ? 'Update Offer' : 'Publish Page'}</>
                     )}
                 </button>
             </div>
