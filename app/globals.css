@@ -48,48 +48,55 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: #0f172a;
-  /* slate-900 */
+  --radius: 1rem;
+  /* Deep, rich midnight background */
+  --background: #020617; 
   --foreground: #f8fafc;
-  /* slate-50 */
-  --card: #1e293b;
-  /* slate-800 */
+  
+  /* Cards with subtle glass depth */
+  --card: #0f172a;
   --card-foreground: #f8fafc;
-  --popover: #0f172a;
+  
+  --popover: #020617;
   --popover-foreground: #f8fafc;
-  --primary: #06b6d4;
-  /* cyan-500 */
-  --primary-foreground: #0f172a;
+  
+  /* Vibrant, premium primary (Cyan to Indigo shift) */
+  --primary: #22d3ee; 
+  --primary-foreground: #020617;
+  
+  /* Soft, elevated secondary */
   --secondary: #1e293b;
-  /* slate-800 */
   --secondary-foreground: #f8fafc;
+  
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
-  /* slate-400 */
+  
   --accent: #1e293b;
-  --accent-foreground: #06b6d4;
+  --accent-foreground: #22d3ee;
+  
   --destructive: #ef4444;
-  --border: #334155;
-  /* slate-700 */
-  --input: #334155;
-  --ring: #06b6d4;
-  --chart-1: #06b6d4;
-  --chart-2: #a855f7;
-  /* purple-500 */
-  --chart-3: #ec4899;
-  /* pink-500 */
-  --chart-4: #eab308;
-  --chart-5: #22c55e;
-  --sidebar: #0f172a;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #22d3ee;
+  
+  /* Chart colors with more vibrance */
+  --chart-1: #22d3ee;
+  --chart-2: #818cf8;
+  --chart-3: #f472b6;
+  --chart-4: #fbbf24;
+  --chart-5: #34d399;
+  
+  /* Sidebar refined */
+  --sidebar: #020617;
   --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #06b6d4;
-  --sidebar-primary-foreground: #0f172a;
+  --sidebar-primary: #22d3ee;
+  --sidebar-primary-foreground: #020617;
   --sidebar-accent: #1e293b;
-  --sidebar-accent-foreground: #06b6d4;
-  --sidebar-border: #334155;
-  --sidebar-ring: #06b6d4;
+  --sidebar-accent-foreground: #22d3ee;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #22d3ee;
 }
+
 
 @layer base {
   * {
@@ -97,11 +104,30 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20;
   }
 }
 
 @layer utilities {
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 8s linear infinite;
+  }
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+  }
+
   .container {
     width: 100%;
     margin-left: auto;
@@ -109,6 +135,7 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+
 
   @media (min-width: 640px) {
     .container {

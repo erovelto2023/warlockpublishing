@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/navbar";
@@ -9,7 +9,8 @@ import { Suspense } from "react";
 
 import { LayoutShell } from "@/components/layout-shell";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "Warlock Publishing",
@@ -25,15 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         </head>
-        <body className={inter.className} suppressHydrationWarning>
+        <body className={`${outfit.className} antialiased bg-background text-foreground`} suppressHydrationWarning>
           <LayoutShell
             navbar={
-              <Suspense fallback={<div className="h-16 border-b bg-background/95 backdrop-blur" />}>
+              <Suspense fallback={<div className="h-20 border-b bg-background/95 backdrop-blur-md" />}>
                 <Navbar />
               </Suspense>
             }
@@ -47,3 +48,4 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+

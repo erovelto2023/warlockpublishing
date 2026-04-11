@@ -13,19 +13,29 @@ export function NavbarAuth() {
     }, []);
 
     if (!isMounted) {
-        return <div className="min-h-[40px] min-w-[40px]" />;
+        return <div className="h-10 w-24" />;
     }
 
     return (
-        <div className="min-h-[40px] min-w-[40px] flex items-center justify-end">
+        <div className="flex items-center justify-end">
             <SignedOut>
                 <SignInButton mode="modal">
-                    <Button variant="ghost">Sign In</Button>
+                    <Button variant="ghost" className="text-slate-400 hover:text-white transition-all text-xs font-bold uppercase tracking-widest">
+                        Sign In
+                    </Button>
                 </SignInButton>
             </SignedOut>
             <SignedIn>
-                <UserButton afterSignOutUrl="/" />
+                <UserButton 
+                    afterSignOutUrl="/" 
+                    appearance={{
+                        elements: {
+                            userButtonAvatarBox: "w-9 h-9 border border-white/10 rounded-xl"
+                        }
+                    }}
+                />
             </SignedIn>
         </div>
     );
 }
+
