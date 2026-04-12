@@ -520,13 +520,15 @@ export async function backfillAffiliateTags(affiliateId: string = "weightlo0f57d
     return { success: true, updatedCount };
 }
 
-export async function verifyYouTubeLinksBatch() {
+export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
     await connectToDatabase();
     const terms = await GlossaryTerm.find({ 
         $or: [{ "youtubeVideo.url": { $ne: "" } }, { "videoUrl": { $ne: "" } }] 
     });
     
     const broken: any[] = [];
+    let updatedCount = 0;
+
     for (const term of terms) {
         const url = term.youtubeVideo?.url || term.videoUrl;
         if (!url) continue;
@@ -534,14 +536,59 @@ export async function verifyYouTubeLinksBatch() {
         try {
             const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
             if (res.status === 404 || res.status === 400) {
-                broken.push({ id: term._id.toString(), term: term.term, url });
+                let fixed = false;
+                
+                if (autoFix) {
+                    try {
+                        const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(term.term + " explanation")}`, {
+                            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+                        });
+                        const html = await searchRes.text();
+                        const match = html.match(/ytInitialData\s*=\s*({.+?});/);
+                        if (match) {
+                            const data = JSON.parse(match[1]);
+                            const contents = data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents || [];
+                            for (const item of contents) {
+                                if (item.videoRenderer) {
+                                    const newUrl = `https://www.youtube.com/watch?v=${item.videoRenderer.videoId}`;
+                                    const title = item.videoRenderer.title?.runs?.[0]?.text || '';
+                                    const channel = item.videoRenderer.ownerText?.runs?.[0]?.text || '';
+                                    
+                                    term.videoUrl = newUrl;
+                                    term.youtubeVideo = {
+                                        ...(term.youtubeVideo || {}),
+                                        url: newUrl,
+                                        title: title,
+                                        channel: channel
+                                    };
+                                    
+                                    await term.save();
+                                    fixed = true;
+                                    updatedCount++;
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (searchError) {
+                        console.error('Failed to auto-fix video for', term.term);
+                    }
+                }
+                
+                if (!fixed) {
+                    broken.push({ id: term._id.toString(), term: term.term, url });
+                }
             }
         } catch (e) {
             // Network error or timeout, skip for now
         }
     }
     
-    return { success: true, broken };
+    if (autoFix && updatedCount > 0) {
+        revalidatePath('/admin/glossary');
+        revalidatePath('/glossary');
+    }
+    
+    return { success: true, updatedCount, broken: broken.length > 0 ? broken : undefined };
 }
 
 export async function getGlossaryHealthData() {

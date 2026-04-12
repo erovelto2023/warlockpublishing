@@ -28,6 +28,7 @@ export default function GlossaryMaintenance() {
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
     const [healthData, setHealthData] = useState<any>(null);
+    const [autoFixVideos, setAutoFixVideos] = useState(false);
 
     const handleAction = async (actionFn: () => Promise<any>, successMsg: string) => {
         setIsLoading(true);
@@ -111,6 +112,19 @@ export default function GlossaryMaintenance() {
             )}
 
             {/* Actions Grid */}
+            <div className="flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                <input 
+                    type="checkbox" 
+                    id="autoFixVideos"
+                    checked={autoFixVideos}
+                    onChange={(e) => setAutoFixVideos(e.target.checked)}
+                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                />
+                <label htmlFor="autoFixVideos" className="text-xs font-bold text-slate-600 uppercase tracking-widest">
+                    Auto-Replace Broken Videos
+                </label>
+            </div>
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <MaintenanceCard 
                     icon={<Trash2 size={20} />}
@@ -138,8 +152,8 @@ export default function GlossaryMaintenance() {
                 <MaintenanceCard 
                     icon={<Youtube size={20} />}
                     title="Video Audit"
-                    description="Pings YouTube API to check for broken/missing video embeds."
-                    action={() => handleAction(verifyYouTubeLinksBatch, "Video audit complete")}
+                    description="Pings YouTube API to check for broken/missing embeds."
+                    action={() => handleAction(() => verifyYouTubeLinksBatch(autoFixVideos), "Video audit complete")}
                     disabled={isLoading}
                 />
                 <MaintenanceCard 

@@ -190,6 +190,7 @@ OUTPUT REQUIREMENTS:
 3. QUOTE ALL KEYS.
 4. NO TRAILING COMMAS.
 5. Nested fields like "relatedKeywords" must be real JSON arrays, not strings containing JSON.
+6. For "youtubeVideo", ONLY provide URLs that are LIVE, PUBLIC, and currently accessible. Do NOT guess or use placeholder IDs.
 
 SCHEMA STRUCTURE:
 {
