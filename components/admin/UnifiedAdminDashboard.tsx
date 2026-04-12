@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare, BookOpen,
+    Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare, BookOpen, Image,
     Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check, X, Mail
 } from 'lucide-react';
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import GlossaryTable from '@/components/admin/GlossaryTable';
+import MediaLibrary from '@/components/admin/MediaLibrary';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -25,7 +26,7 @@ interface AdminDashboardProps {
 }
 
 export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [] }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media'>('overview');
     const router = useRouter();
 
     // Stats
@@ -126,6 +127,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'pen_names', label: 'Pen Names', icon: Users },
                             { id: 'blog', label: 'Blog Posts', icon: FileText },
                             { id: 'glossary', label: 'Glossary', icon: BookOpen },
+                            { id: 'media', label: 'Media', icon: Image },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
                         ].map((tab) => (
                             <button
