@@ -535,7 +535,8 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
         
         try {
             const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
-            if (res.status === 404 || res.status === 400) {
+            // 404 = Deleted/Not Found, 401 = Private/Unauthorized, 403 = Forbidden, 400 = Bad Request
+            if (res.status === 404 || res.status === 400 || res.status === 401 || res.status === 403) {
                 let fixed = false;
                 
                 if (autoFix) {
@@ -561,7 +562,7 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
                                         title: title,
                                         channel: channel
                                     };
-                                    
+                                    term.markModified('youtubeVideo');
                                     await term.save();
                                     fixed = true;
                                     updatedCount++;
@@ -581,6 +582,11 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
         } catch (e) {
             // Network error or timeout, skip for now
         }
+    }
+    
+    if (autoFix && updatedCount > 0) {
+        revalidatePath('/admin/glossary');
+        revalidatePath('/glossary');
     }
     
     if (autoFix && updatedCount > 0) {
