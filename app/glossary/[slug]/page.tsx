@@ -1,6 +1,5 @@
 import React from 'react';
 import { getGlossaryTermBySlug, getRelatedGlossaryTerms, trackGlossaryView } from '@/lib/actions/glossary';
-import { getPublishedProducts } from '@/lib/actions/product.actions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
@@ -11,7 +10,6 @@ import {
   ListChecks, PieChart, UserCheck, ChevronRight, BookDashed
 } from 'lucide-react';
 import StructuredData from '@/components/glossary/StructuredData';
-import RotatingAffiliateBanner from '@/components/glossary/RotatingAffiliateBanner';
 import CopyPromptButton from '@/components/glossary/CopyPromptButton';
 import PrintButton from '@/components/glossary/PrintButton';
 
@@ -20,12 +18,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const term = await getGlossaryTermBySlug(params.slug);
     if (!term) return notFound();
 
-    const [relatedTerms, products] = await Promise.all([
-        getRelatedGlossaryTerms(term.category || 'General', term.slug),
-        getPublishedProducts()
-    ]);
-
-    const featuredProduct = products.find((p: any) => p._id.toString() === term.marketplaceProduct?.productId) || products[0];
+    const relatedTerms = await getRelatedGlossaryTerms(term.category || 'General', term.slug);
 
     // Fire-and-forget view tracking (non-blocking)
     void trackGlossaryView(params.slug);
@@ -586,12 +579,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
             </div>
 
-            {/* Global Context Footer */}
-            <div className="max-w-[1440px] mx-auto px-4 md:px-8 pb-32 no-print">
-                <div className="pt-20 border-t border-slate-200">
-                    <RotatingAffiliateBanner products={products} />
-                </div>
-            </div>
+
 
         </div>
     );

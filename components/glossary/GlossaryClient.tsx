@@ -14,8 +14,9 @@ import {
     ChevronRight,
     Brain,
 } from "lucide-react";
+
 import TagCloud from "./TagCloud";
-import RotatingAffiliateBanner from "./RotatingAffiliateBanner";
+
 
 interface Term {
     _id: string;
@@ -33,19 +34,9 @@ interface Term {
     };
 }
 
-interface Product {
-    _id: string;
-    title: string;
-    description: string;
-    imageUrl?: string;
-    slug: string;
-    amazonLink?: string;
-}
-
 interface GlossaryClientProps {
     initialTerms: Term[];
     categories: string[];
-    products?: Product[];
 }
 
 function GlossaryClientInner({ initialTerms, categories, products = [] }: GlossaryClientProps) {
@@ -207,14 +198,7 @@ function GlossaryClientInner({ initialTerms, categories, products = [] }: Glossa
                     </div>
                 </div>
 
-                {/* Strategic Partnerships */}
-                <div className="bg-slate-900 p-12 rounded-[2rem] border border-slate-900 flex flex-col justify-center relative overflow-hidden shadow-2xl shadow-slate-900/20">
-                    <div className="absolute -top-12 -right-12 p-10 opacity-[0.07] rotate-[15deg] text-indigo-400 pointer-events-none"><Zap size={240} /></div>
-                    <div className="relative z-10 h-full">
-                        <span className="inline-block px-4 py-1.5 bg-indigo-900 text-indigo-300 text-[10px] font-bold uppercase tracking-widest rounded-xl mb-8">Ecosystem Leverage</span>
-                        <RotatingAffiliateBanner products={products} />
-                    </div>
-                </div>
+
             </div>
 
             {/* Main Vocabulary Grid */}

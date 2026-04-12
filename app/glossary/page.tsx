@@ -1,5 +1,4 @@
 import { getGlossaryTerms, getGlossaryCategories } from "@/lib/actions/glossary";
-import { getPublishedProducts } from "@/lib/actions/product.actions";
 import GlossaryClient from "@/components/glossary/GlossaryClient";
 import { BookOpen } from "lucide-react";
 
@@ -12,12 +11,11 @@ export default async function GlossaryPage() {
     try {
         const terms = (await getGlossaryTerms()) as any[];
         const categories = await getGlossaryCategories();
-        const products = (await getPublishedProducts()) as any[];
 
         return (
         <div className="min-h-screen bg-slate-200 pt-24">
             <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-                <GlossaryClient initialTerms={terms} categories={categories} products={products} />
+                <GlossaryClient initialTerms={terms} categories={categories} />
             </div>
         </div>
         );
