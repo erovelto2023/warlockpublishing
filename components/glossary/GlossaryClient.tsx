@@ -39,7 +39,7 @@ interface GlossaryClientProps {
     categories: string[];
 }
 
-function GlossaryClientInner({ initialTerms, categories, products = [] }: GlossaryClientProps) {
+function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) {
     const [search, setSearch] = useState("");
     const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
