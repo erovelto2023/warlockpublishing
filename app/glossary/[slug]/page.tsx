@@ -1,5 +1,5 @@
 import React from 'react';
-import { getGlossaryTermBySlug, getRelatedGlossaryTerms } from '@/lib/actions/glossary';
+import { getGlossaryTermBySlug, getRelatedGlossaryTerms, trackGlossaryView } from '@/lib/actions/glossary';
 import { getPublishedProducts } from '@/lib/actions/product.actions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -26,6 +26,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     ]);
 
     const featuredProduct = products.find((p: any) => p._id.toString() === term.marketplaceProduct?.productId) || products[0];
+
+    // Fire-and-forget view tracking (non-blocking)
+    void trackGlossaryView(params.slug);
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 pb-20">

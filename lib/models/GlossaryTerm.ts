@@ -186,7 +186,8 @@ const GlossaryTermSchema = new Schema({
     isPublished: { type: Boolean, default: true },
     imageUrl: { type: String },
     lastUpdated: { type: Date, default: Date.now },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    viewCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
 GlossaryTermSchema.pre('save', async function () {

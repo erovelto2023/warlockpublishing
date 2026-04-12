@@ -220,7 +220,7 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                                         {term.category}
                                     </td>
                                     <td className="px-6 py-4 font-semibold text-slate-600 text-sm">
-                                        {term.views || 0}
+                                        {term.viewCount || 0}
                                     </td>
                                     <td className="px-6 py-4 text-xs font-mono text-slate-400 group-hover:text-blue-500 transition-colors">
                                         /glossary/{term.slug}

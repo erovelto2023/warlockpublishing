@@ -29,6 +29,32 @@ function serializeTerm(term: any) {
     return JSON.parse(JSON.stringify(term));
 }
 
+// Normalize any YouTube URL format to a standard watch URL
+function normalizeYouTubeUrl(url: string): string | null {
+    if (!url) return null;
+    // Already a full watch URL
+    if (url.includes('youtube.com/watch')) return url;
+    // youtu.be short link
+    const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
+    if (shortMatch) return `https://www.youtube.com/watch?v=${shortMatch[1]}`;
+    // youtube.com/embed/ID
+    const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
+    if (embedMatch) return `https://www.youtube.com/watch?v=${embedMatch[1]}`;
+    // Raw video ID (11 alphanumeric chars)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url.trim())) return `https://www.youtube.com/watch?v=${url.trim()}`;
+    // Unknown format – return as-is and let oEmbed decide
+    return url;
+}
+
+export async function trackGlossaryView(slug: string) {
+    try {
+        await connectToDatabase();
+        await GlossaryTerm.findOneAndUpdate({ slug }, { $inc: { viewCount: 1 } });
+    } catch {
+        // Non-critical – don't surface tracking errors to the user
+    }
+}
+
 export async function createGlossaryTerm(data: any) {
     await connectToDatabase();
     
@@ -530,13 +556,17 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
     let updatedCount = 0;
 
     for (const term of terms) {
-        const url = term.youtubeVideo?.url || term.videoUrl;
-        if (!url) continue;
+        const rawUrl = term.youtubeVideo?.url || term.videoUrl;
+        if (!rawUrl) continue;
         
+        // Normalize the stored value to a proper YouTube watch URL before checking
+        const url = normalizeYouTubeUrl(rawUrl);
+        if (!url) continue;
+
         try {
             const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
-            // 404 = Deleted/Not Found, 401 = Private/Unauthorized, 403 = Forbidden, 400 = Bad Request
-            if (res.status === 404 || res.status === 400 || res.status === 401 || res.status === 403) {
+            // 404 = Deleted/Not Found, 401 = Private/Unauthorized, 403 = Forbidden/Embedding Disabled, 400 = Bad Request (malformed URL)
+            if (res.status !== 200) {
                 let fixed = false;
                 
                 if (autoFix) {
@@ -555,9 +585,13 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
                                     const title = item.videoRenderer.title?.runs?.[0]?.text || '';
                                     const channel = item.videoRenderer.ownerText?.runs?.[0]?.text || '';
                                     
+                                    // Verify the replacement video is actually live before saving
+                                    const verifyRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(newUrl)}&format=json`);
+                                    if (verifyRes.status !== 200) continue;
+
                                     term.videoUrl = newUrl;
                                     term.youtubeVideo = {
-                                        ...(term.youtubeVideo || {}),
+                                        ...(term.youtubeVideo?.toObject?.() || term.youtubeVideo || {}),
                                         url: newUrl,
                                         title: title,
                                         channel: channel
@@ -576,17 +610,12 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
                 }
                 
                 if (!fixed) {
-                    broken.push({ id: term._id.toString(), term: term.term, url });
+                    broken.push({ id: term._id.toString(), term: term.term, url: rawUrl, status: res.status });
                 }
             }
         } catch (e) {
-            // Network error or timeout, skip for now
+            // Network error or timeout, skip
         }
-    }
-    
-    if (autoFix && updatedCount > 0) {
-        revalidatePath('/admin/glossary');
-        revalidatePath('/glossary');
     }
     
     if (autoFix && updatedCount > 0) {
