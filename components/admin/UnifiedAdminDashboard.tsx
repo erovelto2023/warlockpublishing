@@ -117,7 +117,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                     </div>
 
                     {/* Tabs Scroll Area */}
-                    <div className="flex gap-1 overflow-x-auto no-scrollbar pb-0 -mb-px">
+                    <div className="flex flex-wrap items-center gap-1 pb-2">
                         {[
                             { id: 'overview', label: 'Dashboard', icon: BarChart3 },
                             { id: 'products', label: 'Products / Tools', icon: ShoppingBag },
@@ -132,15 +132,15 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
                                 className={`
-                                    flex items-center gap-2 px-6 py-4 text-sm font-bold border-b-2 transition-all whitespace-nowrap
+                                    flex items-center gap-1.5 px-4 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all
                                     ${activeTab === tab.id
-                                        ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-                                        : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                                        ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                                        : 'bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shadow-sm'
                                     }
                                 `}
                             >
-                                <tab.icon size={16} />
-                                {tab.label.toUpperCase()}
+                                <tab.icon size={14} />
+                                {tab.label}
                                 {tab.id === 'messages' && pendingMessages > 0 && (
                                     <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">{pendingMessages}</span>
                                 )}

@@ -623,17 +623,70 @@ export async function getGlossaryHealthData() {
 }
 export async function runGlossaryAudit(type: 'video' | 'affiliate' | 'article') {
     await connectToDatabase();
-    let query: any = {};
+    
     if (type === 'video') {
-        query = { 
+        const missingVideoTerms = await GlossaryTerm.find({ 
             $or: [
                 { "youtubeVideo.url": "" }, 
                 { "youtubeVideo.url": { $exists: false } },
                 { "videoUrl": "" },
                 { "videoUrl": { $exists: false } }
             ] 
-        };
-    } else if (type === 'affiliate') {
+        });
+        
+        const stillMissing = [];
+        
+        for (const term of missingVideoTerms) {
+            let fixed = false;
+            try {
+                const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(term.term + " explanation")}`, {
+                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+                });
+                const html = await searchRes.text();
+                const match = html.match(/ytInitialData\s*=\s*({.+?});/);
+                if (match) {
+                    const data = JSON.parse(match[1]);
+                    const contents = data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents || [];
+                    for (const item of contents) {
+                        if (item.videoRenderer) {
+                            const newUrl = `https://www.youtube.com/watch?v=${item.videoRenderer.videoId}`;
+                            const title = item.videoRenderer.title?.runs?.[0]?.text || '';
+                            const channel = item.videoRenderer.ownerText?.runs?.[0]?.text || '';
+                            
+                            term.videoUrl = newUrl;
+                            term.youtubeVideo = {
+                                ...(term.youtubeVideo || {}),
+                                url: newUrl,
+                                title: title,
+                                channel: channel
+                            };
+                            
+                            term.markModified('youtubeVideo');
+                            await term.save();
+                            fixed = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (searchError) {
+                console.error('Failed to auto-fix video for', term.term);
+            }
+            
+            if (!fixed) {
+                stillMissing.push({ _id: term._id.toString(), term: term.term });
+            }
+        }
+        
+        if (missingVideoTerms.length > stillMissing.length) {
+            revalidatePath('/admin/glossary');
+            revalidatePath('/glossary');
+        }
+        
+        return stillMissing;
+    }
+    
+    let query: any = {};
+    if (type === 'affiliate') {
         query = { 
             $or: [
                 { amazonProducts: { $size: 0 } },
