@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { 
   History, Globe, BookOpen, CheckCircle2, AlertTriangle, Zap, DollarSign, 
   ArrowRight, Copy, ChevronDown, ShoppingBag, Star, ExternalLink, 
-  FileText, Users, Monitor, TrendingUp, Rocket, Compass, ShieldCheck, 
+  FileText, Users, Monitor, TrendingUp, Rocket, Compass,
   MessageSquareQuote, Youtube, Layout, Clock, Hash, Tag, Share2, 
   ListChecks, PieChart, UserCheck, ChevronRight, BookDashed
 } from 'lucide-react';
@@ -507,26 +507,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                 {/*  SIDEBAR ELEMENTS  */}
                 <aside className="lg:col-span-4 space-y-10 no-print">
                     
-                    {/*  TOP RIGHT SIDEBAR: Marketplace Product Feature  */}
-                    <div className="bg-indigo-600 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group border border-indigo-400">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-                        <div className="relative z-10 space-y-6">
-                            <div className="w-full aspect-square bg-white/10 rounded-3xl flex items-center justify-center border border-white/20">
-                                 {featuredProduct?.imageUrl ? (
-                                    <img src={featuredProduct.imageUrl} alt={featuredProduct.title} className="w-full h-full object-cover rounded-3xl" />
-                                 ) : (
-                                    <ShieldCheck size={80} className="text-indigo-200" />
-                                 )}
-                            </div>
-                            <div className="space-y-2">
-                                <h3 className="text-xl font-extrabold leading-tight">{featuredProduct?.title || "Premium Toolkit"}</h3>
-                                <div className="flex items-center gap-2 font-bold"><span className="text-lg font-black">${featuredProduct?.price || "49.00"}</span></div>
-                            </div>
-                            <Link href={featuredProduct ? `/products/${featuredProduct.slug}` : "/products"} className="w-full py-4 bg-white text-indigo-700 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
-                                 Get Tool <ArrowRight size={14} />
-                            </Link>
-                        </div>
-                    </div>
+
+
 
                     {/*  Related Terms Cloud  */}
                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-8">
