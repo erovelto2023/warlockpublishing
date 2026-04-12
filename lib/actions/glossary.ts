@@ -337,6 +337,19 @@ export async function importDetailedJson(data: any[]) {
             if (typeof item.youtubeVideo === 'string') item.youtubeVideo = { url: item.youtubeVideo };
             if (typeof item.aiPromptCommandCenter === 'string') item.aiPromptCommandCenter = { contentStrategyPrompt: item.aiPromptCommandCenter };
 
+            // Defend Array-to-String Cast Errors (for fields defined as String but sometimes output as Array by GPT)
+            const stringFields = [
+                'affirmations', 'visualizations', 'guidedPractice', 'beginnerExplanation', 
+                'advancedPerspective', 'misconceptions', 'warningsOrNotes', 'audioOrVideoResources',
+                'whyItMatters', 'expertOpinion', 'historicalContext', 'originalUsage', 
+                'currentUsage', 'expandedDefinition', 'simpleDefinition', 'technicalDefinition'
+            ];
+            stringFields.forEach(field => {
+                if (Array.isArray(item[field])) {
+                    item[field] = item[field].join('\n');
+                }
+            });
+
             // Sync videoUrl if present in legacy field
             if (item.videoUrl && (!item.youtubeVideo || !item.youtubeVideo.url)) {
                 item.youtubeVideo = { ...item.youtubeVideo, url: item.videoUrl };
