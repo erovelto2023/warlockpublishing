@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string[] } }) {
+export async function GET(req: NextRequest, context: any) {
     try {
-        const slug = params.slug; // Could be ['thumbs', 'uuid.png'] or ['uuid.png']
+        const { slug } = await context.params; // Next.js 15+ passes params as a Promise
         const filePath = join(process.cwd(), 'public', 'uploads', 'gallery', ...slug);
 
         // Basic security to avoid directory traversal
