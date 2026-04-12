@@ -543,6 +543,11 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                     </div>
                 )}
 
+                {/* MEDIA TAB */}
+                {activeTab === 'media' && (
+                    <MediaLibrary />
+                )}
+
             </main>
         </div>
     );
