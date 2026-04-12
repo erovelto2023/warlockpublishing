@@ -328,6 +328,14 @@ export async function importDetailedJson(data: any[]) {
             if (typeof item.productIdeas === 'string') item.productIdeas = [];
             if (typeof item.competitorReferences === 'string') item.competitorReferences = [];
             if (typeof item.commonPitfalls === 'string') item.commonPitfalls = [];
+            
+            // Defend complex nested objects
+            if (typeof item.targetAudience === 'string') item.targetAudience = { primaryDemographic: item.targetAudience };
+            if (typeof item.marketDemand === 'string') item.marketDemand = { trendStatus: item.marketDemand };
+            if (typeof item.marketingHooks === 'string') item.marketingHooks = { blogTitles: [item.marketingHooks] };
+            if (typeof item.blogArticle === 'string') item.blogArticle = { content: item.blogArticle };
+            if (typeof item.youtubeVideo === 'string') item.youtubeVideo = { url: item.youtubeVideo };
+            if (typeof item.aiPromptCommandCenter === 'string') item.aiPromptCommandCenter = { contentStrategyPrompt: item.aiPromptCommandCenter };
 
             // Sync videoUrl if present in legacy field
             if (item.videoUrl && (!item.youtubeVideo || !item.youtubeVideo.url)) {
@@ -363,9 +371,9 @@ export async function importDetailedJson(data: any[]) {
             upserted: result.upsertedCount,
             updated: result.modifiedCount
         };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Detailed import error:', error);
-        throw error;
+        return { success: false, message: error.message || "An unknown database error occurred during hydrate" };
     }
 }
 

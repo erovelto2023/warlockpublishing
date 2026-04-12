@@ -51,9 +51,9 @@ const GlossaryTermSchema = new Schema({
     bestFor: { type: String },
     commonMistakes: { type: String },
     realExamples: { type: String },
-    startupCost: { type: String, enum: ['$0', '<$100', '$100+'], default: '$0' },
+    startupCost: { type: String, default: '$0' },
     timeToFirstDollar: { type: String },
-    skillRequired: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' },
+    skillRequired: { type: String, default: 'Beginner' },
     platformPreference: { type: String },
     lowPhysicalEffort: { type: Boolean, default: false },
 
