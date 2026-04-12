@@ -16,6 +16,7 @@ const isPublicRoute = createRouteMatcher([
     '/author(.*)',
     '/glossary(.*)',
     '/api/seed-glossary',
+    '/uploads(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
