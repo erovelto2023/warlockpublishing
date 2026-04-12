@@ -167,22 +167,9 @@ const GlossaryTermSchema = new Schema({
         competitionLevel: String,
     }],
 
-    // --- Marketing Hooks ---
-    marketingHooks: [String],
-    headlines: [String],
-    youtubeTitles: [String],
-    pinterestIdeas: [String],
-    instagramIdeas: [String],
-
     // --- Authority & References ---
     referenceWebsites: [{ name: String, url: String }],
     amazonProducts: [{ name: String, url: String }],
-    faqs: [{ question: String, answer: String }],
-    
-    // --- AI Command Center ---
-    productIdeaPrompt: { type: String },
-    contentStrategyPrompt: { type: String },
-    aiImagePrompt: { type: String },
 
     // --- Expertise & Opinion ---
     expertOpinion: { type: String },
