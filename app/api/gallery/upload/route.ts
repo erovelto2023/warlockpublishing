@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import { connectToDatabase } from '@/lib/db';
 import GalleryImage from '@/lib/models/GalleryImage';
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
             }
 
             const ext = ALLOWED_TYPES[file.type];
-            const uuid = uuidv4();
+            const uuid = crypto.randomUUID();
             const storedFilename = `${uuid}${ext}`;
             const bytes = await file.arrayBuffer();
             const buffer = Buffer.from(bytes);
