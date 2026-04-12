@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import crypto from 'crypto';
 import { connectToDatabase } from '@/lib/db';
@@ -51,6 +51,10 @@ export async function POST(req: NextRequest) {
             const storedFilename = `${uuid}${ext}`;
             const bytes = await file.arrayBuffer();
             const buffer = Buffer.from(bytes);
+
+            // Ensure directories exist
+            await mkdir(GALLERY_DIR, { recursive: true });
+            await mkdir(THUMB_DIR, { recursive: true });
 
             // Save original
             await writeFile(join(GALLERY_DIR, storedFilename), buffer);
