@@ -6,13 +6,8 @@ import { revalidatePath } from 'next/cache';
 
 // Helper to serialize Mongoose documents
 function serializePost(post: any) {
-    return {
-        ...post._doc,
-        _id: post._id.toString(),
-        createdAt: post.createdAt?.toISOString(),
-        updatedAt: post.updatedAt?.toISOString(),
-        publishedAt: post.publishedAt?.toISOString(),
-    };
+    if (!post) return null;
+    return JSON.parse(JSON.stringify(post));
 }
 
 export async function createPost(data: Partial<IBlogPost>) {

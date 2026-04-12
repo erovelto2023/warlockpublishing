@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare,
+    Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare, BookOpen,
     Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check, X, Mail
 } from 'lucide-react';
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
+import GlossaryTable from '@/components/admin/GlossaryTable';
 import { deleteProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -20,10 +21,11 @@ interface AdminDashboardProps {
     messages: any[];
     offers: any[];
     subscribers: any[];
+    glossaryTerms?: any[];
 }
 
-export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers'>('overview');
+export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [] }: AdminDashboardProps) {
+    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary'>('overview');
     const router = useRouter();
 
     // Stats
@@ -93,16 +95,16 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen font-sans text-slate-900 pb-20">
+        <div className="bg-slate-200 min-h-screen font-sans text-slate-900 pb-20">
             {/* Header / Nav */}
             <div className="bg-white border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <div className="bg-slate-900 text-white p-1.5 rounded-lg">
+                            <div className="p-1.5 bg-slate-900 text-white rounded-lg">
                                 <LayoutDashboard size={20} />
                             </div>
-                            <span className="font-black text-lg tracking-tight text-slate-900 uppercase">Warlock Admin</span>
+                            <span className="font-bold text-lg tracking-tight text-slate-800 uppercase">Warlock Admin</span>
                         </div>
                         <div className="flex items-center gap-4">
                             <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 uppercase tracking-widest">
@@ -123,6 +125,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'subscribers', label: 'Subscribers', icon: Users },
                             { id: 'pen_names', label: 'Pen Names', icon: Users },
                             { id: 'blog', label: 'Blog Posts', icon: FileText },
+                            { id: 'glossary', label: 'Glossary', icon: BookOpen },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
                         ].map((tab) => (
                             <button
@@ -156,29 +159,29 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
                             <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Megaphone size={24} /></div>
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Offer Views</p>
-                                <h3 className="text-2xl font-black text-slate-900">{totalViews.toLocaleString()}</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Offer Views</p>
+                                <h3 className="text-2xl font-bold text-slate-900">{totalViews.toLocaleString()}</h3>
                             </div>
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
                             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><ShoppingBag size={24} /></div>
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Products</p>
-                                <h3 className="text-2xl font-black text-slate-900">{totalProducts}</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Products</p>
+                                <h3 className="text-2xl font-bold text-slate-900">{totalProducts}</h3>
                             </div>
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
                             <div className="p-3 bg-purple-50 text-purple-600 rounded-xl"><Users size={24} /></div>
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Pen Names</p>
-                                <h3 className="text-2xl font-black text-slate-900">{penNames.length}</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pen Names</p>
+                                <h3 className="text-2xl font-bold text-slate-900">{penNames.length}</h3>
                             </div>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                            <div className="p-3 bg-green-50 text-green-600 rounded-xl"><FileText size={24} /></div>
+                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 cursor-pointer hover:border-blue-500 transition-all" onClick={() => setActiveTab('glossary')}>
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><BookOpen size={24} /></div>
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Published Posts</p>
-                                <h3 className="text-2xl font-black text-slate-900">{totalPosts}</h3>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Glossary Terms</p>
+                                <h3 className="text-2xl font-bold text-slate-900">{glossaryTerms.length}</h3>
                             </div>
                         </div>
                     </div>
@@ -419,7 +422,22 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                     </div>
                 )}
 
-                {/* INBOX TAB */}
+                {activeTab === 'glossary' && (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                                <BookOpen className="text-blue-600" /> Glossary Management
+                            </h2>
+                            <button
+                                onClick={() => router.push('/admin/glossary/new')}
+                                className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-black flex items-center gap-2 transition-all"
+                            >
+                                <Plus size={16} /> New Term
+                            </button>
+                        </div>
+                        <GlossaryTable terms={glossaryTerms} />
+                    </div>
+                )}
                 {activeTab === 'messages' && (
                     <div className="max-w-5xl mx-auto space-y-6">
                         <div className="flex justify-between items-center mb-6">

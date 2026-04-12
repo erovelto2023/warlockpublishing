@@ -6,12 +6,8 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@clerk/nextjs/server';
 
 function serializeMessage(msg: any) {
-    return {
-        ...msg._doc,
-        _id: msg._id.toString(),
-        createdAt: msg.createdAt?.toISOString(),
-        updatedAt: msg.updatedAt?.toISOString(),
-    };
+    if (!msg) return null;
+    return JSON.parse(JSON.stringify(msg));
 }
 
 export async function createMessage(data: {
