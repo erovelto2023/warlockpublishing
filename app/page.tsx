@@ -4,15 +4,24 @@ import { HeroAuthButtons } from "@/components/hero-auth-buttons";
 
 import { connectToDatabase } from "@/lib/db";
 import GlobalSettings from "@/lib/models/GlobalSettings";
+import SearchTrigger from "@/components/SearchTrigger";
 
 export default async function Home() {
-  await connectToDatabase();
-  const rawSettings = await GlobalSettings.findOne().lean();
-  const settings = JSON.parse(JSON.stringify(rawSettings)) || {
+  let settings = {
     homeHeroImageUrl: '',
     siteTitle: 'World Builders',
     siteDescription: 'Discover a curated universe of premium digital assets, literary masterpieces, and creative software.'
   };
+
+  try {
+    await connectToDatabase();
+    const rawSettings = await GlobalSettings.findOne().lean();
+    if (rawSettings) {
+        settings = JSON.parse(JSON.stringify(rawSettings));
+    }
+  } catch (err) {
+    console.error('Failed to fetch settings, using defaults', err);
+  }
 
   const categories = [
     { name: "Fiction Books", icon: <BookOpen className="w-6 h-6 text-cyan-400" />, count: "1,240+" },
@@ -80,12 +89,7 @@ export default async function Home() {
                 </Link>
               </div>
               
-              <div className="w-full sm:flex-1 relative cursor-pointer" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}>
-                <div className="w-full px-8 py-5 bg-white/5 text-slate-500 rounded-2xl border border-white/10 focus:outline-none flex items-center justify-between group-hover:bg-white/[0.08] transition-all">
-                    <span className="text-sm font-medium">Search 15,000+ assets...</span>
-                    <span className="text-[10px] font-black opacity-40 px-2 py-1 bg-white/10 rounded-md">CMD + K</span>
-                </div>
-              </div>
+              <SearchTrigger />
             </div>
 
             <div className="mt-16 flex flex-wrap items-center justify-center gap-10 text-slate-500 text-xs font-bold tracking-widest uppercase opacity-50">
