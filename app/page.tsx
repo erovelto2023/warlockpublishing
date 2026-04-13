@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getFeaturedItems } from "@/lib/actions/product.actions";
 export const dynamic = "force-dynamic";
 import { ArrowRight, Globe, Shield, Layers, Users, Zap, Search } from 'lucide-react';
 import { connectToDatabase } from "@/lib/db";
