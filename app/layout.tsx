@@ -19,6 +19,8 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
+import CommandCenter from "@/components/CommandCenter";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,7 @@ export default function RootLayout({
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         </head>
         <body className={`${outfit.className} antialiased bg-background text-foreground`} suppressHydrationWarning>
+          <CommandCenter />
           <LayoutShell
             navbar={
               <Suspense fallback={<div className="h-20 border-b bg-background/95 backdrop-blur-md" />}>

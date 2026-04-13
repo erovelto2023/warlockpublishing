@@ -41,7 +41,7 @@ export default async function ProductsPage() {
                         </CardHeader>
                         <CardContent className="flex-1">
                             <p className="text-sm text-muted-foreground line-clamp-3">
-                                {product.description}
+                                {product.description?.replace(/<[^>]*>?/gm, '') || ''}
                             </p>
                         </CardContent>
                         <CardFooter className="flex items-center justify-between border-t pt-4">

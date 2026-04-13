@@ -2,7 +2,18 @@ import Link from "next/link";
 import { ShoppingBag, Star, Zap, Globe, Shield, ArrowRight, Play, Download, Layers, Cpu, BookOpen, PenTool, Puzzle, GraduationCap, Sparkles, Palette, Briefcase, FileText, Monitor, Book, ChevronRight } from 'lucide-react';
 import { HeroAuthButtons } from "@/components/hero-auth-buttons";
 
-export default function Home() {
+import { connectToDatabase } from "@/lib/db";
+import GlobalSettings from "@/lib/models/GlobalSettings";
+
+export default async function Home() {
+  await connectToDatabase();
+  const rawSettings = await GlobalSettings.findOne().lean();
+  const settings = JSON.parse(JSON.stringify(rawSettings)) || {
+    homeHeroImageUrl: '',
+    siteTitle: 'World Builders',
+    siteDescription: 'Discover a curated universe of premium digital assets, literary masterpieces, and creative software.'
+  };
+
   const categories = [
     { name: "Fiction Books", icon: <BookOpen className="w-6 h-6 text-cyan-400" />, count: "1,240+" },
     { name: "Non-Fiction", icon: <Book className="w-6 h-6 text-indigo-400" />, count: "850+" },
@@ -17,30 +28,48 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 selection:text-white overflow-x-hidden pt-20">
 
-      {/* Hero Section - Inspired by Image 3 */}
+      {/* Hero Section - Upgraded with Dynamic Image and Premium Visuals */}
       <section className="relative pt-20 pb-24 lg:pt-32 lg:pb-32 overflow-hidden border-b border-white/5">
+        
         {/* Dynamic Background Effects */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl px-4 pointer-events-none -z-10">
             <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[80%] bg-primary/10 rounded-full blur-[100px] animate-pulse"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[70%] bg-indigo-600/10 rounded-full blur-[100px]"></div>
         </div>
 
+        {/* Global Settings Hero Graphic Layer */}
+        {settings.homeHeroImageUrl && (
+            <div className="absolute inset-0 -z-20 opacity-40">
+                <img 
+                    src={settings.homeHeroImageUrl} 
+                    alt="Hero Visual" 
+                    className="w-full h-full object-cover grayscale brightness-50 contrast-125 scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+            </div>
+        )}
+
+        {/* Premium Grid Pattern Overlay */}
+        <div className="absolute inset-0 -z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
-              The Future of Digital Assets
+              Live Broadcast: {settings.siteTitle}
             </div>
             
             <h1 className="text-5xl lg:text-8xl font-black tracking-tighter leading-[0.9] mb-8 max-w-5xl animate-in fade-in slide-in-from-bottom-6 duration-1000">
-              WORLD BUILDERS <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary bg-[length:200%_auto] animate-gradient">
-                UNITE & CREATE
-              </span>
+              {settings.siteTitle.split(' ').map((word: string, i: number) => (
+                  <span key={i} className={i % 2 !== 0 ? "text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary bg-[length:200%_auto] animate-gradient" : ""}>
+                      {word}{' '}
+                  </span>
+              ))}
             </h1>
             
             <p className="text-lg lg:text-xl text-slate-400 mb-12 max-w-2xl leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                Discover a curated universe of premium digital assets, literary masterpieces, and creative software. Built for the modern visionary.
+                {settings.siteDescription}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-6 w-full max-w-3xl justify-center animate-in fade-in slide-in-from-bottom-10 duration-1000">
@@ -51,12 +80,11 @@ export default function Home() {
                 </Link>
               </div>
               
-              <div className="w-full sm:flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="Search 15,000+ assets..."
-                  className="w-full px-8 py-5 bg-white/5 text-white rounded-2xl border border-white/10 focus:outline-none focus:border-primary/50 focus:bg-white/[0.08] transition-all text-sm font-medium"
-                />
+              <div className="w-full sm:flex-1 relative cursor-pointer" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}>
+                <div className="w-full px-8 py-5 bg-white/5 text-slate-500 rounded-2xl border border-white/10 focus:outline-none flex items-center justify-between group-hover:bg-white/[0.08] transition-all">
+                    <span className="text-sm font-medium">Search 15,000+ assets...</span>
+                    <span className="text-[10px] font-black opacity-40 px-2 py-1 bg-white/10 rounded-md">CMD + K</span>
+                </div>
               </div>
             </div>
 

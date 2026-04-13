@@ -10,7 +10,8 @@ import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import GlossaryTable from '@/components/admin/GlossaryTable';
 import MediaLibrary from '@/components/admin/MediaLibrary';
 import AssetWarehouse from '@/components/admin/AssetWarehouse';
-import { Package } from 'lucide-react';
+import { Package, Smartphone } from 'lucide-react';
+import SiteSettings from '@/components/admin/SiteSettings';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -28,7 +29,7 @@ interface AdminDashboardProps {
 }
 
 export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [] }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse' | 'settings'>('overview');
     const router = useRouter();
 
     // Stats
@@ -150,6 +151,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'media', label: 'Media', icon: Image },
                             { id: 'warehouse', label: 'Warehouse', icon: Package },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
+                            { id: 'settings', label: 'Site Config', icon: Settings },
                         ].map((tab) => (
                             <button
                                 key={tab.id}
@@ -591,6 +593,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
                 {activeTab === 'warehouse' && (
                     <AssetWarehouse />
+                )}
+
+                {activeTab === 'settings' && (
+                    <SiteSettings />
                 )}
 
             </main>
