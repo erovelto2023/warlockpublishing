@@ -49,12 +49,15 @@ export default async function Home() {
 
         {/* Global Settings Hero Graphic Layer */}
         {settings.homeHeroImageUrl && (
-            <div className="absolute inset-0 -z-20 opacity-40">
-                <img 
-                    src={settings.homeHeroImageUrl} 
-                    alt="Hero Visual" 
-                    className="w-full h-full object-cover grayscale brightness-50 contrast-125 scale-105"
-                />
+            <div 
+                className="absolute inset-0 z-0 opacity-40 grayscale brightness-50 contrast-125 scale-105 pointer-events-none"
+                style={{ 
+                    backgroundImage: `url('${settings.homeHeroImageUrl}')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
                 <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
             </div>
         )}
