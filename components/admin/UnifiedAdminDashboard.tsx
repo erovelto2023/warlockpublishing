@@ -12,7 +12,7 @@ import MediaLibrary from '@/components/admin/MediaLibrary';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
-import { deleteSalesPage } from '@/lib/actions/sales-page.actions';
+import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 
 interface AdminDashboardProps {
@@ -98,6 +98,15 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const toggleRotation = async (productId: string, currentState: boolean) => {
         try {
             await updateProduct(productId, { isFeaturedInRotation: !currentState });
+            router.refresh();
+        } catch (e) {
+            alert('Error toggling rotation status');
+        }
+    };
+
+    const toggleOfferRotation = async (offerId: string, currentState: boolean) => {
+        try {
+            await updateSalesPageRotation(offerId, !currentState);
             router.refresh();
         } catch (e) {
             alert('Error toggling rotation status');
@@ -230,6 +239,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Title / Slug</th>
                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Stats</th>
+                                            <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Rotation</th>
                                             <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
                                             <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
                                         </tr>
@@ -246,6 +256,15 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                                         <span className="flex items-center gap-1"><Eye size={12} /> {offer.views || 0}</span>
                                                         <span className="flex items-center gap-1 text-green-600"><ShoppingBag size={12} /> {offer.clicks || 0}</span>
                                                     </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <button
+                                                        onClick={() => toggleOfferRotation(offer._id, !!offer.isFeaturedInRotation)}
+                                                        className={`p-2 rounded-full transition-all ${offer.isFeaturedInRotation ? 'text-indigo-600 bg-indigo-50' : 'text-slate-300 bg-slate-50'}`}
+                                                        title={offer.isFeaturedInRotation ? "In Rotation Pool" : "Not in Rotation"}
+                                                    >
+                                                        <RefreshCw size={16} className={offer.isFeaturedInRotation ? "animate-spin-slow" : ""} />
+                                                    </button>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${offer.isPublished ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-yellow-50 text-yellow-600 border border-yellow-100'}`}>

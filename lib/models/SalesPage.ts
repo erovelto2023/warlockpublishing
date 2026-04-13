@@ -32,6 +32,8 @@ export interface ISalesPage extends Document {
     viewsB: number;
     clicksA: number;
     clicksB: number;
+    isFeaturedInRotation: boolean;
+    externalUrl?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -73,6 +75,8 @@ const SalesPageSchema: Schema = new Schema({
     viewsB: { type: Number, default: 0 },
     clicksA: { type: Number, default: 0 },
     clicksB: { type: Number, default: 0 },
+    isFeaturedInRotation: { type: Boolean, default: true },
+    externalUrl: { type: String },
 }, { timestamps: true });
 
 export default mongoose.models.SalesPage || mongoose.model<ISalesPage>('SalesPage', SalesPageSchema);

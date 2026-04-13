@@ -1,6 +1,7 @@
 import React from 'react';
 import { getGlossaryTermBySlug, getRelatedGlossaryTerms, trackGlossaryView } from '@/lib/actions/glossary';
 import { getPublishedProducts } from '@/lib/actions/product.actions';
+import { getPublishedSalesPages } from '@/lib/actions/sales-page.actions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
@@ -19,20 +20,44 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const term = await getGlossaryTermBySlug(params.slug);
     if (!term) return notFound();
 
-    const [relatedTerms, products] = await Promise.all([
+    const [relatedTerms, products, offers] = await Promise.all([
         getRelatedGlossaryTerms(term.category || 'General', term.slug),
-        getPublishedProducts()
+        getPublishedProducts(),
+        getPublishedSalesPages()
     ]);
 
-    // Choose a random product from the pool for rotation
-    const rotationPool = products.filter((p: any) => p.isFeaturedInRotation !== false);
-    const featuredProduct = products.find((p: any) => p._id.toString() === term.marketplaceProduct?.productId) 
-        || (rotationPool.length > 0 ? rotationPool[Math.floor(Math.random() * rotationPool.length)] : products[0]);
+    // Normalize both products and offers into a single rotation pool
+    const normalizedProducts = products.map((p: any) => ({
+        id: p._id.toString(),
+        title: p.title,
+        price: p.price,
+        imageUrl: p.imageUrl,
+        link: p.externalUrl || `/products/${p.slug || p._id}`,
+        isExternal: !!p.externalUrl,
+        isFeaturedInRotation: p.isFeaturedInRotation !== false,
+        type: 'product'
+    }));
 
-    // Handle external vs internal linking
-    const productLink = featuredProduct?.externalUrl 
-        ? featuredProduct.externalUrl 
-        : (featuredProduct ? `/products/${featuredProduct.slug || featuredProduct._id}` : "/products");
+    const normalizedOffers = offers.map((o: any) => ({
+        id: o._id.toString(),
+        title: o.title,
+        price: o.price,
+        imageUrl: o.marketplaceImage || o.ogImage,
+        link: o.externalUrl || `/offers/${o.slug}`,
+        isExternal: !!o.externalUrl,
+        isFeaturedInRotation: o.isFeaturedInRotation !== false,
+        type: 'offer'
+    }));
+
+    const fullPool = [...normalizedProducts, ...normalizedOffers];
+    const rotationPool = fullPool.filter(item => item.isFeaturedInRotation);
+
+    // Choose a random item from the pool for rotation, or the pinned one
+    const featuredPoolItem = fullPool.find(item => item.id === term.marketplaceProduct?.productId) 
+        || (rotationPool.length > 0 ? rotationPool[Math.floor(Math.random() * rotationPool.length)] : fullPool[0]);
+
+    // Handle external vs internal linking (used in the UI)
+    const productLink = featuredPoolItem?.link || "/products";
 
     // Fire-and-forget view tracking (non-blocking)
     void trackGlossaryView(params.slug);
@@ -525,23 +550,26 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     <div className="bg-indigo-600 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group border border-indigo-400">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
                         <div className="relative z-10 space-y-6">
-                            <div className="w-full aspect-square bg-white/10 rounded-3xl flex items-center justify-center border border-white/20">
-                                 {featuredProduct?.imageUrl ? (
-                                    <img src={featuredProduct.imageUrl} alt={featuredProduct.title} className="w-full h-full object-cover rounded-3xl" />
+                            <div className="w-full aspect-square bg-white/10 rounded-3xl flex items-center justify-center border border-white/20 relative overflow-hidden">
+                                 {featuredPoolItem?.imageUrl ? (
+                                    <img src={featuredPoolItem.imageUrl} alt={featuredPoolItem.title} className="w-full h-full object-cover rounded-3xl" />
                                  ) : (
                                     <ShieldCheck size={80} className="text-indigo-200" />
                                  )}
+                                 {featuredPoolItem?.type === 'offer' && (
+                                     <div className="absolute top-4 left-4 px-3 py-1 bg-white text-indigo-700 text-[8px] font-black uppercase tracking-widest rounded-full shadow-lg">Special Offer</div>
+                                 )}
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-xl font-extrabold leading-tight">{featuredProduct?.title || "Premium Toolkit"}</h3>
-                                <div className="flex items-center gap-2 font-bold"><span className="text-lg font-black">${featuredProduct?.price || "49.00"}</span></div>
+                                <h3 className="text-xl font-extrabold leading-tight">{featuredPoolItem?.title || "Premium Toolkit"}</h3>
+                                <div className="flex items-center gap-2 font-bold"><span className="text-lg font-black">${featuredPoolItem?.price || "49.00"}</span></div>
                             </div>
                             <Link 
                                 href={productLink} 
-                                target={featuredProduct?.externalUrl ? "_blank" : "_self"}
+                                target={featuredPoolItem?.isExternal ? "_blank" : "_self"}
                                 className="w-full py-4 bg-white text-indigo-700 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
                             >
-                                 {featuredProduct?.externalUrl ? 'Visit Resource' : 'Get Tool'} <ArrowRight size={14} />
+                                 {featuredPoolItem?.isExternal ? 'Visit Resource' : 'Get Tool'} <ArrowRight size={14} />
                             </Link>
                         </div>
                     </div>

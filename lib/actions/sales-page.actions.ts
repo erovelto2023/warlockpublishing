@@ -15,6 +15,20 @@ export async function getSalesPages() {
     }
 }
 
+export async function getPublishedSalesPages() {
+    try {
+        await connectToDatabase();
+        const pages = await SalesPage.find({ 
+            isPublished: true, 
+            isFeaturedInRotation: { $ne: false } 
+        }).sort({ createdAt: -1 }).lean();
+        return JSON.parse(JSON.stringify(pages));
+    } catch (error: any) {
+        console.error("Error fetching published sales pages:", error);
+        return [];
+    }
+}
+
 export async function getSalesPageBySlug(slug: string) {
     try {
         await connectToDatabase();
@@ -72,6 +86,19 @@ export async function deleteSalesPage(id: string) {
     } catch (error: any) {
         console.error("Error deleting sales page:", error);
         return { error: error.message || "Failed to delete sales page" };
+    }
+}
+
+export async function updateSalesPageRotation(id: string, isFeaturedInRotation: boolean) {
+    try {
+        await connectToDatabase();
+        const updated = await SalesPage.findByIdAndUpdate(id, { isFeaturedInRotation }, { new: true });
+        revalidatePath('/admin');
+        revalidatePath('/');
+        return { success: true, page: JSON.parse(JSON.stringify(updated)) };
+    } catch (error: any) {
+        console.error("Error updating sales page rotation:", error);
+        return { error: error.message || "Failed to update rotation" };
     }
 }
 

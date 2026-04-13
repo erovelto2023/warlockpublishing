@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createOrUpdateSalesPage } from '@/lib/actions/sales-page.actions';
-import { Save, Globe, Code, Megaphone, DollarSign, ExternalLink, Zap, Info, Wand2, Image as ImageIcon, Share2, Tag, ShoppingBag, Layout, Plus, Trash2, ChevronDown, ChevronUp, BarChart3, Layers, Copy, Check, Eye } from 'lucide-react';
+import { Save, Globe, Code, Megaphone, DollarSign, ExternalLink, Zap, Info, Wand2, Image as ImageIcon, Share2, Tag, ShoppingBag, Layout, Plus, Trash2, ChevronDown, ChevronUp, BarChart3, Layers, Copy, Check, Eye, X } from 'lucide-react';
 import { SMART_VARIABLES } from '@/lib/constants/smartVariables';
 
 interface SalesPageFormProps {
@@ -38,10 +38,17 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
         marketplaceColor: initialData?.marketplaceColor || '#3b82f6',
         useColorAsDefault: initialData?.useColorAsDefault ?? true,
         marketplaceFeatures: initialData?.marketplaceFeatures || ['Instant Access', 'Premium Content'],
+        // Rotation Settings
+        isFeaturedInRotation: initialData?.isFeaturedInRotation ?? true,
+        externalUrl: initialData?.externalUrl || '',
         // A/B Testing
         abEnabled: initialData?.abEnabled ?? false,
         bodyCodeB: initialData?.bodyCodeB || '',
     });
+
+    const [showGallery, setShowGallery] = useState(false);
+    const [galleryImages, setGalleryImages] = useState<any[]>([]);
+    const [galleryLoading, setGalleryLoading] = useState(false);
 
     const [showVariableHelp, setShowVariableHelp] = useState(false);
 
@@ -131,6 +138,25 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
             ...prev,
             marketplaceFeatures: prev.marketplaceFeatures.filter((_: string, i: number) => i !== index)
         }));
+    };
+
+    const openGallery = async () => {
+        setShowGallery(true);
+        setGalleryLoading(true);
+        try {
+            const res = await fetch('/api/gallery?limit=50');
+            const data = await res.json();
+            setGalleryImages(data.images || []);
+        } catch (e) {
+            console.error("Failed to fetch gallery", e);
+        } finally {
+            setGalleryLoading(false);
+        }
+    };
+
+    const selectImage = (url: string) => {
+        setFormData(prev => ({ ...prev, marketplaceImage: url }));
+        setShowGallery(false);
     };
 
     const scrollToSection = (id: string) => {
@@ -286,6 +312,34 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
                                     <option value="downsell">Downsell Page</option>
                                     <option value="thank-you">Thank You Page</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-100 flex flex-wrap gap-8 items-center">
+                            <label className="flex items-center gap-4 px-6 py-4 bg-indigo-50 border border-indigo-100 rounded-2xl cursor-pointer hover:bg-indigo-100 transition-all font-black text-xs uppercase tracking-widest text-indigo-700">
+                                <input 
+                                    type="checkbox" 
+                                    name="isFeaturedInRotation" 
+                                    checked={formData.isFeaturedInRotation} 
+                                    onChange={handleChange} 
+                                    className="w-6 h-6 rounded-lg border-indigo-300 text-indigo-600 focus:ring-indigo-500" 
+                                />
+                                Include in Side Rotation Pool
+                            </label>
+
+                            <div className="flex-1 min-w-[300px]">
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Override Link (External URL)</label>
+                                <div className="flex items-center">
+                                    <div className="bg-slate-50 border border-r-0 border-slate-200 px-4 py-3 rounded-l-2xl text-slate-400 font-bold text-xs"><ExternalLink size={14} /></div>
+                                    <input 
+                                        type="url" 
+                                        name="externalUrl" 
+                                        value={formData.externalUrl} 
+                                        onChange={handleChange} 
+                                        className="flex-1 px-5 py-3 rounded-r-2xl border border-slate-200 focus:border-indigo-500 outline-none transition-all font-medium text-sm" 
+                                        placeholder="https://specific-landing-page.com (Optional)" 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -468,7 +522,12 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Card Image URL (Optional)</label>
+                                        <label className="flex items-center justify-between block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">
+                                            Card Image URL (Optional)
+                                            <button type="button" onClick={openGallery} className="text-blue-600 hover:scale-105 flex items-center gap-1 transition-all">
+                                                <ImageIcon size={12} /> Pick from Gallery
+                                            </button>
+                                        </label>
                                         <input type="url" name="marketplaceImage" value={formData.marketplaceImage} onChange={handleChange} className="w-full px-6 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 outline-none font-medium text-xs" placeholder="https://..." />
                                     </div>
                                     <div>
@@ -606,6 +665,50 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
                     </div>
                 </section>
             </div>
+
+            {/* GALLERY PICKER MODAL */}
+            {showGallery && (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="flex items-center justify-between p-8 border-b border-slate-100">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Image Gallery</h3>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Select an image for your offer card</p>
+                            </div>
+                            <button type="button" onClick={() => setShowGallery(false)} className="p-3 hover:bg-slate-100 rounded-2xl transition-all">
+                                <X size={24} className="text-slate-500" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-8">
+                            {galleryLoading ? (
+                                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                    <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
+                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading Media...</span>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    {galleryImages.map((img: any) => (
+                                        <button
+                                            key={img._id}
+                                            type="button"
+                                            onClick={() => selectImage(img.fileUrl)}
+                                            className="group relative aspect-square bg-slate-50 rounded-2xl overflow-hidden border-2 border-transparent hover:border-blue-500 transition-all hover:scale-[1.02] shadow-sm"
+                                        >
+                                            <img src={img.thumbnailUrl} alt={img.title} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/20 transition-all flex items-center justify-center">
+                                                <div className="bg-white text-blue-600 p-2 rounded-xl opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all shadow-xl">
+                                                    <Plus size={20} />
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </form>
     );
 }
