@@ -109,6 +109,39 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
         alert('Copied to clipboard!');
     };
 
+    // Universal CSV Download
+    const downloadCSV = (filename: string, headers: string[], rows: string[][]) => {
+        const escapeField = (field: string) => `"${String(field ?? '').replace(/"/g, '""')}"`;
+        const csvContent = [headers.map(escapeField).join(','), ...rows.map(r => r.map(escapeField).join(','))].join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const DOMAIN = typeof window !== 'undefined' ? window.location.origin : 'https://warlockpublishing.com';
+
+    const exportOffers = () => {
+        downloadCSV(
+            `warlock-offers-${new Date().toISOString().slice(0, 10)}.csv`,
+            ['Product Name', 'URL', 'Views', 'Clicks', 'Status'],
+            offers.map((o: any) => [o.title, `${DOMAIN}/offers/${o.slug}`, String(o.views || 0), String(o.clicks || 0), o.isPublished ? 'Live' : 'Draft'])
+        );
+    };
+
+    const exportProducts = () => {
+        downloadCSV(
+            `warlock-products-${new Date().toISOString().slice(0, 10)}.csv`,
+            ['Product Name', 'URL', 'Type', 'Price'],
+            products.map((p: any) => [p.title, `${DOMAIN}/products/${p.slug}`, p.productType || 'Standard', `$${p.price}`])
+        );
+    };
+
     const handleViewMessage = async (msg: any) => {
         setViewingMessage(msg);
         setIsEditingMessage(false);
@@ -272,6 +305,12 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                 <Megaphone className="text-blue-600" /> Offer Builder
                             </h2>
                             <div className="flex gap-2">
+                                <button
+                                    onClick={exportOffers}
+                                    className="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 flex items-center gap-1.5"
+                                >
+                                    <Download size={14} /> Export CSV
+                                </button>
                                 <button
                                     onClick={() => setOfferView('list')}
                                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${offerView === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
@@ -475,12 +514,20 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                     <div className="max-w-5xl mx-auto space-y-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-slate-800">All Tools ({products.length})</h2>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={exportProducts}
+                                    className="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 flex items-center gap-1.5"
+                                >
+                                    <Download size={14} /> Export CSV
+                                </button>
                             <button
                                 onClick={() => router.push('/admin/products/new')}
                                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 flex items-center gap-2 shadow-lg shadow-blue-200 transition-all hover:scale-105"
                             >
                                 <Plus size={16} /> Add New Tool
                             </button>
+                            </div>
                         </div>
                         <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                             <table className="min-w-full divide-y divide-slate-100">
