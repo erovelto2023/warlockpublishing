@@ -13,7 +13,8 @@ import {
     Loader2,
     BarChart3,
     Activity,
-    Youtube
+    Youtube,
+    Database
 } from 'lucide-react';
 import { 
     findDuplicateGlossaryTerms, 
