@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
             limits: { fileSize: 1024 * 1024 * 1024 } // 1GB
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise<NextResponse>((resolve, reject) => {
             let fileWritten = false;
             let assetData: any = {};
 
