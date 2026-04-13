@@ -569,7 +569,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 target={featuredPoolItem?.isExternal ? "_blank" : "_self"}
                                 className="w-full py-4 bg-white text-indigo-700 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
                             >
-                                 {featuredPoolItem?.isExternal ? 'Visit Resource' : 'Get Tool'} <ArrowRight size={14} />
+                                 {featuredPoolItem?.isExternal ? 'Visit Resource' : 'Visit Offer'} <ArrowRight size={14} />
                             </Link>
                         </div>
                     </div>
@@ -617,10 +617,10 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
                     {/*  Access Hub Sticky footer  */}
                     <div className="bg-slate-900 rounded-[2.5rem] p-10 text-center space-y-6 shadow-xl border border-slate-800">
-                        <h4 className="text-lg font-black text-white uppercase tracking-tight italic leading-tight">Accelerate Your Strategy</h4>
-                        <p className="text-xs font-bold text-slate-400 leading-relaxed uppercase tracking-widest">Access the complete {term.category} Mastery Hub.</p>
+                        <h4 className="text-lg font-black text-white uppercase tracking-tight italic leading-tight">Visit our Content Catalog</h4>
+                        <p className="text-xs font-bold text-slate-400 leading-relaxed uppercase tracking-widest">Explore the full Warlock Digital Library.</p>
                         <Link href="/products" className="w-full py-4 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-indigo-50 hover:text-indigo-900 transition-all flex items-center justify-center gap-2">
-                            Access Hub <ArrowRight size={14} />
+                            Enter Library <ArrowRight size={14} />
                         </Link>
                     </div>
 
