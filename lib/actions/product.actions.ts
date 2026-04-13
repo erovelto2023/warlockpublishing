@@ -53,7 +53,7 @@ export async function createProduct(data: any) {
         delete sanitizedData.penNameId;
     }
     // Ensure optional fields are not empty strings if they should be undefined/null
-    ['description', 'imageUrl', 'category', 'format', 'grooveSellId', 'grooveSellEmbed', 'amazonLink', 'htmlContent'].forEach(field => {
+    ['description', 'imageUrl', 'category', 'format', 'grooveSellId', 'grooveSellEmbed', 'amazonLink', 'htmlContent', 'externalUrl'].forEach(field => {
         if (sanitizedData[field] === "") {
             delete sanitizedData[field];
         }
@@ -97,7 +97,7 @@ export async function updateProduct(id: string, data: any) {
         delete updateData.penNameId;
     }
     // Ensure optional fields are not empty strings if they should be undefined/null
-    ['description', 'imageUrl', 'category', 'format', 'grooveSellId', 'grooveSellEmbed', 'amazonLink', 'htmlContent'].forEach(field => {
+    ['description', 'imageUrl', 'category', 'format', 'grooveSellId', 'grooveSellEmbed', 'amazonLink', 'htmlContent', 'externalUrl'].forEach(field => {
         if (updateData[field] === "") {
             delete updateData[field];
         }

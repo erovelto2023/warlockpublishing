@@ -16,6 +16,8 @@ const ProductSchema = new Schema({
     amazonLink: { type: String },
     isAmazonProduct: { type: Boolean, default: false },
     isHidden: { type: Boolean, default: false },
+    isFeaturedInRotation: { type: Boolean, default: true },
+    externalUrl: { type: String },
     licenseType: { type: String }, // PLR, MRR, etc.
     htmlContent: { type: String }, // Custom HTML for the page
     penNameId: { type: mongoose.Schema.Types.ObjectId, ref: "PenName" },

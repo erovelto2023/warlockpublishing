@@ -24,7 +24,15 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         getPublishedProducts()
     ]);
 
-    const featuredProduct = products.find((p: any) => p._id.toString() === term.marketplaceProduct?.productId) || products[0];
+    // Choose a random product from the pool for rotation
+    const rotationPool = products.filter((p: any) => p.isFeaturedInRotation !== false);
+    const featuredProduct = products.find((p: any) => p._id.toString() === term.marketplaceProduct?.productId) 
+        || (rotationPool.length > 0 ? rotationPool[Math.floor(Math.random() * rotationPool.length)] : products[0]);
+
+    // Handle external vs internal linking
+    const productLink = featuredProduct?.externalUrl 
+        ? featuredProduct.externalUrl 
+        : (featuredProduct ? `/products/${featuredProduct.slug || featuredProduct._id}` : "/products");
 
     // Fire-and-forget view tracking (non-blocking)
     void trackGlossaryView(params.slug);
@@ -528,8 +536,12 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 <h3 className="text-xl font-extrabold leading-tight">{featuredProduct?.title || "Premium Toolkit"}</h3>
                                 <div className="flex items-center gap-2 font-bold"><span className="text-lg font-black">${featuredProduct?.price || "49.00"}</span></div>
                             </div>
-                            <Link href={featuredProduct ? `/products/${featuredProduct.slug}` : "/products"} className="w-full py-4 bg-white text-indigo-700 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
-                                 Get Tool <ArrowRight size={14} />
+                            <Link 
+                                href={productLink} 
+                                target={featuredProduct?.externalUrl ? "_blank" : "_self"}
+                                className="w-full py-4 bg-white text-indigo-700 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
+                            >
+                                 {featuredProduct?.externalUrl ? 'Visit Resource' : 'Get Tool'} <ArrowRight size={14} />
                             </Link>
                         </div>
                     </div>

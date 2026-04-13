@@ -90,6 +90,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                                 <SelectItem value="software" className="focus:bg-slate-700 focus:text-white">Software</SelectItem>
                                 <SelectItem value="amazon" className="focus:bg-slate-700 focus:text-white">Amazon Product</SelectItem>
                                 <SelectItem value="course" className="focus:bg-slate-700 focus:text-white">Course</SelectItem>
+                                <SelectItem value="external" className="focus:bg-slate-700 focus:text-white">External Link / Affiliate</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -215,6 +216,42 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                         onChange={(e) => updateData({ imageUrl: e.target.value })}
                         placeholder="https://..."
                     />
+                </div>
+
+                {/* PROMOTIONAL ROTATION SECTION */}
+                <div className="pt-6 border-t border-slate-700 space-y-6">
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-bold text-indigo-400">Promotional Rotation</h3>
+                        <p className="text-xs text-slate-400">Control if and how this product appears in rotating features across the site.</p>
+                    </div>
+
+                    <div className="flex items-center space-x-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                        <input
+                            type="checkbox"
+                            id="isFeaturedInRotation"
+                            className="w-5 h-5 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-slate-900"
+                            checked={data.isFeaturedInRotation}
+                            onChange={(e) => updateData({ isFeaturedInRotation: e.target.checked })}
+                        />
+                        <div className="space-y-0.5">
+                            <Label htmlFor="isFeaturedInRotation" className="text-sm font-bold text-slate-200 cursor-pointer">Include in Rotation Pool</Label>
+                            <p className="text-[10px] text-slate-500">When enabled, this product will randomly appear on glossary terms and other sales hubs.</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="externalUrl" className="text-sm font-bold text-slate-300">Custom Destination URL (Optional)</Label>
+                        <Input
+                            id="externalUrl"
+                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-500"
+                            value={data.externalUrl}
+                            onChange={(e) => updateData({ externalUrl: e.target.value })}
+                            placeholder="https://external-store.com/your-product"
+                        />
+                        <p className="text-[10px] text-slate-500">
+                            If set, "Buy" buttons will lead here instead of the internal sales page. Perfect for affiliate links or Amazon.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

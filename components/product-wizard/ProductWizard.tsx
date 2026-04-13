@@ -33,6 +33,8 @@ export type WizardData = {
     licenseType: string
     imageUrl: string
     isHidden: boolean
+    isFeaturedInRotation: boolean
+    externalUrl: string
     isAmazonProduct: boolean
     amazonLink: string
     grooveSellId: string
@@ -54,6 +56,8 @@ const initialData: WizardData = {
     licenseType: "PLR",
     imageUrl: "",
     isHidden: false,
+    isFeaturedInRotation: true,
+    externalUrl: "",
     isAmazonProduct: false,
     amazonLink: "",
     grooveSellId: "",

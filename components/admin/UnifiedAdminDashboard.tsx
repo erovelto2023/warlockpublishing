@@ -9,7 +9,7 @@ import {
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import GlossaryTable from '@/components/admin/GlossaryTable';
 import MediaLibrary from '@/components/admin/MediaLibrary';
-import { deleteProduct } from '@/lib/actions/product.actions';
+import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage } from '@/lib/actions/sales-page.actions';
@@ -92,6 +92,15 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             router.refresh();
         } catch (e) {
             alert('Error updating message');
+        }
+    };
+
+    const toggleRotation = async (productId: string, currentState: boolean) => {
+        try {
+            await updateProduct(productId, { isFeaturedInRotation: !currentState });
+            router.refresh();
+        } catch (e) {
+            alert('Error toggling rotation status');
         }
     };
 
@@ -319,6 +328,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Product</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Type</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Price</th>
+                                        <th className="px-6 py-4 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Rotation</th>
                                         <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
                                     </tr>
                                 </thead>
@@ -333,6 +343,15 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                                 <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold uppercase tracking-wider">{product.productType || 'Standard'}</span>
                                             </td>
                                             <td className="px-6 py-4 font-bold text-slate-700">${product.price}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <button
+                                                    onClick={() => toggleRotation(product._id, !!product.isFeaturedInRotation)}
+                                                    className={`p-2 rounded-full transition-all ${product.isFeaturedInRotation ? 'text-indigo-600 bg-indigo-50' : 'text-slate-300 bg-slate-50'}`}
+                                                    title={product.isFeaturedInRotation ? "In Rotation Pool" : "Not in Rotation"}
+                                                >
+                                                    <RefreshCw size={16} className={product.isFeaturedInRotation ? "animate-spin-slow" : ""} />
+                                                </button>
+                                            </td>
                                             <td className="px-6 py-4 text-right space-x-2">
                                                 <a href={`/products/${product.slug}`} target="_blank" className="inline-block p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"><Eye size={16} /></a>
                                                 <button onClick={() => copyToClipboard(`${window.location.origin}/products/${product.slug}`)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><LinkIcon size={16} /></button>
