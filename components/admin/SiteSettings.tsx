@@ -173,8 +173,8 @@ export default function SiteSettings() {
                             <button onClick={() => setShowMediaLibrary(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors font-bold text-slate-400">X</button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-4">
-                            <MediaLibrary onSelect={(img) => {
-                                setSettings({ ...settings, homeHeroImageUrl: img.url });
+                            <MediaLibrary onSelect={(url) => {
+                                setSettings({ ...settings, homeHeroImageUrl: url });
                                 setShowMediaLibrary(false);
                             }} />
                         </div>
