@@ -1,17 +1,7 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-    // In production build, we might not have the env var yet, but we shouldn't crash unless we try to connect.
-    // However, for this specific setup, we'll just log a warning if it's missing during build, 
-    // but usually it's required.
-    // If this is running during 'next build' and trying to statically generate pages that fetch data,
-    // it needs the DB.
-    // If we want to skip DB connection during build for static pages, we can check process.env.NODE_ENV
-    // But let's just suppress the error for now to see if that's the blocker.
-    console.warn('MONGODB_URI is not defined');
-}
+// Environment variable will be EVALUATED inside the function to ensure 
+// that scripts using dotenv have a chance to load it before use.
 
 interface MongooseCache {
     conn: typeof mongoose | null;
@@ -33,6 +23,8 @@ async function connectToDatabase() {
         const opts = {
             bufferCommands: false,
         };
+
+        const MONGODB_URI = process.env.MONGODB_URI;
 
         if (!MONGODB_URI) {
             throw new Error('MONGODB_URI is not defined');

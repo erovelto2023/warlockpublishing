@@ -28,6 +28,9 @@ export default async function Navbar() {
                         <Link href="/products" className="text-slate-600 hover:text-primary transition-all text-sm font-semibold tracking-wide uppercase">
                             Marketplace
                         </Link>
+                        <Link href="/offers" className="text-slate-600 hover:text-primary transition-all text-sm font-semibold tracking-wide uppercase">
+                            The Emporium
+                        </Link>
                         <Link href="/blog" className="text-slate-600 hover:text-primary transition-all text-sm font-semibold tracking-wide uppercase">
                             Blog
                         </Link>

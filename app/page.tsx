@@ -29,16 +29,8 @@ export default async function Home() {
         settings = JSON.parse(JSON.stringify(rawSettings));
     }
 
-    // Fetch Featured Products
-    const rawProducts = await Product.find({ 
-      isFeaturedInRotation: true,
-      isHidden: { $ne: true }
-    })
-    .sort({ createdAt: -1 })
-    .limit(8)
-    .lean();
-    
-    featuredProducts = JSON.parse(JSON.stringify(rawProducts));
+    const items = await getFeaturedItems();
+    featuredProducts = items;
 
   } catch (err) {
     console.error('Failed to fetch home data', err);

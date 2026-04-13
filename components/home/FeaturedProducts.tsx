@@ -5,12 +5,14 @@ import { ShoppingBag, Star, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface Product {
-  _id: string;
+  id: string;
   title: string;
   price: number;
   imageUrl?: string;
   category?: string;
   slug?: string;
+  type?: string;
+  externalUrl?: string;
 }
 
 export default function FeaturedProducts({ products }: { products: Product[] }) {
@@ -33,7 +35,7 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.map((product, i) => (
             <motion.div
-              key={product._id}
+              key={product.id}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
@@ -56,9 +58,9 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
                 <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-transparent opacity-60"></div>
                 
                 {/* Badge */}
-                <div className="absolute top-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-1.5 text-[10px] font-bold text-secondary uppercase tracking-widest">
-                  <Star className="w-3 h-3 fill-secondary text-secondary" />
-                  Premium
+                <div className={`absolute top-4 left-4 px-3 py-1 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${product.type === 'offer' ? 'bg-amber-500/20 text-amber-400 border-amber-500/20' : 'bg-black/60 text-secondary'}`}>
+                  <Star className={`w-3 h-3 ${product.type === 'offer' ? 'fill-amber-400 text-amber-400' : 'fill-secondary text-secondary'}`} />
+                  {product.type === 'offer' ? 'Emporium Special' : 'Marketplace'}
                 </div>
               </div>
 
@@ -70,9 +72,9 @@ export default function FeaturedProducts({ products }: { products: Product[] }) 
                 </h4>
                 
                 <div className="mt-auto flex items-center justify-between">
-                  <span className="text-xl font-serif text-white">${product.price.toFixed(2)}</span>
+                  <span className="text-xl font-serif text-white">${product.price ? product.price.toFixed(2) : '0.00'}</span>
                   <Link 
-                    href={`/products/${product.slug || product._id}`}
+                    href={product.externalUrl || `/products/${product.slug || product.id}`}
                     className="p-3 bg-secondary/10 text-secondary rounded-xl hover:bg-secondary hover:text-black transition-all"
                   >
                     <ArrowRight className="w-5 h-5" />

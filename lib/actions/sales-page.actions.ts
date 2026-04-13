@@ -19,8 +19,7 @@ export async function getPublishedSalesPages() {
     try {
         await connectToDatabase();
         const pages = await SalesPage.find({ 
-            isPublished: true, 
-            isFeaturedInRotation: { $ne: false } 
+            isPublished: true
         }).sort({ createdAt: -1 }).lean();
         return JSON.parse(JSON.stringify(pages));
     } catch (error: any) {

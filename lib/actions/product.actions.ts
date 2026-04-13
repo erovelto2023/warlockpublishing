@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import Product from "../models/Product";
+import SalesPage from "../models/SalesPage";
 import "../models/PenName"; // Import to ensure model is registered for populate
 import { connectToDatabase } from "../db";
 import { auth } from "@clerk/nextjs/server";
@@ -149,6 +150,97 @@ export async function getPublishedProducts() {
         return JSON.parse(JSON.stringify(products));
     } catch (error) {
         console.error("Error fetching published products:", error);
+        return [];
+    }
+}
+
+export async function getMarketplaceItems() {
+    try {
+        await connectToDatabase();
+        
+        // Fetch products
+        const products = await Product.find({ isHidden: { $ne: true } }).sort({ createdAt: -1 });
+        
+        // Fetch sales pages marked for marketplace
+        const salesPages = await SalesPage.find({ isPublished: true, showInMarketplace: true }).sort({ createdAt: -1 });
+        
+        // Normalize
+        const normalizedProducts = products.map((p: any) => ({
+            id: p._id.toString(),
+            title: p.title,
+            description: p.description,
+            price: p.price,
+            slug: p.slug,
+            imageUrl: p.imageUrl,
+            type: 'product',
+            category: p.category,
+            externalUrl: p.externalUrl
+        }));
+
+        const normalizedSalesPages = salesPages.map((s: any) => ({
+            id: s._id.toString(),
+            title: s.marketplaceTitle || s.title,
+            description: s.marketplaceDescription || s.description,
+            price: s.price,
+            slug: s.slug,
+            imageUrl: s.marketplaceImage || s.ogImage,
+            type: 'offer',
+            category: 'Offers',
+            externalUrl: `/offers/${s.slug}`
+        }));
+
+        // Combine and sort
+        const combined = [...normalizedProducts, ...normalizedSalesPages];
+        
+        return JSON.parse(JSON.stringify(combined));
+    } catch (error) {
+        console.error("Error fetching marketplace items:", error);
+        return [];
+    }
+}
+
+export async function getFeaturedItems() {
+    try {
+        await connectToDatabase();
+        
+        const products = await Product.find({ 
+            isFeaturedInRotation: true,
+            isHidden: { $ne: true } 
+        }).sort({ createdAt: -1 }).limit(10);
+        
+        const salesPages = await SalesPage.find({ 
+            isPublished: true, 
+            showInMarketplace: true,
+            isFeaturedInRotation: true 
+        }).sort({ createdAt: -1 }).limit(5);
+        
+        const normalizedProducts = products.map((p: any) => ({
+            id: p._id.toString(),
+            title: p.title,
+            description: p.description,
+            price: p.price,
+            slug: p.slug,
+            imageUrl: p.imageUrl,
+            type: 'product',
+            category: p.category,
+            externalUrl: p.externalUrl
+        }));
+
+        const normalizedSalesPages = salesPages.map((s: any) => ({
+            id: s._id.toString(),
+            title: s.marketplaceTitle || s.title,
+            description: s.marketplaceDescription || s.description,
+            price: s.price,
+            slug: s.slug,
+            imageUrl: s.marketplaceImage || s.ogImage,
+            type: 'offer',
+            category: 'Premium Offer',
+            externalUrl: `/offers/${s.slug}`
+        }));
+
+        return JSON.parse(JSON.stringify([...normalizedProducts, ...normalizedSalesPages]));
+    } catch (error) {
+        console.error("Error fetching featured items:", error);
         return [];
     }
 }

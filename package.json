@@ -6,7 +6,9 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:glossary": "npx tsx scripts/seed-glossary.ts",
+    "seed:marketplace": "npx tsx scripts/seed-marketplace.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.5",
