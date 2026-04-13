@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from "react";
+import TrafficTracker from "@/components/TrafficTracker";
 
 import { LayoutShell } from "@/components/layout-shell";
 
@@ -36,6 +37,7 @@ export default function RootLayout({
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         </head>
         <body className={`${outfit.className} antialiased bg-background text-foreground`} suppressHydrationWarning>
+          <TrafficTracker />
           <CommandCenter />
           <LayoutShell
             navbar={

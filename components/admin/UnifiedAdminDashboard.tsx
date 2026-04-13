@@ -4,14 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare, BookOpen, Image,
-    Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check, X, Mail
+    Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check, X, Mail,
+    Package, Smartphone, ShieldCheck
 } from 'lucide-react';
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import GlossaryTable from '@/components/admin/GlossaryTable';
 import MediaLibrary from '@/components/admin/MediaLibrary';
 import AssetWarehouse from '@/components/admin/AssetWarehouse';
-import { Package, Smartphone, ShieldCheck } from 'lucide-react';
 import SiteSettings from '@/components/admin/SiteSettings';
+import AdminModuleGrid from '@/components/admin/AdminModuleGrid';
+import TrafficIntelligence from '@/components/admin/TrafficIntelligence';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -27,10 +29,11 @@ interface AdminDashboardProps {
     offers: any[];
     subscribers: any[];
     glossaryTerms?: any[];
+    analytics?: any;
 }
 
-export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [] }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse' | 'settings'>('overview');
+export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [], analytics }: AdminDashboardProps) {
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse' | 'settings'>('overview');
     const router = useRouter();
 
     // Stats
@@ -177,7 +180,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                     {/* Tabs Scroll Area */}
                     <div className="flex flex-wrap items-center gap-1 pb-2">
                         {[
-                            { id: 'overview', label: 'Dashboard', icon: BarChart3 },
+                            { id: 'overview', label: 'Command Center', icon: BarChart3 },
+                            { id: 'analytics', label: 'Traffic Intel', icon: Eye },
                             { id: 'products', label: 'Products / Tools', icon: ShoppingBag },
                             { id: 'offers', label: 'Offer Builder', icon: Megaphone },
                             { id: 'subscribers', label: 'Subscribers', icon: Users },
@@ -214,38 +218,50 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             {/* Main Content Area */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
 
-                {/* OVERVIEW TAB */}
+                {/* OVERVIEW TAB — Command Center */}
                 {activeTab === 'overview' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Megaphone size={24} /></div>
-                            <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Offer Views</p>
+                    <div className="space-y-8">
+                        {/* Quick Stats Row */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Site Visitors</p>
+                                <h3 className="text-2xl font-bold text-slate-900">{analytics?.totalHits?.toLocaleString() || '0'}</h3>
+                            </div>
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Offer Views</p>
                                 <h3 className="text-2xl font-bold text-slate-900">{totalViews.toLocaleString()}</h3>
                             </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><ShoppingBag size={24} /></div>
-                            <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Products</p>
-                                <h3 className="text-2xl font-bold text-slate-900">{totalProducts}</h3>
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Subscribers</p>
+                                <h3 className="text-2xl font-bold text-slate-900">{subscribers.length}</h3>
+                            </div>
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Unread Msgs</p>
+                                <h3 className={`text-2xl font-bold ${pendingMessages > 0 ? 'text-red-500' : 'text-slate-900'}`}>{pendingMessages}</h3>
                             </div>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                            <div className="p-3 bg-purple-50 text-purple-600 rounded-xl"><Users size={24} /></div>
-                            <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pen Names</p>
-                                <h3 className="text-2xl font-bold text-slate-900">{penNames.length}</h3>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 cursor-pointer hover:border-blue-500 transition-all" onClick={() => setActiveTab('glossary')}>
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><BookOpen size={24} /></div>
-                            <div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Glossary Terms</p>
-                                <h3 className="text-2xl font-bold text-slate-900">{glossaryTerms.length}</h3>
-                            </div>
+
+                        {/* Module Navigation Cards */}
+                        <div>
+                            <h2 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Modules</h2>
+                            <AdminModuleGrid
+                                stats={{
+                                    products: totalProducts,
+                                    offers: offers.length,
+                                    subscribers: subscribers.length,
+                                    messages: pendingMessages,
+                                    posts: totalPosts,
+                                    glossary: glossaryTerms.length
+                                }}
+                                setActiveTab={setActiveTab}
+                            />
                         </div>
                     </div>
+                )}
+
+                {/* ANALYTICS TAB — Traffic Intelligence */}
+                {activeTab === 'analytics' && (
+                    <TrafficIntelligence data={analytics} />
                 )}
 
                 {/* OFFERS TAB (The Requested Feature) */}
