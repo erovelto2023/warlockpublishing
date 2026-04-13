@@ -10,6 +10,11 @@
   --font-sans: var(--font-outfit);
   --font-serif: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-space-grotesk);
+  --color-primary-new: #8b5cf6;
+  --color-secondary-new: #06b6d4;
+  --bg-dark: #020617;
+  --bg-card: #0f172a;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -138,6 +143,36 @@
 
   .glass-dark {
     @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+  }
+
+  .heading-font {
+    font-family: var(--font-space-grotesk), sans-serif;
+  }
+
+  .glass-premium {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, var(--color-primary-new), var(--color-secondary-new));
+  }
+
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-[2px] border-primary-new/50;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+  }
+
+  .glow-dot {
+    @apply h-2 w-2 rounded-full;
+    background-color: var(--color-primary-new);
+    box-shadow: 0 0 10px var(--color-primary-new);
   }
 
   .container {

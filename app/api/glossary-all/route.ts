@@ -5,7 +5,7 @@ import GlossaryTerm from "@/lib/models/GlossaryTerm";
 export async function GET() {
     try {
         await connectToDatabase();
-        const terms = await GlossaryTerm.find({ status: "Published" })
+        const terms = await GlossaryTerm.find({ isPublished: { $ne: false } })
             .select("term slug shortDefinition category definition")
             .lean();
             

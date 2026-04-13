@@ -21,7 +21,8 @@ import {
     scrubGlossaryUrls, 
     backfillAffiliateTags,
     verifyYouTubeLinksBatch,
-    getGlossaryHealthData
+    getGlossaryHealthData,
+    seedSampleGlossaryData
 } from '@/lib/actions/glossary';
 
 export default function GlossaryMaintenance() {
@@ -148,6 +149,14 @@ export default function GlossaryMaintenance() {
                     description="Rebuilds niche aliases and search indexes for the frontend."
                     action={() => handleAction(async () => ({ success: true }), "Discovery sync complete")}
                     disabled={isLoading}
+                />
+                <MaintenanceCard 
+                    icon={<Database size={20} />}
+                    title="Seed Registry"
+                    description="Populates the database with core sample research data. Use if your collection is empty."
+                    action={() => handleAction(seedSampleGlossaryData, "Sample data seeded")}
+                    disabled={isLoading}
+                    variant="success"
                 />
             </div>
 

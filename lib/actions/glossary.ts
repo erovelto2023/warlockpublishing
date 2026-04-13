@@ -626,6 +626,53 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
     return { success: true, updatedCount, broken: broken.length > 0 ? broken : undefined };
 }
 
+export async function seedSampleGlossaryData() {
+    await connectToDatabase();
+    
+    // Sample terms from the seed script to allow quick hydration on live
+    const sampleTerms = [
+        {
+            term: "Billionaire Revenge",
+            shortDefinition: "A high-stakes romance trope where a wealthy protagonist uses their resources to avenge a past wrong, only to find love in the process.",
+            definition: "The Billionaire Revenge trope centers on a protagonist who has been marginalized, betrayed, or ruined in the past. Having built an empire, they return to systematically dismantle their enemies. The emotional core of the story is the conflict between their cold mission for justice and the warmth of a new, unexpected relationship—often with someone connected to their past or their enemy.",
+            category: "Writing & Tropes",
+            isPublished: true,
+            status: 'Seeded'
+        },
+        {
+            term: "Craved by the Billionaire",
+            shortDefinition: "The 'Obsession' trope where a powerful figure focuses their entire attention on a single, often unsuspecting, individual.",
+            definition: "This niche focuses on the 'Insta-Love' or 'Deep Obsession' dynamics. The billionaire uses their influence to protect, provide for, and ultimately win over the object of their affection. It often borders on the 'Stalker' or 'Dark' romance sub-genres but remains firmly in the 'Protector' fantasy.",
+            category: "Writing & Tropes",
+            isPublished: true,
+            status: 'Seeded'
+        },
+        {
+            term: "Billionaire Husband Chapter 1",
+            shortDefinition: "Specific hook strategy for viral billionaire romance series, optimized for cliffhangers and immediate reader retention.",
+            definition: "A 'Chapter 1' strategy specifically engineered for platforms like Wattpad, Radish, or Kindle Vella. It requires an immediate world-building establishment where the billionaire's power is demonstrated through an interaction with the protagonist—usually involving a contract, a debt, or a chance encounter in a high-status location.",
+            category: "Writing & Tropes",
+            isPublished: true,
+            status: 'Seeded'
+        }
+    ];
+
+    let seededCount = 0;
+    for (const term of sampleTerms) {
+        const baseSlug = term.term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        await GlossaryTerm.findOneAndUpdate(
+            { slug: baseSlug },
+            { ...term, slug: baseSlug, lastUpdated: new Date() },
+            { upsert: true, new: true }
+        );
+        seededCount++;
+    }
+    
+    revalidatePath('/glossary');
+    revalidatePath('/admin/glossary');
+    return { success: true, seededCount };
+}
+
 export async function getGlossaryHealthData() {
     await connectToDatabase();
     const terms = await GlossaryTerm.find({}).lean();

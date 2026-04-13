@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
-import { connectToDatabase } from "../db";
-import GlossaryTerm from "../models/GlossaryTerm";
+import { connectToDatabase } from "../lib/db";
+import GlossaryTerm from "../lib/models/GlossaryTerm";
 
 const sampleTerms = [
     {
