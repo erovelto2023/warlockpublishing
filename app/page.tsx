@@ -1,4 +1,5 @@
 import Link from "next/link";
+export const dynamic = "force-dynamic";
 import { ShoppingBag, Star, Zap, Globe, Shield, ArrowRight, Play, Download, Layers, Cpu, BookOpen, PenTool, Puzzle, GraduationCap, Sparkles, Palette, Briefcase, FileText, Monitor, Book, ChevronRight } from 'lucide-react';
 import { HeroAuthButtons } from "@/components/hero-auth-buttons";
 
