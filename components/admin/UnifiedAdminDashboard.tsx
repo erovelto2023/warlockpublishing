@@ -9,6 +9,8 @@ import {
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import GlossaryTable from '@/components/admin/GlossaryTable';
 import MediaLibrary from '@/components/admin/MediaLibrary';
+import AssetWarehouse from '@/components/admin/AssetWarehouse';
+import { Package } from 'lucide-react';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -26,7 +28,7 @@ interface AdminDashboardProps {
 }
 
 export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [] }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse'>('overview');
     const router = useRouter();
 
     // Stats
@@ -146,6 +148,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'blog', label: 'Blog Posts', icon: FileText },
                             { id: 'glossary', label: 'Glossary', icon: BookOpen },
                             { id: 'media', label: 'Media', icon: Image },
+                            { id: 'warehouse', label: 'Warehouse', icon: Package },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
                         ].map((tab) => (
                             <button
@@ -584,6 +587,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 {/* MEDIA TAB */}
                 {activeTab === 'media' && (
                     <MediaLibrary />
+                )}
+
+                {activeTab === 'warehouse' && (
+                    <AssetWarehouse />
                 )}
 
             </main>
