@@ -129,7 +129,9 @@ export default async function Home() {
 
       {/* Featured Vault Section */}
       {featuredProducts.length > 0 && (
-        <FeaturedProducts products={featuredProducts} />
+        <section className="bg-neutral-900/40 relative">
+          <FeaturedProducts products={featuredProducts} />
+        </section>
       )}
 
       {/* CTA Section - The Final Frontier */}

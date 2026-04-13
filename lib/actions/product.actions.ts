@@ -203,16 +203,31 @@ export async function getFeaturedItems() {
     try {
         await connectToDatabase();
         
-        const products = await Product.find({ 
+        let products = await Product.find({ 
             isFeaturedInRotation: true,
             isHidden: { $ne: true } 
         }).sort({ createdAt: -1 }).limit(10);
+
+        // Fallback to latest products if none are marked as featured
+        if (products.length === 0) {
+            products = await Product.find({ 
+                isHidden: { $ne: true } 
+            }).sort({ createdAt: -1 }).limit(8);
+        }
         
-        const salesPages = await SalesPage.find({ 
+        let salesPages = await SalesPage.find({ 
             isPublished: true, 
             showInMarketplace: true,
             isFeaturedInRotation: true 
         }).sort({ createdAt: -1 }).limit(5);
+
+        // Fallback to latest sales pages if none are marked as featured
+        if (salesPages.length === 0) {
+            salesPages = await SalesPage.find({ 
+                isPublished: true,
+                showInMarketplace: true
+            }).sort({ createdAt: -1 }).limit(4);
+        }
         
         const normalizedProducts = products.map((p: any) => ({
             id: p._id.toString(),
