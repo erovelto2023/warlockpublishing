@@ -2,29 +2,40 @@
 
 import { useState, useEffect } from 'react';
 import { createOrUpdateSalesPage } from '@/lib/actions/sales-page.actions';
-import { Info, Plus, Loader2, Save } from 'lucide-react';
+import { Info, Plus, Loader2, Save, Image as ImageIcon, RefreshCw, ExternalLink, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import MediaLibrary from './MediaLibrary';
 
 interface SimplePageBuilderProps {
-    onSuccess?: () => void; // Made optional
+    onSuccess?: () => void;
     initialData?: {
         _id?: string;
         title?: string;
         slug?: string;
         bodyCode?: string;
+        marketplaceImage?: string;
+        isFeaturedInRotation?: boolean;
+        externalUrl?: string;
     };
 }
 
 export default function SimplePageBuilder({ onSuccess, initialData }: SimplePageBuilderProps) {
     const [slug, setSlug] = useState(initialData?.slug || '');
     const [content, setContent] = useState(initialData?.bodyCode || '');
+    const [marketplaceImage, setMarketplaceImage] = useState(initialData?.marketplaceImage || '');
+    const [isFeaturedInRotation, setIsFeaturedInRotation] = useState(initialData?.isFeaturedInRotation !== false);
+    const [externalUrl, setExternalUrl] = useState(initialData?.externalUrl || '');
     const [isSaving, setIsSaving] = useState(false);
+    const [showGallery, setShowGallery] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         if (initialData) {
             setSlug(initialData.slug || '');
             setContent(initialData.bodyCode || '');
+            setMarketplaceImage(initialData.marketplaceImage || '');
+            setIsFeaturedInRotation(initialData.isFeaturedInRotation !== false);
+            setExternalUrl(initialData.externalUrl || '');
         }
     }, [initialData]);
 
@@ -33,16 +44,13 @@ export default function SimplePageBuilder({ onSuccess, initialData }: SimplePage
 
         setIsSaving(true);
         try {
-            // Auto-generate title from H1 if present, else use slug, or keep existing title
             let title = initialData?.title || slug || 'Untitled Offer';
 
-            // Only try to extract H1 if we don't have a title or if we are creating new
             if (!initialData?.title) {
                 const h1Match = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
                 if (h1Match) title = h1Match[1];
             }
 
-            // Clean slug
             const finalSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || title.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
             const result = await createOrUpdateSalesPage(initialData?._id || null, {
@@ -50,7 +58,10 @@ export default function SimplePageBuilder({ onSuccess, initialData }: SimplePage
                 slug: finalSlug,
                 bodyCode: content,
                 isPublished: true,
-                pageType: 'sales'
+                pageType: 'sales',
+                marketplaceImage,
+                isFeaturedInRotation,
+                externalUrl
             });
 
             if (result.success) {
@@ -58,12 +69,14 @@ export default function SimplePageBuilder({ onSuccess, initialData }: SimplePage
                 if (!initialData) {
                     setSlug('');
                     setContent('');
+                    setMarketplaceImage('');
+                    setExternalUrl('');
                 }
                 if (onSuccess) {
                     onSuccess();
                 } else {
                     router.refresh();
-                    router.push('/admin'); // Redirect back to admin on save if no onSuccess provided
+                    router.push('/admin');
                 }
             } else {
                 alert("Error: " + result.error);
@@ -91,17 +104,84 @@ export default function SimplePageBuilder({ onSuccess, initialData }: SimplePage
                 </div>
             </div>
 
-            {/* Slug Input */}
-            <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Page Slug / URL</label>
-                <div className="flex items-center">
-                    <span className="bg-slate-100 border border-r-0 border-slate-200 px-3 py-2.5 rounded-l-lg text-slate-400 font-mono text-sm">/offers/</span>
-                    <input
-                        type="text"
-                        value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
-                        className="flex-1 bg-white border border-slate-200 rounded-r-lg px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g. breathalyzer-dashboard (Leave empty to auto-generate from content)"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Slug Input */}
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Page Slug / URL</label>
+                        <div className="flex items-center">
+                            <span className="bg-slate-100 border border-r-0 border-slate-200 px-3 py-2.5 rounded-l-lg text-slate-400 font-mono text-sm">/offers/</span>
+                            <input
+                                type="text"
+                                value={slug}
+                                onChange={(e) => setSlug(e.target.value)}
+                                className="flex-1 bg-white border border-slate-200 rounded-r-lg px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="slug"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Override Link (Optional)</label>
+                        <div className="flex items-center">
+                            <span className="bg-slate-100 border border-r-0 border-slate-200 px-3 py-2.5 rounded-l-lg text-slate-400 font-mono text-sm"><ExternalLink size={14} /></span>
+                            <input
+                                type="url"
+                                value={externalUrl}
+                                onChange={(e) => setExternalUrl(e.target.value)}
+                                className="flex-1 bg-white border border-slate-200 rounded-r-lg px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="https://..."
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <input 
+                            type="checkbox" 
+                            id="rotation-toggle"
+                            checked={isFeaturedInRotation} 
+                            onChange={(e) => setIsFeaturedInRotation(e.target.checked)}
+                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label htmlFor="rotation-toggle" className="text-xs font-black uppercase tracking-widest text-slate-600 cursor-pointer">
+                            Include in Rotation Pool
+                        </label>
+                    </div>
+                </div>
+
+                {/* Image Picker */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center space-y-4">
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest self-start mb-2">Marketplace Thumbnail</label>
+                    
+                    <div className="w-full aspect-square bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center relative overflow-hidden group">
+                        {marketplaceImage ? (
+                            <>
+                                <img src={marketplaceImage} alt="Preview" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <button onClick={() => setMarketplaceImage('')} className="bg-white text-red-500 p-2 rounded-full shadow-lg hover:bg-red-50 transition-all"><X size={16} /></button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center gap-2 text-slate-400">
+                                <ImageIcon size={40} strokeWidth={1} />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">No Image Selected</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <button 
+                        type="button" 
+                        onClick={() => setShowGallery(true)}
+                        className="w-full py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        <Plus size={14} /> Pick from Gallery
+                    </button>
+                    <input 
+                        type="url" 
+                        value={marketplaceImage} 
+                        onChange={(e) => setMarketplaceImage(e.target.value)}
+                        placeholder="Or paste URL here..."
+                        className="w-full px-4 py-2 bg-transparent text-[10px] font-bold text-slate-500 text-center outline-none"
                     />
                 </div>
             </div>
@@ -135,6 +215,29 @@ export default function SimplePageBuilder({ onSuccess, initialData }: SimplePage
                     )}
                 </button>
             </div>
+
+            {/* GALLERY MODAL */}
+            {showGallery && (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="flex items-center justify-between p-8 border-b border-slate-100">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Image Gallery</h3>
+                                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Select an image for your offer card</p>
+                            </div>
+                            <button type="button" onClick={() => setShowGallery(false)} className="p-3 hover:bg-slate-100 rounded-2xl transition-all">
+                                <X size={24} className="text-slate-500" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                           <MediaLibrary onSelect={(url) => {
+                               setMarketplaceImage(url);
+                               setShowGallery(false);
+                           }} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

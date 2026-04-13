@@ -23,7 +23,7 @@ interface GalleryImage {
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://warlockpublishing.com';
 
-export default function MediaLibrary() {
+export default function MediaLibrary({ onSelect }: { onSelect?: (url: string) => void }) {
     const [images, setImages] = useState<GalleryImage[]>([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -271,10 +271,17 @@ export default function MediaLibrary() {
                                         className="p-2 bg-indigo-600 rounded-xl text-white hover:bg-indigo-700 transition-colors">
                                         <Copy size={14} />
                                     </button>
-                                    <button onClick={() => openEdit(img)} title="Edit metadata"
-                                        className="p-2 bg-white rounded-xl text-slate-700 hover:bg-slate-100 transition-colors">
-                                        <Pencil size={14} />
-                                    </button>
+                                    {onSelect ? (
+                                        <button onClick={() => onSelect(img.fileUrl)} title="Select this image"
+                                            className="p-2 bg-emerald-600 rounded-xl text-white hover:bg-emerald-700 transition-colors">
+                                            <Check size={14} />
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => openEdit(img)} title="Edit metadata"
+                                            className="p-2 bg-white rounded-xl text-slate-700 hover:bg-slate-100 transition-colors">
+                                            <Pencil size={14} />
+                                        </button>
+                                    )}
                                     <button onClick={() => toggleStatus(img)} title={img.status === 'published' ? 'Set to draft' : 'Publish'}
                                         className="p-2 bg-white rounded-xl text-slate-700 hover:bg-slate-100 transition-colors">
                                         {img.status === 'published' ? <EyeOff size={14} /> : <Eye size={14} />}
