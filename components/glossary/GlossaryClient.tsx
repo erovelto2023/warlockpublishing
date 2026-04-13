@@ -124,14 +124,6 @@ function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) 
                     >
                         <LayoutList size={14} /> Taxonomy Search
                     </button>
-                    <span className="opacity-20 hidden md:block">|</span>
-                    <Link href="/glossary/study" className="hover:text-indigo-600 transition-colors flex items-center gap-2">
-                        <Zap size={14} className="fill-current" /> Mastery Mode
-                    </Link>
-                    <span className="opacity-20 hidden md:block">|</span>
-                    <Link href="/glossary/quiz" className="hover:text-indigo-600 transition-colors flex items-center gap-2">
-                        <Brain size={14} className="fill-current" /> Knowledge Quiz
-                    </Link>
                 </div>
 
                 {/* Sub-Nav: Alphabet */}

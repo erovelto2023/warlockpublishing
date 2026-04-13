@@ -31,6 +31,9 @@ export default async function Navbar() {
                         <Link href="/blog" className="text-slate-600 hover:text-primary transition-all text-sm font-semibold tracking-wide uppercase">
                             Blog
                         </Link>
+                        <Link href="/glossary" className="text-slate-600 hover:text-primary transition-all text-sm font-semibold tracking-wide uppercase">
+                            Glossary
+                        </Link>
                         {isUserAdmin && (
                             <div className="flex items-center space-x-6 border-l border-slate-200 pl-6">
                                 <Link href="/admin" className="text-slate-500 hover:text-primary transition-all text-xs font-bold uppercase tracking-widest">
