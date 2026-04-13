@@ -17,12 +17,12 @@ export default function SearchTrigger() {
             className="w-full sm:flex-1 relative cursor-pointer" 
             onClick={handleClick}
         >
-            <div className="w-full px-8 py-5 bg-white/5 text-slate-500 rounded-2xl border border-white/10 flex items-center justify-between hover:bg-white/[0.08] transition-all group">
+            <div className="w-full px-8 py-5 bg-white text-slate-900 rounded-2xl border border-white/20 flex items-center justify-between hover:bg-slate-50 transition-all shadow-xl group">
                 <div className="flex items-center gap-3">
-                    <Search size={18} className="text-slate-500 group-hover:text-primary transition-colors" />
-                    <span className="text-sm font-medium">Search 15,000+ assets...</span>
+                    <Search size={18} className="text-indigo-600 group-hover:scale-110 transition-transform" />
+                    <span className="text-sm font-semibold">Search 15,000+ assets...</span>
                 </div>
-                <span className="text-[10px] font-black opacity-40 px-2 py-1 bg-white/10 rounded-md">CMD + K</span>
+                <span className="text-[10px] font-black opacity-30 px-2 py-1 bg-slate-100 rounded-md border border-slate-200">CMD + K</span>
             </div>
         </div>
     );

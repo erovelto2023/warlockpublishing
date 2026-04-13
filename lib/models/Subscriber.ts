@@ -2,12 +2,17 @@ import mongoose from "mongoose";
 
 const SubscriberSchema = new mongoose.Schema({
     email: { type: String, required: true },
-    penNameId: { type: mongoose.Schema.Types.ObjectId, ref: "PenName", required: true },
-    userId: { type: String, required: true }, // The admin user who owns the pen name
+    penNameId: { type: mongoose.Schema.Types.ObjectId, ref: "PenName" },
+    userId: { type: String }, // The admin user who owns the pen name
+    ipAddress: { type: String },
+    userAgent: { type: String },
+    signupUrl: { type: String },
     createdAt: { type: Date, default: Date.now },
 });
 
-// Compound index to ensure unique email per pen name
-SubscriberSchema.index({ email: 1, penNameId: 1 }, { unique: true });
+// Forced re-registration to pick up schema changes in development
+if (mongoose.models && mongoose.models.Subscriber) {
+    delete mongoose.models.Subscriber;
+}
 
-export default mongoose.models.Subscriber || mongoose.model("Subscriber", SubscriberSchema);
+export default mongoose.model("Subscriber", SubscriberSchema);

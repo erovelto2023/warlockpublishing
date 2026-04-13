@@ -10,13 +10,14 @@ import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
 import GlossaryTable from '@/components/admin/GlossaryTable';
 import MediaLibrary from '@/components/admin/MediaLibrary';
 import AssetWarehouse from '@/components/admin/AssetWarehouse';
-import { Package, Smartphone } from 'lucide-react';
+import { Package, Smartphone, ShieldCheck } from 'lucide-react';
 import SiteSettings from '@/components/admin/SiteSettings';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
+import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
 
 interface AdminDashboardProps {
     products: any[];
@@ -45,8 +46,11 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const [viewingMessage, setViewingMessage] = useState<any | null>(null);
     const [isEditingMessage, setIsEditingMessage] = useState(false);
     const [editMessageContent, setEditMessageContent] = useState('');
+    const [selectedSubscribers, setSelectedSubscribers] = useState<string[]>([]);
+    const [editingSubscriber, setEditingSubscriber] = useState<any | null>(null);
+    const [editSubEmail, setEditSubEmail] = useState('');
 
-    const handleDelete = async (type: 'product' | 'post' | 'pen_name' | 'offer' | 'message', id: string) => {
+    const handleDelete = async (type: 'product' | 'post' | 'pen_name' | 'offer' | 'message' | 'subscriber', id: string) => {
         if (!confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) return;
 
         try {
@@ -58,10 +62,42 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 await deleteMessage(id);
                 if (viewingMessage?._id === id) setViewingMessage(null);
             }
+            if (type === 'subscriber' as any) {
+                await deleteSubscriber(id);
+            }
             alert('Deleted successfully');
             router.refresh();
         } catch (e) {
             alert('Error deleting item');
+        }
+    };
+
+    const handleBulkDeleteSubscribers = async () => {
+        if (!confirm(`Are you sure you want to delete ${selectedSubscribers.length} subscribers?`)) return;
+        try {
+            await deleteSubscribersBulk(selectedSubscribers);
+            setSelectedSubscribers([]);
+            alert('Bulk deletion successful');
+            router.refresh();
+        } catch (e) {
+            alert('Error deleting subscribers');
+        }
+    };
+
+    const handleEditSubscriber = (sub: any) => {
+        setEditingSubscriber(sub);
+        setEditSubEmail(sub.email);
+    };
+
+    const handleSaveSubscriber = async () => {
+        if (!editingSubscriber) return;
+        try {
+            await updateSubscriber(editingSubscriber._id, { email: editSubEmail });
+            alert('Subscriber updated');
+            setEditingSubscriber(null);
+            router.refresh();
+        } catch (e) {
+            alert('Error updating subscriber');
         }
     };
 
@@ -292,39 +328,124 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
                 {/* SUBSCRIBERS TAB */}
                 {activeTab === 'subscribers' && (
-                    <div className="max-w-5xl mx-auto space-y-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-slate-800">Subscribers ({subscribers.length})</h2>
-                            <button
-                                onClick={() => {
-                                    const csvContent = "data:text/csv;charset=utf-8," + "Email,Pen Name,Date\n" + subscribers.map((s: any) => `${s.email},${s.penNameId},${s.createdAt}`).join("\n");
-                                    const encodedUri = encodeURI(csvContent);
-                                    const link = document.createElement("a");
-                                    link.setAttribute("href", encodedUri);
-                                    link.setAttribute("download", "subscribers.csv");
-                                    document.body.appendChild(link);
-                                    link.click();
-                                }}
-                                className="bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50 flex items-center gap-2 transition-all"
-                            >
-                                <Download size={16} /> Export CSV
-                            </button>
+                    <div className="max-w-6xl mx-auto space-y-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div>
+                                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                                    <Users className="text-blue-600" /> Subscribers ({subscribers.length})
+                                </h2>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Mailing List Compliance & Management</p>
+                            </div>
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                {selectedSubscribers.length > 0 && (
+                                    <button
+                                        onClick={handleBulkDeleteSubscribers}
+                                        className="flex-1 sm:flex-none bg-red-50 text-red-600 border border-red-100 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 shadow-sm"
+                                    >
+                                        <Trash2 size={14} /> Delete Selected ({selectedSubscribers.length})
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        const csvHeader = "Email,Signup Date,Registration URL,IP Address,User Agent\n";
+                                        const csvRows = subscribers.map((s: any) => 
+                                            `"${s.email}","${new Date(s.createdAt).toISOString()}","${s.signupUrl || 'N/A'}","${s.ipAddress || 'unknown'}","${(s.userAgent || 'unknown').replace(/"/g, '""')}"`
+                                        ).join("\n");
+                                        const csvContent = "data:text/csv;charset=utf-8," + csvHeader + csvRows;
+                                        const encodedUri = encodeURI(csvContent);
+                                        const link = document.createElement("a");
+                                        link.setAttribute("href", encodedUri);
+                                        link.setAttribute("download", `subscribers_${new Date().toISOString().split('T')[0]}.csv`);
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    }}
+                                    className="flex-1 sm:flex-none bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
+                                >
+                                    <Download size={14} /> Export CSV
+                                </button>
+                            </div>
                         </div>
-                        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+
+                        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-100">
                                 <thead className="bg-slate-50/50">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Email</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Pen Name ID</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Date</th>
+                                        <th className="px-6 py-4 text-left w-10">
+                                            <input 
+                                                type="checkbox" 
+                                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                checked={selectedSubscribers.length === subscribers.length && subscribers.length > 0}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) setSelectedSubscribers(subscribers.map(s => s._id));
+                                                    else setSelectedSubscribers([]);
+                                                }}
+                                            />
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Subscriber Info</th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Compliance Data</th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Date / Origin</th>
+                                        <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {subscribers.map((sub: any) => (
-                                        <tr key={sub._id} className="hover:bg-slate-50/80 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-slate-900">{sub.email}</td>
-                                            <td className="px-6 py-4 text-slate-500 text-xs font-mono">{sub.penNameId}</td>
-                                            <td className="px-6 py-4 text-slate-500 text-sm">{new Date(sub.createdAt).toLocaleDateString()}</td>
+                                        <tr key={sub._id} className={`hover:bg-slate-50/80 transition-colors group ${selectedSubscribers.includes(sub._id) ? 'bg-blue-50/30' : ''}`}>
+                                            <td className="px-6 py-4">
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                                    checked={selectedSubscribers.includes(sub._id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setSelectedSubscribers([...selectedSubscribers, sub._id]);
+                                                        else setSelectedSubscribers(selectedSubscribers.filter(id => id !== sub._id));
+                                                    }}
+                                                />
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="font-bold text-slate-900">{sub.email}</div>
+                                                <div className="text-[9px] text-slate-400 mt-0.5 font-mono truncate max-w-[150px]" title={sub._id}>ID: {sub._id}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                                                        <Smartphone size={10} className="text-slate-400" /> 
+                                                        <span className="truncate max-w-[150px]" title={sub.userAgent}>{sub.userAgent || 'unknown'}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-xs font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded w-fit">
+                                                        {sub.ipAddress || '0.0.0.0'}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-slate-900 text-xs font-bold">{new Date(sub.createdAt).toLocaleDateString()}</div>
+                                                <div className="text-[10px] text-blue-500 hover:underline flex items-center gap-1 mt-1 truncate max-w-[120px]" title={sub.signupUrl}>
+                                                    <LinkIcon size={10} /> {sub.signupUrl ? new URL(sub.signupUrl).pathname : '/'}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right space-x-1.5 whitespace-nowrap">
+                                                <button 
+                                                    onClick={() => copyToClipboard(sub.email)}
+                                                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                    title="Copy Email"
+                                                >
+                                                    <Copy size={14} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleEditSubscriber(sub)}
+                                                    className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                                                    title="Edit Email"
+                                                >
+                                                    <Edit size={14} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDelete('subscriber' as any, sub._id)}
+                                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                    title="Delete Subscriber"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -581,6 +702,57 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                         </button>
                                     </>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Edit Subscriber Modal */}
+                {editingSubscriber && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100">
+                            <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Edit Subscriber</h3>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Update transmission address</p>
+                                </div>
+                                <button onClick={() => setEditingSubscriber(null)} className="p-2 hover:bg-white rounded-full text-slate-400 transition-colors shadow-sm">
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            
+                            <div className="p-8 space-y-6">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Current Email</label>
+                                    <input
+                                        type="email"
+                                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-medium text-slate-900 transition-all"
+                                        value={editSubEmail}
+                                        onChange={(e) => setEditSubEmail(e.target.value)}
+                                        placeholder="enter new email..."
+                                    />
+                                </div>
+                                <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex gap-3">
+                                    <ShieldCheck className="text-blue-600 shrink-0" size={18} />
+                                    <div className="text-[10px] leading-relaxed text-blue-700 font-medium">
+                                        Compliance records (IP, Timestamp, User Agent) will be preserved. This change only updates the communication endpoint.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-8 pt-0 flex gap-3">
+                                <button 
+                                    onClick={() => setEditingSubscriber(null)}
+                                    className="flex-1 px-6 py-4 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 rounded-xl transition-all"
+                                >
+                                    Abort
+                                </button>
+                                <button 
+                                    onClick={handleSaveSubscriber}
+                                    className="flex-[2] bg-slate-900 text-white px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-slate-200"
+                                >
+                                    Synchronize Changes
+                                </button>
                             </div>
                         </div>
                     </div>

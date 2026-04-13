@@ -7,7 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-outfit);
+  --font-serif: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -48,52 +49,55 @@
 }
 
 :root {
-  --radius: 1.5rem;
-  /* Clean, Pure White Background */
-  --background: #ffffff; 
-  --foreground: #0f172a; /* Slate-900 / Deep Navy */
+  --radius: 1rem;
   
-  /* Cards with soft depth */
-  --card: #ffffff;
-  --card-foreground: #0f172a;
+  /* Mastery Base - Deep Mystery Palette */
+  --background: #0f1115; /* Charcoal Matte */
+  --foreground: #f5f3f0; /* Cream Text */
   
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  /* Cards with elevated depth */
+  --card: #181b22;
+  --card-foreground: #f5f3f0;
   
-  /* Vibrant Amethyst-Azure Palette */
-  --primary: #6366f1; /* Indigo-500 */
+  --popover: #181b22;
+  --popover-foreground: #f5f3f0;
+  
+  /* Warlock Primary: Violet/Indigo Power */
+  --primary: #7c3aed; 
   --primary-foreground: #ffffff;
   
-  --secondary: #9333ea; /* Purple-600 */
-  --secondary-foreground: #ffffff;
+  /* Warlock Secondary: Gold Influence */
+  --secondary: #d4af37; 
+  --secondary-foreground: #0f1115;
   
-  --muted: #f8fafc; /* Slate-50 */
-  --muted-foreground: #64748b; /* Slate-500 */
+  --muted: #1e222a;
+  --muted-foreground: #94a3b8;
   
-  --accent: #f5f3ff; /* Lavender-50 Backgrounds */
-  --accent-foreground: #6366f1;
+  --accent: #2d1b4e; /* Mystical Deep Indigo */
+  --accent-foreground: #d4af37;
   
   --destructive: #ef4444;
-  --border: #e2e8f0; /* Slate-200 */
-  --input: #e2e8f0;
-  --ring: #6366f1;
+  --border: #2d323d;
+  --input: #1e222a;
+  --ring: #d4af37;
   
-  /* Chart colors refreshed for light mode */
-  --chart-1: #6366f1;
-  --chart-2: #8b5cf6;
+  /* Chart colors (Luxury Accents) */
+  --chart-1: #d4af37;
+  --chart-2: #7c3aed;
   --chart-3: #ec4899;
-  --chart-4: #f59e0b;
-  --chart-5: #10b981;
   
-  /* Sidebar refined for light mode */
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: #6366f1;
+  /* Sidebar Legacy Token Support */
+  --sidebar: #0f1115;
+  --sidebar-foreground: #f5f3f0;
+  --sidebar-primary: #7c3aed;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #6366f1;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #6366f1;
+  --sidebar-accent: #2d1b4e;
+  --sidebar-accent-foreground: #d4af37;
+  --sidebar-border: #2d323d;
+  --sidebar-ring: #d4af37;
+
+  /* Dynamic Hero Overlays */
+  --hero-overlay: #2d1b4e;
 }
 
 
