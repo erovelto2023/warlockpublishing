@@ -6,19 +6,17 @@ import GlobalSettings from '@/lib/models/GlobalSettings';
 export async function GET() {
     try {
         await connectToDatabase();
-        let settings = await GlobalSettings.findOne().lean();
+        const settings = await GlobalSettings.findOne().lean();
         
         // Return default if none exists
-        if (!settings) {
-            settings = {
-                homeHeroImageUrl: '',
-                siteTitle: 'Warlock Publishing',
-                siteDescription: 'Premium Digital Products & PLR',
-                isMaintenanceMode: false
-            };
-        }
+        const output = settings || {
+            homeHeroImageUrl: '',
+            siteTitle: 'Warlock Publishing',
+            siteDescription: 'Premium Digital Products & PLR',
+            isMaintenanceMode: false
+        };
         
-        return NextResponse.json(JSON.parse(JSON.stringify(settings)));
+        return NextResponse.json(JSON.parse(JSON.stringify(output)));
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
