@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/db";
 import Subscriber from "@/lib/models/Subscriber";
 import PenName from "@/lib/models/PenName";
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export async function subscribeToMailingList(email: string, penNameId?: string, signupUrl?: string) {
     await connectToDatabase();
