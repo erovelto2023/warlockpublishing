@@ -399,10 +399,18 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
                                                         />
                                                         {block.data?.[field.name] && (
                                                             <div className="relative w-full h-32 bg-slate-100 rounded overflow-hidden border">
+                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                                                 <img
                                                                     src={block.data[field.name]}
                                                                     alt="Preview"
                                                                     className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        const target = e.target as HTMLImageElement;
+                                                                        target.style.display = 'none';
+                                                                        if (target.parentElement) {
+                                                                            target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-xs font-medium px-2 text-center">Image failed to load</div>';
+                                                                        }
+                                                                    }}
                                                                 />
                                                             </div>
                                                         )}

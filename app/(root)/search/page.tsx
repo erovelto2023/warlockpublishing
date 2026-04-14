@@ -36,11 +36,11 @@ export default async function SearchPage(props: { searchParams: Promise<{ q?: st
                         <Card key={product._id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
                             <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                                 {product.imageUrl ? (
-                                    <Image
+                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                    <img
                                         src={product.imageUrl}
                                         alt={product.title}
-                                        fill
-                                        className="object-cover transition-transform hover:scale-105"
+                                        className="w-full h-full object-cover transition-transform hover:scale-105"
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-muted-foreground">

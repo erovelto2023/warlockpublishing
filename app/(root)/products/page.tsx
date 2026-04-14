@@ -18,11 +18,11 @@ export default async function ProductsPage() {
                     <Card key={item.id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
                         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                             {item.imageUrl ? (
-                                <Image
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
                                     src={item.imageUrl}
                                     alt={item.title}
-                                    fill
-                                    className="object-cover transition-transform hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform hover:scale-105"
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-muted-foreground">

@@ -113,11 +113,11 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                 {/* Product Image */}
                 <div className="relative aspect-square rounded-xl overflow-hidden border shadow-lg bg-muted">
                     {product.imageUrl ? (
-                        <Image
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
                             src={product.imageUrl}
                             alt={product.title}
-                            fill
-                            className="object-cover"
+                            className="w-full h-full object-cover"
                         />
                     ) : (
                         <div className="flex items-center justify-center h-full text-muted-foreground">

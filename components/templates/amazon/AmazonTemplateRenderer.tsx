@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { Check, Star, ShoppingCart } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -48,11 +47,18 @@ export function AmazonTemplateRenderer({ contentData, amazonLink, title, descrip
                         <div className="bg-slate-100 p-8 flex items-center justify-center min-h-[400px]">
                             {imageUrl ? (
                                 <div className="relative w-full h-[400px] shadow-lg rounded-lg overflow-hidden">
-                                    <Image
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
                                         src={imageUrl}
                                         alt={title}
-                                        fill
-                                        className="object-contain" // Use contain for book covers to show full image
+                                        className="w-full h-full object-contain"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = 'none';
+                                            if (target.parentElement) {
+                                                target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 font-medium">Image failed to load</div>';
+                                            }
+                                        }}
                                     />
                                 </div>
                             ) : (
