@@ -282,10 +282,12 @@ export async function getProductById(idOrSlug: string) {
         }
 
         // If we found by ID but it doesn't have a slug, let's generate one and save it (lazy migration)
-        if (!product.slug) {
-            const slug = await generateUniqueSlug(product.title, product._id.toString());
-            product.slug = slug;
-            await product.save();
+        const p = product as any;
+        if (!p.slug) {
+            const slug = await generateUniqueSlug(p.title, p._id.toString());
+            p.slug = slug;
+            await Product.findByIdAndUpdate(p._id, { slug });
+            product = p;
         }
 
         console.log(`[ProductAction] Successfully fetched product: ${(product as any).title} (ID: ${(product as any)._id})`);
