@@ -19,7 +19,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
     
     console.log(`[AuthorPage] Rendering for slug: ${slug}`);
 
-    let penName;
+    let penName: any;
     try {
         penName = await getPenNameBySlug(slug);
 
@@ -36,7 +36,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
         notFound();
     }
 
-    let publishedProducts = [];
+    let publishedProducts: any[] = [];
     try {
         const products = await getProductsByPenName(penName._id);
         publishedProducts = products.filter((p: any) => !p.isHidden);
