@@ -15,8 +15,8 @@ export default async function Navbar() {
     const { userId } = await auth();
 
     const navLinks = [
-        { name: 'Marketplace', href: '/products' },
-        { name: 'Emporium', href: '/offers' },
+        { name: 'Ebooks', href: '/products' },
+        { name: 'Marketplace', href: '/offers' },
         { name: 'Blog', href: '/blog' },
         { name: 'Glossary', href: '/glossary' },
     ];
