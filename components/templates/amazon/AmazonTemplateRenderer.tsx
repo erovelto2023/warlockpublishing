@@ -11,7 +11,7 @@ interface AmazonTemplateRendererProps {
     imageUrl: string;
 }
 
-export function AmazonTemplateRenderer({ contentData, amazonLink, title, description, imageUrl }: AmazonTemplateRendererProps) {
+export function AmazonTemplateRenderer({ contentData, amazonLink, title, description = "", imageUrl }: AmazonTemplateRendererProps) {
     // Default data if contentData is missing or partial, but NO default values for fields user wants to control
     const data = {
         subheadline: contentData?.subheadline || "",
@@ -124,7 +124,7 @@ export function AmazonTemplateRenderer({ contentData, amazonLink, title, descrip
                     <div className="p-8 md:p-12 border-t border-slate-100 bg-slate-50/50">
                         {/* 'Our Verdict' removed as requested */}
                         <div className="prose max-w-none text-slate-700">
-                            <ReactMarkdown>{description}</ReactMarkdown>
+                            <ReactMarkdown>{typeof description === 'string' ? description : ""}</ReactMarkdown>
                         </div>
                     </div>
                 </div>

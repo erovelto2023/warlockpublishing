@@ -7,8 +7,9 @@ interface EbookSalesPageProps {
 export function EbookSalesPage({ data }: EbookSalesPageProps) {
     // Helper to get block data safely
     const getBlock = (id: string) => {
-        const block = data?.blocks?.find((b: any) => b.id === id);
-        return block?.enabled ? block.data : null;
+        if (!data || !Array.isArray(data.blocks)) return null;
+        const block = data.blocks.find((b: any) => b.id === id);
+        return block?.enabled ? (block.data || {}) : null;
     };
 
     const navbar = getBlock('navbar');
@@ -147,7 +148,7 @@ export function EbookSalesPage({ data }: EbookSalesPageProps) {
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <h2 className="text-3xl font-bold text-slate-900 mb-6">{synopsis.title}</h2>
                         <div className="prose prose-lg mx-auto text-slate-600">
-                            <p>{synopsis.description}</p>
+                            <p>{typeof synopsis.description === 'string' ? synopsis.description : ""}</p>
                         </div>
                     </div>
                 </section>
@@ -159,7 +160,7 @@ export function EbookSalesPage({ data }: EbookSalesPageProps) {
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <h2 className="text-3xl font-bold text-slate-900 mb-6">{problem.title}</h2>
                         <div className="prose prose-lg mx-auto text-slate-600">
-                            <p>{problem.text}</p>
+                            <p>{typeof problem.text === 'string' ? problem.text : ""}</p>
                         </div>
                     </div>
                 </section>
@@ -171,7 +172,7 @@ export function EbookSalesPage({ data }: EbookSalesPageProps) {
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <h2 className="text-3xl font-bold text-slate-900 mb-6">{solution.title}</h2>
                         <div className="prose prose-lg mx-auto text-slate-600">
-                            <p>{solution.text}</p>
+                            <p>{typeof solution.text === 'string' ? solution.text : ""}</p>
                         </div>
                     </div>
                 </section>

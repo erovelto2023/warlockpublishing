@@ -15,6 +15,8 @@ import { redirect, notFound } from "next/navigation";
 // Ensure models are registered for SSR
 import "@/lib/models/Product";
 import "@/lib/models/PenName";
+import "@/lib/models/SalesPage";
+import "@/lib/models/Subscriber";
 
 export const dynamic = 'force-dynamic';
 
@@ -43,13 +45,13 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
 
     // SEO: Redirect to slug URL if available and we are currently using ID
     if (product.slug && productId !== product.slug) {
-        console.log(`[ProductPage] Redirecting to slug URL: /products/${product.slug}`);
+        // console.log(`[ProductPage] Redirecting to slug URL: /products/${product.slug}`);
         redirect(`/products/${product.slug}`);
     }
 
     // Check for Custom HTML first - with defensive check for empty content
-    if (product.htmlContent && product.htmlContent.trim() !== "") {
-        console.log("[ProductPage] Rendering custom HTML view");
+    if (product.htmlContent && typeof product.htmlContent === 'string' && product.htmlContent.trim() !== "") {
+        // console.log("[ProductPage] Rendering custom HTML view");
         return (
             <>
                 {/* 
@@ -162,7 +164,7 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight mb-4">{product.title}</h1>
                         <div className="text-3xl font-bold text-primary mb-6">
-                            ${product.price.toFixed(2)}
+                            ${(Number(product.price) || 0).toFixed(2)}
                         </div>
                         <div className="prose max-w-none text-muted-foreground whitespace-pre-wrap">
                             {product.description}

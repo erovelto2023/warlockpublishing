@@ -18,8 +18,9 @@ export function SoftwareTemplateRenderer({ contentData }: SoftwareTemplateRender
 
     // Helper to get block data
     const getBlockData = (id: string) => {
+        if (!Array.isArray(blocks)) return null;
         const block = blocks.find((b: any) => b.id === id);
-        return block?.enabled ? block.data : null;
+        return block?.enabled ? (block.data || {}) : null;
     };
 
     // Helper to check if block is enabled
