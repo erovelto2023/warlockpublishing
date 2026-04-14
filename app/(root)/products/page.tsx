@@ -6,15 +6,30 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProductsPage() {
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+    const resolvedSearchParams = await searchParams;
     const items = await getMarketplaceItems();
+
+    const pageStr = resolvedSearchParams?.page as string;
+    const currentPage = parseInt(pageStr) || 1;
+    const itemsPerPage = 20;
+
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+    const validPage = Math.max(1, Math.min(currentPage, Math.max(1, totalPages)));
+    
+    const startIndex = (validPage - 1) * itemsPerPage;
+    const paginatedItems = items.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div className="container py-10 px-4">
             <h1 className="text-3xl font-bold mb-8">All Products & Offers</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {items.map((item: any) => (
+                {paginatedItems.map((item: any) => (
                     <Card key={item.id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
                         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                             {item.imageUrl ? (
@@ -57,6 +72,28 @@ export default async function ProductsPage() {
                     </Card>
                 ))}
             </div>
+
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 mt-12">
+                    <Button variant="outline" disabled={validPage <= 1} asChild={validPage > 1}>
+                        {validPage > 1 ? (
+                            <Link href={`/products?page=${validPage - 1}`}>Previous</Link>
+                        ) : (
+                            <span>Previous</span>
+                        )}
+                    </Button>
+                    <span className="text-sm font-medium">
+                        Page {validPage} of {totalPages}
+                    </span>
+                    <Button variant="outline" disabled={validPage >= totalPages} asChild={validPage < totalPages}>
+                        {validPage < totalPages ? (
+                            <Link href={`/products?page=${validPage + 1}`}>Next</Link>
+                        ) : (
+                            <span>Next</span>
+                        )}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
