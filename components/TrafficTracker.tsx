@@ -40,6 +40,9 @@ function TrackerContent() {
     useEffect(() => {
         if (!sessionId) return;
 
+        // ── Guard: never track admin routes ──────────────────────────────────
+        if (pathname.startsWith('/admin')) return;
+
         const handlePageVisit = async () => {
             // First, update dwell time for the PREVIOUS page if it exists
             await sendDwellTime();

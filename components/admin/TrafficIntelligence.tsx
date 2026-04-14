@@ -1,10 +1,13 @@
 'use client'
 
+import { useState } from 'react';
 import { 
     TrendingUp, Clock, Globe, ArrowUpRight, 
     MousePointer2, ExternalLink, Calendar,
-    BarChart
+    BarChart, Trash2, RefreshCw
 } from 'lucide-react';
+import { resetTrafficData } from '@/lib/actions/analytics.actions';
+import { useRouter } from 'next/navigation';
 
 interface TrafficIntelligenceProps {
     data: {
@@ -24,12 +27,73 @@ const formatDuration = (ms: number) => {
 };
 
 export default function TrafficIntelligence({ data }: TrafficIntelligenceProps) {
+    const router = useRouter();
+    const [resetting, setResetting] = useState(false);
+    const [confirmReset, setConfirmReset] = useState(false);
+
+    const handleReset = async () => {
+        if (!confirmReset) {
+            setConfirmReset(true);
+            return;
+        }
+        setResetting(true);
+        try {
+            await resetTrafficData();
+            router.refresh(); // reload page data after wipe
+        } catch (e) {
+            console.error('Reset failed', e);
+        } finally {
+            setResetting(false);
+            setConfirmReset(false);
+        }
+    };
+
     if (!data) return <div className="p-8 text-neutral-500">No analytics data available.</div>;
 
     const { popularPages, topReferrers, hourlyActivity, totalHits } = data;
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+            {/* Header row with reset control */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+                        Public visitors only · admin visits excluded
+                    </p>
+                </div>
+                <div className="flex items-center gap-3">
+                    {confirmReset && !resetting && (
+                        <span className="text-xs font-bold text-red-500 animate-in fade-in">
+                            This will wipe ALL traffic records. Click again to confirm.
+                        </span>
+                    )}
+                    <button
+                        id="reset-traffic-btn"
+                        onClick={handleReset}
+                        disabled={resetting}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all
+                            ${confirmReset
+                                ? 'bg-red-500 text-white hover:bg-red-600'
+                                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                        {resetting
+                            ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Resetting…</>
+                            : <><Trash2 className="w-3.5 h-3.5" /> {confirmReset ? 'Confirm Reset' : 'Reset Traffic Data'}</>
+                        }
+                    </button>
+                    {confirmReset && !resetting && (
+                        <button
+                            onClick={() => setConfirmReset(false)}
+                            className="text-xs font-bold text-neutral-400 hover:text-neutral-600 underline"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
+            </div>
+
             {/* High Level Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="p-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl">
@@ -79,6 +143,11 @@ export default function TrafficIntelligence({ data }: TrafficIntelligenceProps) 
                         </h3>
                     </div>
                     <div className="space-y-4">
+                        {popularPages.length === 0 && (
+                            <div className="py-12 text-center text-neutral-500 italic text-sm">
+                                No page view data yet.
+                            </div>
+                        )}
                         {popularPages.map((page, i) => (
                             <div key={page._id} className="group flex items-center justify-between p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-xl transition-colors">
                                 <div className="flex items-center gap-4">
@@ -147,7 +216,8 @@ export default function TrafficIntelligence({ data }: TrafficIntelligenceProps) 
                 <div className="flex items-end gap-1 h-32 w-full">
                     {Array.from({ length: 24 }).map((_, hour) => {
                         const activity = hourlyActivity.find(a => a._id === hour);
-                        const height = activity ? (activity.count / Math.max(...hourlyActivity.map(a => a.count)) * 100) : 2;
+                        const maxCount = Math.max(...hourlyActivity.map(a => a.count), 1);
+                        const height = activity ? (activity.count / maxCount * 100) : 2;
                         return (
                             <div key={hour} className="flex-1 group relative">
                                 <div 

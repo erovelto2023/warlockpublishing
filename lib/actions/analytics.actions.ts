@@ -1,8 +1,8 @@
 'use server'
 
+import { auth } from "@clerk/nextjs/server";
 import { connectToDatabase } from "../db";
 import SiteTraffic from "../models/SiteTraffic";
-import { revalidatePath } from "next/cache";
 
 export async function logPageView(data: {
     path: string;
@@ -11,6 +11,19 @@ export async function logPageView(data: {
     userAgent: string;
 }) {
     try {
+        // ── Server-side guards ────────────────────────────────────────────────
+        // 1. Skip any /admin route
+        if (data.path.startsWith('/admin')) {
+            return { success: true, hitId: null };
+        }
+
+        // 2. Skip logged-in users (admins browsing the public site)
+        const { userId } = await auth();
+        if (userId) {
+            return { success: true, hitId: null };
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         await connectToDatabase();
         
         const newHit = await SiteTraffic.create({
@@ -30,6 +43,7 @@ export async function logPageView(data: {
 
 export async function updateDwellTime(hitId: string, durationMs: number) {
     try {
+        if (!hitId) return { success: true }; // guard against null hitId from skipped logs
         await connectToDatabase();
         await SiteTraffic.findByIdAndUpdate(hitId, { $set: { dwellTime: durationMs } });
         return { success: true };
@@ -39,12 +53,27 @@ export async function updateDwellTime(hitId: string, durationMs: number) {
     }
 }
 
+export async function resetTrafficData() {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    try {
+        await connectToDatabase();
+        await SiteTraffic.deleteMany({});
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error resetting traffic data:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function getAnalyticsSummary() {
     try {
         await connectToDatabase();
 
-        // 1. Most Popular Pages
+        // 1. Most Popular Pages (exclude /admin paths just in case old data exists)
         const popularPages = await SiteTraffic.aggregate([
+            { $match: { path: { $not: /^\/admin/ } } },
             {
                 $group: {
                     _id: "$path",
@@ -58,6 +87,7 @@ export async function getAnalyticsSummary() {
 
         // 2. Top Referrers
         const topReferrers = await SiteTraffic.aggregate([
+            { $match: { path: { $not: /^\/admin/ } } },
             {
                 $group: {
                     _id: "$referrer",
@@ -71,7 +101,7 @@ export async function getAnalyticsSummary() {
         // 3. Recent Activity (Last 24 hours)
         const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const hourlyActivity = await SiteTraffic.aggregate([
-            { $match: { timestamp: { $gte: dayAgo } } },
+            { $match: { timestamp: { $gte: dayAgo }, path: { $not: /^\/admin/ } } },
             {
                 $group: {
                     _id: { $hour: "$timestamp" },
@@ -81,11 +111,14 @@ export async function getAnalyticsSummary() {
             { $sort: { "_id": 1 } }
         ]);
 
+        // 4. Total — only non-admin hits
+        const totalHits = await SiteTraffic.countDocuments({ path: { $not: /^\/admin/ } });
+
         return {
             popularPages,
             topReferrers,
             hourlyActivity,
-            totalHits: await SiteTraffic.countDocuments()
+            totalHits,
         };
     } catch (error: any) {
         console.error("Error getting analytics summary:", error);
