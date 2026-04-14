@@ -254,7 +254,14 @@ export async function getFeaturedItems() {
             externalUrl: `/offers/${s.slug}`
         }));
 
-        return parseData([...normalizedProducts, ...normalizedSalesPages]);
+        // Shuffle combined pool so featured items rotate each revalidation cycle
+        const combined = [...normalizedProducts, ...normalizedSalesPages];
+        for (let i = combined.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [combined[i], combined[j]] = [combined[j], combined[i]];
+        }
+
+        return parseData(combined.slice(0, 8));
     } catch (error) {
         console.error("Error fetching featured items:", error);
         return [];
