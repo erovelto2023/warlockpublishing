@@ -203,33 +203,19 @@ export async function getMarketplaceItems() {
 export async function getFeaturedItems() {
     try {
         await connectToDatabase();
-        
-        let products = await Product.find({ 
-            isFeaturedInRotation: true,
-            isHidden: { $ne: true } 
-        }).sort({ createdAt: -1 }).limit(10).lean();
 
-        // Fallback to latest products if none are marked as featured
-        if (products.length === 0) {
-            products = await Product.find({ 
-                isHidden: { $ne: true } 
-            }).sort({ createdAt: -1 }).limit(8).lean();
-        }
-        
-        let salesPages = await SalesPage.find({ 
-            isPublished: true, 
-            showInMarketplace: true,
-            isFeaturedInRotation: true 
-        }).sort({ createdAt: -1 }).limit(5).lean();
+        // Pull the FULL catalog — all product types (ebooks, tools, software, etc.),
+        // no isFeaturedInRotation filter, no limit so every item can rotate through.
+        const products = await Product.find({
+            isHidden: { $ne: true }
+        }).lean();
 
-        // Fallback to latest sales pages if none are marked as featured
-        if (salesPages.length === 0) {
-            salesPages = await SalesPage.find({ 
-                isPublished: true,
-                showInMarketplace: true
-            }).sort({ createdAt: -1 }).limit(4).lean();
-        }
-        
+        // Pull ALL published offer-builder (SalesPage) items in the marketplace.
+        const salesPages = await SalesPage.find({
+            isPublished: true,
+            showInMarketplace: true
+        }).lean();
+
         const normalizedProducts = products.map((p: any) => ({
             id: p._id.toString(),
             title: p.title,
@@ -254,7 +240,8 @@ export async function getFeaturedItems() {
             externalUrl: `/offers/${s.slug}`
         }));
 
-        // Shuffle combined pool so featured items rotate each revalidation cycle
+        // Fisher-Yates shuffle over the full combined pool, then take 8 random items.
+        // A fresh random selection is chosen each revalidation cycle (every hour).
         const combined = [...normalizedProducts, ...normalizedSalesPages];
         for (let i = combined.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
