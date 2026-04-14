@@ -51,7 +51,7 @@ export function constructMetadata({
           alt: title,
         },
       ],
-      type,
+      type: type === 'product' ? 'website' : type,
       ...(publishedTime && { publishedTime }),
     },
     twitter: {
