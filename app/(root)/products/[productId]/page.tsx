@@ -10,23 +10,46 @@ import { EbookTemplateRenderer } from "@/components/templates/ebook/EbookTemplat
 import { CourseTemplateRenderer } from "@/components/templates/course/CourseTemplateRenderer";
 import { ThankYouTemplateRenderer } from "@/components/templates/thankyou/ThankYouTemplateRenderer";
 import { AmazonTemplateRenderer } from "@/components/templates/amazon/AmazonTemplateRenderer";
+import { redirect, notFound } from "next/navigation";
+
+// Ensure models are registered for SSR
+import "@/lib/models/Product";
+import "@/lib/models/PenName";
 
 export const dynamic = 'force-dynamic';
-
-import { redirect } from "next/navigation";
 
 export default async function ProductPage(props: { params: Promise<{ productId: string }> }) {
     const params = await props.params;
     const productId = params.productId;
-    const product = await getProductById(productId);
+    
+    console.log(`[ProductPage] Rendering for ID: ${productId}`);
+
+    let product;
+    try {
+        product = await getProductById(productId);
+    } catch (error) {
+        console.error(`[ProductPage] Error fetching product ${productId}:`, error);
+        // If it's a 404, we can handle it with notFound()
+        if (error instanceof Error && error.message === "Product not found") {
+            notFound();
+        }
+        throw error; // Let error boundary handle it
+    }
+
+    if (!product) {
+        console.warn(`[ProductPage] Product not found for ID: ${productId}`);
+        notFound();
+    }
 
     // SEO: Redirect to slug URL if available and we are currently using ID
     if (product.slug && productId !== product.slug) {
+        console.log(`[ProductPage] Redirecting to slug URL: /products/${product.slug}`);
         redirect(`/products/${product.slug}`);
     }
 
-    // Check for Custom HTML first
-    if (product.htmlContent) {
+    // Check for Custom HTML first - with defensive check for empty content
+    if (product.htmlContent && product.htmlContent.trim() !== "") {
+        console.log("[ProductPage] Rendering custom HTML view");
         return (
             <>
                 {/* 

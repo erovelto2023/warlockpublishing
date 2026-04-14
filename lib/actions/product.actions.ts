@@ -261,28 +261,38 @@ export async function getFeaturedItems() {
 }
 
 export async function getProductById(idOrSlug: string) {
-    await connectToDatabase();
+    console.log(`[ProductAction] getProductById called for: ${idOrSlug}`);
+    try {
+        await connectToDatabase();
 
-    let product;
+        let product;
 
-    if (mongoose.isValidObjectId(idOrSlug)) {
-        product = await Product.findById(idOrSlug);
+        if (mongoose.isValidObjectId(idOrSlug)) {
+            product = await Product.findById(idOrSlug);
+        }
+
+        if (!product) {
+            product = await Product.findOne({ slug: idOrSlug });
+        }
+
+        if (!product) {
+            console.warn(`[ProductAction] Product not found for search: ${idOrSlug}`);
+            throw new Error("Product not found");
+        }
+
+        // If we found by ID but it doesn't have a slug, let's generate one and save it (lazy migration)
+        if (!product.slug) {
+            const slug = await generateUniqueSlug(product.title, product._id.toString());
+            product.slug = slug;
+            await product.save();
+        }
+
+        console.log(`[ProductAction] Successfully fetched product: ${product.title} (ID: ${product._id})`);
+        return JSON.parse(JSON.stringify(product));
+    } catch (error) {
+        console.error(`[ProductAction] Error in getProductById for ${idOrSlug}:`, error);
+        throw error;
     }
-
-    if (!product) {
-        product = await Product.findOne({ slug: idOrSlug });
-    }
-
-    if (!product) throw new Error("Product not found");
-
-    // If we found by ID but it doesn't have a slug, let's generate one and save it (lazy migration)
-    if (!product.slug) {
-        const slug = await generateUniqueSlug(product.title, product._id.toString());
-        product.slug = slug;
-        await product.save();
-    }
-
-    return JSON.parse(JSON.stringify(product));
 }
 
 export async function getProductsByPenName(penNameId: string) {

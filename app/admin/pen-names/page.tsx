@@ -87,6 +87,11 @@ export default async function PenNamesPage() {
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2">
+                                            <Link href={`/admin/products/new?penNameId=${penName._id}`}>
+                                                <Button variant="ghost" size="sm" className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-800 flex items-center gap-1">
+                                                    <Plus className="h-3 w-3" /> Book
+                                                </Button>
+                                            </Link>
                                             <Link href={`/admin/pen-names/${penName._id}/dashboard`}>
                                                 <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-slate-800">
                                                     Dashboard

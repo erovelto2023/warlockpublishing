@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Check, ChevronRight, ChevronLeft } from "lucide-react"
@@ -72,9 +72,22 @@ interface ProductWizardProps {
 
 export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const urlPenNameId = searchParams?.get('penNameId')
+    
     const { toast } = useToast()
     const [step, setStep] = useState(1)
-    const [data, setData] = useState<WizardData>(initialProduct || initialData)
+    
+    const [data, setData] = useState<WizardData>(() => {
+        if (initialProduct) return initialProduct;
+        
+        if (urlPenNameId) {
+            return { ...initialData, penNameId: urlPenNameId };
+        }
+        
+        return initialData;
+    })
+    
     const [loading, setLoading] = useState(false)
     const [mounted, setMounted] = useState(false)
 
