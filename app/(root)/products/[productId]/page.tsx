@@ -1,22 +1,23 @@
 import { getProductById } from "@/lib/actions/product.actions";
 import { GrooveSellTracking } from "@/components/groove-sell-tracking";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
-import { Check, ShieldCheck, FileText } from "lucide-react";
+import { ShieldCheck, FileText } from "lucide-react";
+import { getSanitizedProduct } from "@/lib/product-utils";
 
 import { SoftwareTemplateRenderer } from "@/components/templates/software/SoftwareTemplateRenderer";
 import { EbookTemplateRenderer } from "@/components/templates/ebook/EbookTemplateRenderer";
 import { CourseTemplateRenderer } from "@/components/templates/course/CourseTemplateRenderer";
 import { ThankYouTemplateRenderer } from "@/components/templates/thankyou/ThankYouTemplateRenderer";
 import { AmazonTemplateRenderer } from "@/components/templates/amazon/AmazonTemplateRenderer";
-import { redirect, notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-// Ensure models are registered for SSR
+// Ensure models are registered for SSR to prevent "Schema not compiled" errors
 import "@/lib/models/Product";
 import "@/lib/models/PenName";
 import "@/lib/models/SalesPage";
 import "@/lib/models/Subscriber";
+import "@/lib/models/DigitalAsset";
 
 export const dynamic = 'force-dynamic';
 
@@ -24,188 +25,180 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
     const params = await props.params;
     const productId = params.productId;
     
-    console.log(`[ProductPage] Rendering for ID: ${productId}`);
+    // console.log(`[ProductPage] Rendering for ID: ${productId}`);
 
-    let product;
+    let rawProduct;
     try {
-        product = await getProductById(productId);
+        rawProduct = await getProductById(productId);
     } catch (error) {
         console.error(`[ProductPage] Error fetching product ${productId}:`, error);
-        // If it's a 404, we can handle it with notFound()
         if (error instanceof Error && error.message === "Product not found") {
             notFound();
         }
-        throw error; // Let error boundary handle it
+        throw error; 
     }
 
-    if (!product) {
-        console.warn(`[ProductPage] Product not found for ID: ${productId}`);
-        notFound();
-    }
+    if (!rawProduct) notFound();
+
+    // Sanitize data before use
+    const product = getSanitizedProduct(rawProduct);
+    if (!product) notFound();
 
     // SEO: Redirect to slug URL if available and we are currently using ID
     if (product.slug && productId !== product.slug) {
-        // console.log(`[ProductPage] Redirecting to slug URL: /products/${product.slug}`);
         redirect(`/products/${product.slug}`);
     }
 
-    // Check for Custom HTML first - with defensive check for empty content
-    if (product.htmlContent && typeof product.htmlContent === 'string' && product.htmlContent.trim() !== "") {
-        // console.log("[ProductPage] Rendering custom HTML view");
-        return (
-            <>
-                {/* 
-                  This style tag is a server-side hack to hide the LayoutShell chrome 
-                  specifically for this page type, without needing complex layout restructuring.
-                  It targets the IDs added to LayoutShell.
-                */}
-                <style dangerouslySetInnerHTML={{
-                    __html: `
-                    #site-navbar-wrapper, #site-footer-wrapper { display: none !important; }
-                    main { flex: 1 1 auto; display: block; width: 100%; }
-                `}} />
+    // --- TEMPLATE RENDERING LOGIC ---
+    try {
+        // 1. Custom HTML Overrides (Highest priority)
+        if (product.htmlContent.trim() !== "") {
+            return (
+                <>
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+                        #site-navbar-wrapper, #site-footer-wrapper { display: none !important; }
+                        main { flex: 1 1 auto; display: block; width: 100%; }
+                    `}} />
+                    <GrooveSellTracking id={product.grooveSellId} />
+                    <div dangerouslySetInnerHTML={{ __html: product.htmlContent }} />
+                </>
+            );
+        }
 
-                <GrooveSellTracking id={product.grooveSellId} />
-                <div dangerouslySetInnerHTML={{ __html: product.htmlContent }} />
-            </>
-        );
-    }
+        // 2. Specialty Template Renderers
+        const commonProps = { id: product.grooveSellId };
+        
+        if (product.productType === 'software') {
+            return (
+                <>
+                    <GrooveSellTracking {...commonProps} />
+                    <SoftwareTemplateRenderer contentData={product.rawContentData} />
+                </>
+            );
+        }
 
-    // Check for Software Template
-    if (product.productType === 'software' && product.contentData) {
-        return (
-            <>
-                <GrooveSellTracking id={product.grooveSellId} />
-                <SoftwareTemplateRenderer contentData={product.contentData} />
-            </>
-        );
-    }
+        if (product.productType === 'ebook' || product.productType === 'fiction') {
+            return (
+                <>
+                    <GrooveSellTracking {...commonProps} />
+                    <EbookTemplateRenderer contentData={product.rawContentData} />
+                </>
+            );
+        }
 
-    // Check for Ebook Template
-    if (product.productType === 'ebook') {
-        // Use contentData if available, otherwise fallback to defaults handled in renderer
-        return (
-            <>
-                <GrooveSellTracking id={product.grooveSellId} />
-                <EbookTemplateRenderer contentData={product.contentData} />
-            </>
-        );
-    }
+        if (product.productType === 'course') {
+            return (
+                <>
+                    <GrooveSellTracking {...commonProps} />
+                    <CourseTemplateRenderer contentData={product.rawContentData} />
+                </>
+            );
+        }
 
-    // Check for Course Template
-    if (product.productType === 'course') {
-        return (
-            <>
-                <GrooveSellTracking id={product.grooveSellId} />
-                <CourseTemplateRenderer contentData={product.contentData} />
-            </>
-        );
-    }
+        if (product.productType === 'thankyou' || product.pageType === 'thankyou') {
+            return (
+                <>
+                    <GrooveSellTracking {...commonProps} />
+                    <ThankYouTemplateRenderer contentData={product.rawContentData} />
+                </>
+            );
+        }
 
-    // Check for Thank You Page Template
-    if (product.pageType === 'thankyou') {
-        return (
-            <>
-                <GrooveSellTracking id={product.grooveSellId} />
-                <ThankYouTemplateRenderer contentData={product.contentData} />
-            </>
-        );
-    }
-
-    // Check for Amazon Product Template
-    // Check for Amazon Product Template
-    if (product.productType === 'amazon') {
-
-        return (
-            <>
-                {/* Amazon pages typically don't need GrooveSell tracking, but kept for consistency if needed */}
+        if (product.productType === 'amazon') {
+            return (
                 <AmazonTemplateRenderer
-                    contentData={product.contentData}
+                    contentData={product.rawContentData}
                     amazonLink={product.amazonLink}
                     title={product.title}
                     description={product.description}
                     imageUrl={product.imageUrl}
                 />
-            </>
-        )
-    }
+            );
+        }
 
-    return (
-        <div className="container py-10 px-4">
-            <GrooveSellTracking id={product.grooveSellId} />
+        // 3. Fallback: Standard Product View
+        return (
+            <div className="container py-10 px-4">
+                <GrooveSellTracking id={product.grooveSellId} />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {/* Product Image */}
-                <div className="relative aspect-square rounded-xl overflow-hidden border shadow-lg bg-muted">
-                    {product.imageUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                            src={product.imageUrl}
-                            alt={product.title}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="flex items-center justify-center h-full text-muted-foreground">
-                            No Image Available
-                        </div>
-                    )}
-                </div>
-
-                {/* Product Details */}
-                <div className="space-y-8">
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                {product.category}
-                            </span>
-                            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                {product.licenseType}
-                            </span>
-                        </div>
-                        <h1 className="text-4xl font-bold tracking-tight mb-4">{product.title}</h1>
-                        <div className="text-3xl font-bold text-primary mb-6">
-                            ${(Number(product.price) || 0).toFixed(2)}
-                        </div>
-                        <div className="prose max-w-none text-muted-foreground whitespace-pre-wrap">
-                            {product.description}
-                        </div>
-                    </div>
-
-                    <div className="space-y-4 border-t pt-6">
-                        <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5 text-muted-foreground" />
-                            <span className="font-medium">Format:</span> {product.format}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <ShieldCheck className="h-5 w-5 text-muted-foreground" />
-                            <span className="font-medium">License:</span> {product.licenseType}
-                        </div>
-                    </div>
-
-                    {/* Checkout / Buy Section */}
-                    <div className="pt-6">
-                        {product.isAmazonProduct ? (
-                            <Link href={product.amazonLink || "#"} target="_blank">
-                                <Button size="lg" className="w-full text-lg h-14">
-                                    Buy on Amazon
-                                </Button>
-                            </Link>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    {/* Product Image */}
+                    <div className="relative aspect-square rounded-xl overflow-hidden border shadow-lg bg-muted">
+                        {product.imageUrl ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                                src={product.imageUrl}
+                                alt={product.title}
+                                className="w-full h-full object-cover"
+                            />
                         ) : (
-                            <div className="space-y-4">
-                                {product.grooveSellEmbed && (
-                                    <div
-                                        dangerouslySetInnerHTML={{ __html: product.grooveSellEmbed }}
-                                        className="w-full flex justify-center"
-                                    />
-                                )}
-                                <p className="text-center text-xs text-muted-foreground">
-                                    Secure checkout via GrooveSell
-                                </p>
+                            <div className="flex items-center justify-center h-full text-muted-foreground italic">
+                                Preview Coming Soon
                             </div>
                         )}
                     </div>
+
+                    {/* Product Details */}
+                    <div className="space-y-8">
+                        <div>
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full capitalize">
+                                    {product.category}
+                                </span>
+                                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full capitalize">
+                                    {product.licenseType}
+                                </span>
+                            </div>
+                            <h1 className="text-4xl font-bold tracking-tight mb-4">{product.title}</h1>
+                            <div className="text-3xl font-bold text-primary mb-6">
+                                ${product.price.toFixed(2)}
+                            </div>
+                            <div className="prose max-w-none text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                                {product.description}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 border-t pt-6">
+                            <div className="flex items-center gap-2">
+                                <FileText className="h-5 w-5 text-muted-foreground" />
+                                <span className="font-medium">Format:</span> {product.format}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+                                <span className="font-medium">License:</span> {product.licenseType}
+                            </div>
+                        </div>
+
+                        {/* Checkout Section */}
+                        <div className="pt-6">
+                            {product.isAmazonProduct ? (
+                                <Link href={product.amazonLink || "#"} target="_blank">
+                                    <Button size="lg" className="w-full text-lg h-14">
+                                        Buy on Amazon
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <div className="space-y-4">
+                                    {product.grooveSellEmbed && (
+                                        <div
+                                            dangerouslySetInnerHTML={{ __html: product.grooveSellEmbed }}
+                                            className="w-full flex justify-center"
+                                        />
+                                    )}
+                                    <p className="text-center text-xs text-muted-foreground">
+                                        Secure transaction via encrypted checkout
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    } catch (err) {
+        // If template rendering itself crashes, log details and redirect to an even simpler view if needed
+        console.error(`[ProductPage] Rendering crash for ${productId}:`, err);
+        throw err; // Still let the error boundary catch it, but we've logged it
+    }
 }

@@ -1,12 +1,12 @@
 import React from 'react';
-import {
+import { 
+    SoftwareHero, 
+    SoftwareFeatures, 
+    SoftwarePricing, 
+    SoftwareFAQ, 
+    SoftwareFooter,
     SoftwareNavbar,
-    SoftwareHero,
-    SoftwareFeatures,
-    SoftwarePricing,
-    SoftwareTestimonials,
-    SoftwareCTA,
-    SoftwareFooter
+    SoftwareCTA
 } from './index';
 
 interface SoftwareTemplateRendererProps {
@@ -14,38 +14,38 @@ interface SoftwareTemplateRendererProps {
 }
 
 export function SoftwareTemplateRenderer({ contentData }: SoftwareTemplateRendererProps) {
-    const blocks = contentData?.blocks || [];
-
-    // Helper to get block data
+    // Helper to get block data safely with guaranteed defaults
     const getBlockData = (id: string) => {
-        if (!Array.isArray(blocks)) return null;
-        const block = blocks.find((b: any) => b.id === id);
-        return block?.enabled ? (block.data || {}) : null;
+        try {
+            if (!contentData || !Array.isArray(contentData.blocks)) return {};
+            const block = contentData.blocks.find((b: any) => b.id === id);
+            return block?.enabled ? (block.data || {}) : {};
+        } catch (err) {
+            console.error(`[SoftwareTemplateRenderer] Error getting block ${id}:`, err);
+            return {};
+        }
     };
 
     // Helper to check if block is enabled
     const isEnabled = (id: string) => {
-        const block = blocks.find((b: any) => b.id === id);
-        return block?.enabled;
+        if (!contentData || !Array.isArray(contentData.blocks)) return false;
+        const block = contentData.blocks.find((b: any) => b.id === id);
+        return Boolean(block?.enabled);
     };
 
+    const heroData = getBlockData('hero');
+    // Features, Pricing etc usually pull from contentData or have their own internal fallback
+    // But to keep it simple and consistent with the others:
+    
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-600 antialiased selection:bg-blue-100 selection:text-blue-700">
+        <div className="min-h-screen bg-white">
             {isEnabled('navbar') && <SoftwareNavbar />}
-
-            {isEnabled('hero') && (
-                <SoftwareHero {...getBlockData('hero')} />
-            )}
-
-            {isEnabled('features') && <SoftwareFeatures />}
-
-            {isEnabled('pricing') && <SoftwarePricing />}
-
-            {isEnabled('testimonials') && <SoftwareTestimonials />}
-
+            <SoftwareHero {...heroData} />
+            <SoftwareFeatures />
+            <SoftwarePricing />
+            {isEnabled('faq') && <SoftwareFAQ />}
             {isEnabled('cta') && <SoftwareCTA />}
-
-            {isEnabled('footer') && <SoftwareFooter />}
+            <SoftwareFooter />
         </div>
     );
 }
