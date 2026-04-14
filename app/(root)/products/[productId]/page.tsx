@@ -28,7 +28,7 @@ export async function generateMetadata(props: { params: Promise<{ productId: str
     const productId = params.productId;
     
     try {
-        const product = await getProductById(productId);
+        const product: any = await getProductById(productId);
         if (!product) return constructMetadata({ title: 'Product Not Found', description: 'The requested product could not be found.' });
 
         return constructMetadata({

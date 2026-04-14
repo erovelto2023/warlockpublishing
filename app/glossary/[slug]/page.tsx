@@ -19,7 +19,7 @@ import { Metadata } from 'next';
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const params = await props.params;
-    const term = await getGlossaryTermBySlug(params.slug);
+    const term: any = await getGlossaryTermBySlug(params.slug);
     
     if (!term) return constructMetadata({ title: 'Not Found', description: 'The requested resource could not be found.' });
 

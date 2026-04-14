@@ -15,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
-    const page = await getSalesPageBySlug(slug);
+    const page: any = await getSalesPageBySlug(slug);
 
     if (!page) return constructMetadata({ title: 'Not Found', description: 'Offer not found.' });
 
