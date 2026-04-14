@@ -20,11 +20,11 @@ export function AmazonTemplateRenderer({
 }: AmazonTemplateRendererProps) {
     // Defensively merge contentData with guaranteed keys
     const data = {
-        subheadline: typeof contentData?.subheadline === 'string' ? contentData.subheadline : "",
+        ...contentData,
+        subheadline: typeof contentData?.subheadline === 'string' ? contentData.subheadline : (contentData?.subheadline || ""),
         features: Array.isArray(contentData?.features) ? contentData.features : [],
         rating: String(contentData?.rating || "4.8"),
         reviewCount: String(contentData?.reviewCount || "1,240"),
-        ...contentData
     };
 
     // Ensure description is a string for ReactMarkdown
