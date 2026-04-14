@@ -77,10 +77,19 @@ export async function getPenNameById(id: string) {
 }
 
 export async function getPenNameBySlug(slug: string) {
-    await connectToDatabase();
-    const penName = await PenName.findOne({ slug });
-    if (!penName) return null;
-    return JSON.parse(JSON.stringify(penName));
+    console.log(`[PenNameAction] getPenNameBySlug called for: ${slug}`);
+    try {
+        await connectToDatabase();
+        const penName = await PenName.findOne({ slug });
+        if (!penName) {
+            console.warn(`[PenNameAction] No PenName found for slug: ${slug}`);
+            return null;
+        }
+        return JSON.parse(JSON.stringify(penName));
+    } catch (error) {
+        console.error(`[PenNameAction] Error in getPenNameBySlug for ${slug}:`, error);
+        throw error;
+    }
 }
 
 export async function updatePenName(id: string, data: any) {

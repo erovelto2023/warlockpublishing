@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Twitter, Instagram, Mail } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter-form";
+// Ensure models are registered for SSR
+import "@/lib/models/PenName";
+import "@/lib/models/Product";
 
 export const dynamic = 'force-dynamic';
 
@@ -13,19 +16,36 @@ interface AuthorPageProps {
 
 export default async function AuthorPage({ params }: AuthorPageProps) {
     const { slug } = await params;
-    let penName = await getPenNameBySlug(slug);
+    
+    console.log(`[AuthorPage] Rendering for slug: ${slug}`);
 
-    if (!penName && /^[0-9a-fA-F]{24}$/.test(slug)) {
-        penName = await getPenNameById(slug);
+    let penName;
+    try {
+        penName = await getPenNameBySlug(slug);
+
+        if (!penName && /^[0-9a-fA-F]{24}$/.test(slug)) {
+            penName = await getPenNameById(slug);
+        }
+    } catch (error) {
+        console.error(`[AuthorPage] Error fetching pen name for slug ${slug}:`, error);
+        throw error; // Let error boundary handle it
     }
 
     if (!penName) {
+        console.warn(`[AuthorPage] Pen name not found for slug: ${slug}`);
         notFound();
     }
 
-    const products = await getProductsByPenName(penName._id);
-    const publishedProducts = products.filter((p: any) => !p.isHidden);
-    const featuredBook = publishedProducts[0]; // Just take the first one as featured for now
+    let publishedProducts = [];
+    try {
+        const products = await getProductsByPenName(penName._id);
+        publishedProducts = products.filter((p: any) => !p.isHidden);
+    } catch (error) {
+        console.error(`[AuthorPage] Error fetching products for pen name ${penName._id}:`, error);
+        // We can continue even if products fail, or throw. Let's log and keep going if possible.
+    }
+    
+    const featuredBook = publishedProducts.length > 0 ? publishedProducts[0] : null;
 
     return (
         <div className="min-h-screen bg-stone-50 font-serif text-stone-800">

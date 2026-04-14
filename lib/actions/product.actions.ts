@@ -286,9 +286,23 @@ export async function getProductById(idOrSlug: string) {
 }
 
 export async function getProductsByPenName(penNameId: string) {
-    await connectToDatabase();
-    const products = await Product.find({ penNameId }).sort({ createdAt: -1 });
-    return JSON.parse(JSON.stringify(products));
+    console.log(`[ProductAction] getProductsByPenName called for ID: ${penNameId}`);
+    if (!penNameId) {
+        console.warn("[ProductAction] No penNameId provided to getProductsByPenName");
+        return [];
+    }
+
+    try {
+        await connectToDatabase();
+        
+        // Ensure penNameId is a valid search criteria (Mongoose will cast string to ObjectId if valid)
+        const products = await Product.find({ penNameId }).sort({ createdAt: -1 });
+        console.log(`[ProductAction] Found ${products.length} products for pen name ${penNameId}`);
+        return JSON.parse(JSON.stringify(products));
+    } catch (error) {
+        console.error(`[ProductAction] Error in getProductsByPenName for ${penNameId}:`, error);
+        throw error;
+    }
 }
 
 export async function deleteProduct(id: string) {
