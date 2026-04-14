@@ -18,7 +18,7 @@ interface SalesPageProps {
 
 export default async function SalesPage({ params }: SalesPageProps) {
     const { productId } = await params;
-    const product = await getProductById(productId);
+    const product: any = await getProductById(productId);
 
     if (!product) {
         notFound();
