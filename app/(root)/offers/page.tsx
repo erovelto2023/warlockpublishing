@@ -13,7 +13,7 @@ export default async function OffersPage() {
     return (
         <div className="container py-24 px-4 max-w-7xl mx-auto">
             <div className="flex flex-col mb-12">
-                <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">The Grand <span className="text-secondary italic">Emporium</span></h1>
+                <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Offer <span className="text-secondary italic">Vault</span></h1>
                 <p className="text-neutral-500 max-w-2xl text-lg">
                     Discover exclusive access to our premier collection of high-value offers and specialized landing pages. 
                     The definitive destination for elite publishing assets.
