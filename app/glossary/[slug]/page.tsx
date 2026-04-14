@@ -14,6 +14,23 @@ import {
 import StructuredData from '@/components/glossary/StructuredData';
 import CopyPromptButton from '@/components/glossary/CopyPromptButton';
 import PrintButton from '@/components/glossary/PrintButton';
+import { constructMetadata } from '@/lib/seo';
+import { Metadata } from 'next';
+
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const params = await props.params;
+    const term = await getGlossaryTermBySlug(params.slug);
+    
+    if (!term) return constructMetadata({ title: 'Not Found', description: 'The requested resource could not be found.' });
+
+    return constructMetadata({
+        title: term.term,
+        description: term.shortDefinition || term.definition || `Learn about ${term.term} in the Warlock Publishing Glossary.`,
+        type: 'article',
+        keywords: [term.category, term.subcategory, ...(term.relatedKeywords?.map((k: any) => typeof k === 'string' ? k : k.keyword) || [])],
+        url: `https://warlockpublishing.com/glossary/${term.slug}`
+    });
+}
 
 export default async function RegistryDetailPage(props: { params: Promise<{ slug: string }> }) {
     const params = await props.params;

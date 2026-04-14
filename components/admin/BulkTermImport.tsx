@@ -285,7 +285,7 @@ KEYWORDS TO RESEARCH:
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-indigo-950/40 backdrop-blur-md" onClick={onClose} />
             
-            <div className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(49,46,129,0.3)] overflow-hidden animate-in zoom-in-95 duration-200 border border-indigo-50">
+            <div className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(49,46,129,0.3)] overflow-hidden animate-in zoom-in-95 duration-200 border border-indigo-50 text-slate-900">
                 {/* Header */}
                 <div className="bg-indigo-600 p-8 flex items-center justify-between">
                     <div className="flex items-center gap-4">

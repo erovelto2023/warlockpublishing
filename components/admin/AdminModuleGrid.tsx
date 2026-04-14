@@ -19,14 +19,14 @@ interface ModuleCardProps {
 const ModuleCard = ({ title, description, icon: Icon, metric, color, onClick, onAddClick }: ModuleCardProps) => (
     <button 
         onClick={onClick}
-        className="group relative flex flex-col p-6 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 text-left"
+        className="group relative flex flex-col p-6 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 text-left shadow-sm hover:bg-white/80"
     >
         <div className={`p-3 rounded-xl ${color} w-fit mb-4 group-hover:scale-110 transition-transform duration-300`}>
             <Icon className="w-6 h-6 text-white" />
         </div>
         
         <div className="flex justify-between items-start mb-2">
-            <h3 className="font-semibold text-lg text-neutral-900 dark:text-white group-hover:text-emerald-500 transition-colors">
+            <h3 className="font-semibold text-lg text-slate-900 group-hover:text-emerald-500 transition-colors">
                 {title}
             </h3>
             {metric && (
@@ -36,7 +36,7 @@ const ModuleCard = ({ title, description, icon: Icon, metric, color, onClick, on
             )}
         </div>
         
-        <p className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">
+        <p className="text-sm text-slate-500 line-clamp-2">
             {description}
         </p>
 
@@ -44,12 +44,12 @@ const ModuleCard = ({ title, description, icon: Icon, metric, color, onClick, on
             {onAddClick && (
                 <div 
                     onClick={(e) => { e.stopPropagation(); onAddClick(e); }}
-                    className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors"
+                    className="p-2 bg-slate-100 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors"
                 >
                     <PlusCircle className="w-5 h-5" />
                 </div>
             )}
-            <div className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+            <div className="p-2 bg-slate-100 rounded-lg">
                 <ArrowUpRight className="w-5 h-5" />
             </div>
         </div>

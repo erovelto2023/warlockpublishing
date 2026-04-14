@@ -174,8 +174,8 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
             </div>
 
             {/* TABLE */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
+            <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden">
+                <div className="w-full overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-100">
                         <thead className="bg-slate-50/50">
                             <tr>

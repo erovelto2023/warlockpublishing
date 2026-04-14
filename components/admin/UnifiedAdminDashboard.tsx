@@ -189,7 +189,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     };
 
     return (
-        <div className="bg-slate-200 min-h-screen font-sans text-slate-900 pb-20">
+        <div className="bg-slate-200 min-h-screen font-sans text-slate-900 antialiased pb-20">
             {/* Header / Nav */}
             <div className="bg-white border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

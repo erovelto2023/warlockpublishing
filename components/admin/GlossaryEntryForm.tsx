@@ -296,10 +296,10 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-5xl mx-auto pb-20">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-5xl mx-auto pb-20 text-slate-900">
                 
                 {/* TOP HEADER */}
-                <div className="flex justify-between items-center bg-white p-5 rounded-xl border border-slate-200 shadow-sm sticky top-0 z-10">
+                <div className="flex justify-between items-center bg-white text-slate-900 p-5 rounded-xl border border-slate-200 shadow-sm sticky top-0 z-10">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 uppercase tracking-tight">
                             {term ? "Update" : "Create"} <span className="text-blue-600">Glossary Asset</span>
@@ -316,7 +316,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
 
                 {/* SECTION 3: GETTING STARTED CHECKLIST */}
                 {/* SECTION 1: IDENTITY & CLASSIFICATION */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><BarChart3 size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Identity & Taxonomy</h3>
@@ -392,7 +392,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                 </div>
 
                 {/* SECTION 2: MEANING & CONTEXT */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><BookOpen size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Contextual Meaning</h3>
@@ -442,7 +442,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                 </div>
 
                 {/* SECTION 3: CORE KNOWLEDGE BASE */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg"><Zap size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Public Knowledge Base</h3>
@@ -480,7 +480,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                 </div>
 
                 {/* SECTION 4: GETTING STARTED CHECKLIST */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><Table size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Getting Started Checklist</h3>
@@ -510,7 +510,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                 </div>
 
                 {/* SECTION: FAQ ACCORDION BUILDER */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-orange-50 text-orange-600 rounded-lg"><HelpCircle size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">FAQ Accordion Builder</h3>
@@ -564,7 +564,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                 </div>
 
                 {/* SECTION 4: MONETIZATION BLUEPRINT */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><ShoppingBag size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Profit & Creation Blueprint</h3>
@@ -658,7 +658,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                 </div>
 
                 {/* SECTION 5: Amazon Affiliate Matrix */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                         <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg"><Palette size={18} /></div>
                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Amazon Recommended Arsenal</h3>

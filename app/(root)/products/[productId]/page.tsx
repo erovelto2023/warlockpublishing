@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ShieldCheck, FileText } from "lucide-react";
 import { getSanitizedProduct } from "@/lib/product-utils";
+import { constructMetadata } from "@/lib/seo";
+import { Metadata } from 'next';
 
 import { SoftwareTemplateRenderer } from "@/components/templates/software/SoftwareTemplateRenderer";
 import { EbookTemplateRenderer } from "@/components/templates/ebook/EbookTemplateRenderer";
@@ -20,6 +22,27 @@ import "@/lib/models/Subscriber";
 import "@/lib/models/DigitalAsset";
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(props: { params: Promise<{ productId: string }> }): Promise<Metadata> {
+    const params = await props.params;
+    const productId = params.productId;
+    
+    try {
+        const product = await getProductById(productId);
+        if (!product) return constructMetadata({ title: 'Product Not Found', description: 'The requested product could not be found.' });
+
+        return constructMetadata({
+            title: product.title,
+            description: product.description || `Explore ${product.title} at Warlock Publishing.`,
+            image: product.imageUrl,
+            type: 'product',
+            keywords: [product.category, product.format, 'Digital Asset'],
+            url: `https://warlockpublishing.com/products/${product.slug || product._id}`
+        });
+    } catch (error) {
+        return constructMetadata({ title: 'Product Not Found', description: 'The requested product could not be found.' });
+    }
+}
 
 export default async function ProductPage(props: { params: Promise<{ productId: string }> }) {
     const params = await props.params;

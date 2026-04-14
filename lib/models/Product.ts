@@ -26,7 +26,13 @@ const ProductSchema = new Schema({
     updatedAt: { type: Date, default: Date.now },
     userId: { type: String, required: true }, // Clerk User ID of the creator/admin
     slug: { type: String, unique: true, sparse: true },
-});
+}, { timestamps: true });
+
+ProductSchema.index({ isHidden: 1 });
+ProductSchema.index({ isFeaturedInRotation: 1 });
+ProductSchema.index({ category: 1 });
+ProductSchema.index({ penNameId: 1 });
+ProductSchema.index({ productType: 1 });
 
 // Force re-compilation of the model if it already exists to pick up schema changes
 const Product = models.Product || model('Product', ProductSchema);

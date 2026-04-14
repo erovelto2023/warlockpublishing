@@ -20,8 +20,6 @@ export const metadata: Metadata = {
   description: "Premium Digital Products & PLR",
 };
 
-export const dynamic = 'force-dynamic';
-
 import CommandCenter from "@/components/CommandCenter";
 
 export default function RootLayout({
@@ -33,8 +31,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${outfit.variable} ${inter.variable} ${playfair.variable} ${spaceGrotesk.variable}`}>
         <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         </head>
         <body className={`${outfit.className} antialiased bg-background text-foreground`} suppressHydrationWarning>
           <TrafficTracker />
@@ -55,4 +51,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-

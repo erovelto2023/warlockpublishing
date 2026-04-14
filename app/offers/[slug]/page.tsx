@@ -6,6 +6,8 @@ import AnalyticsTracker from '@/components/features/AnalyticsTracker';
 import { SMART_VARIABLES } from '@/lib/constants/smartVariables';
 import { cookies } from 'next/headers';
 
+import { constructMetadata } from '@/lib/seo';
+
 interface Props {
     params: Promise<{ slug: string }>;
     searchParams: Promise<{ preview?: string }>;
@@ -15,29 +17,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     const page = await getSalesPageBySlug(slug);
 
-    if (!page) return { title: 'Not Found' };
+    if (!page) return constructMetadata({ title: 'Not Found', description: 'Offer not found.' });
 
-    const title = page.ogTitle || page.title;
-    const description = page.ogDescription || page.description;
-
-    return {
+    return constructMetadata({
         title: page.title,
-        description: page.description,
+        description: page.description || `Special offer from Warlock Publishing: ${page.title}`,
+        image: page.ogImage || page.marketplaceImage,
+        type: 'website',
         keywords: page.keywords,
-        openGraph: {
-            title: title,
-            description: description,
-            images: page.ogImage ? [page.ogImage] : [],
-            url: `${process.env.NEXT_PUBLIC_APP_URL}/offers/${slug}`,
-            type: 'website',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: title,
-            description: description,
-            images: page.ogImage ? [page.ogImage] : [],
-        }
-    };
+        url: `https://warlockpublishing.com/offers/${slug}`
+    });
 }
 
 export default async function SalesPage({ params, searchParams }: Props) {

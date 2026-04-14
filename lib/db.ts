@@ -31,10 +31,22 @@ async function connectToDatabase() {
         }
 
         cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+            console.log('=> New MongoDB connection established');
             return mongoose;
         });
     }
-    cached.conn = await cached.promise;
+    
+    try {
+        cached.conn = await cached.promise;
+        if (mongoose.connection.readyState === 1) {
+            console.log('=> MongoDB is connected');
+        }
+    } catch (e) {
+        cached.promise = null;
+        console.error('=> MongoDB connection error:', e);
+        throw e;
+    }
+    
     return cached.conn;
 }
 

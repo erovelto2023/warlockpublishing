@@ -9,6 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import mongoose from "mongoose";
 
 import { isAdmin } from "@/lib/admin";
+import { parseData } from "@/lib/utils";
 
 function slugify(text: string) {
     return text
@@ -28,8 +29,8 @@ async function generateUniqueSlug(title: string, currentId?: string) {
     let count = 1;
 
     while (true) {
-        const existingProduct = await Product.findOne({ slug: uniqueSlug });
-        if (!existingProduct || (currentId && existingProduct._id.toString() === currentId)) {
+        const existingProduct = await Product.findOne({ slug: uniqueSlug }).lean();
+        if (!existingProduct || (currentId && (existingProduct as any)._id.toString() === currentId)) {
             break;
         }
         uniqueSlug = `${slug}-${count}`;
@@ -72,7 +73,7 @@ export async function createProduct(data: any) {
         revalidatePath("/products");
         revalidatePath("/admin");
 
-        return JSON.parse(JSON.stringify(newProduct));
+        return parseData(newProduct);
     } catch (error) {
         console.error("Error creating Product:", error);
         throw error;
@@ -134,20 +135,20 @@ export async function updateProduct(id: string, data: any) {
         revalidatePath(`/products/${updatedProduct.slug}`);
     }
 
-    return JSON.parse(JSON.stringify(updatedProduct));
+    return parseData(updatedProduct);
 }
 
 export async function getAllProducts() {
     await connectToDatabase();
-    const products = await Product.find({}).sort({ createdAt: -1 }).populate('penNameId');
-    return JSON.parse(JSON.stringify(products));
+    const products = await Product.find({}).sort({ createdAt: -1 }).populate('penNameId').lean();
+    return parseData(products);
 }
 
 export async function getPublishedProducts() {
     try {
         await connectToDatabase();
-        const products = await Product.find({ isHidden: { $ne: true } }).sort({ createdAt: -1 });
-        return JSON.parse(JSON.stringify(products));
+        const products = await Product.find({ isHidden: { $ne: true } }).sort({ createdAt: -1 }).lean();
+        return parseData(products);
     } catch (error) {
         console.error("Error fetching published products:", error);
         return [];
@@ -159,10 +160,10 @@ export async function getMarketplaceItems() {
         await connectToDatabase();
         
         // Fetch products
-        const products = await Product.find({ isHidden: { $ne: true } }).sort({ createdAt: -1 });
+        const products = await Product.find({ isHidden: { $ne: true } }).sort({ createdAt: -1 }).lean();
         
         // Fetch sales pages marked for marketplace
-        const salesPages = await SalesPage.find({ isPublished: true, showInMarketplace: true }).sort({ createdAt: -1 });
+        const salesPages = await SalesPage.find({ isPublished: true, showInMarketplace: true }).sort({ createdAt: -1 }).lean();
         
         // Normalize
         const normalizedProducts = products.map((p: any) => ({
@@ -192,7 +193,7 @@ export async function getMarketplaceItems() {
         // Combine and sort
         const combined = [...normalizedProducts, ...normalizedSalesPages];
         
-        return JSON.parse(JSON.stringify(combined));
+        return parseData(combined);
     } catch (error) {
         console.error("Error fetching marketplace items:", error);
         return [];
@@ -206,27 +207,27 @@ export async function getFeaturedItems() {
         let products = await Product.find({ 
             isFeaturedInRotation: true,
             isHidden: { $ne: true } 
-        }).sort({ createdAt: -1 }).limit(10);
+        }).sort({ createdAt: -1 }).limit(10).lean();
 
         // Fallback to latest products if none are marked as featured
         if (products.length === 0) {
             products = await Product.find({ 
                 isHidden: { $ne: true } 
-            }).sort({ createdAt: -1 }).limit(8);
+            }).sort({ createdAt: -1 }).limit(8).lean();
         }
         
         let salesPages = await SalesPage.find({ 
             isPublished: true, 
             showInMarketplace: true,
             isFeaturedInRotation: true 
-        }).sort({ createdAt: -1 }).limit(5);
+        }).sort({ createdAt: -1 }).limit(5).lean();
 
         // Fallback to latest sales pages if none are marked as featured
         if (salesPages.length === 0) {
             salesPages = await SalesPage.find({ 
                 isPublished: true,
                 showInMarketplace: true
-            }).sort({ createdAt: -1 }).limit(4);
+            }).sort({ createdAt: -1 }).limit(4).lean();
         }
         
         const normalizedProducts = products.map((p: any) => ({
@@ -253,7 +254,7 @@ export async function getFeaturedItems() {
             externalUrl: `/offers/${s.slug}`
         }));
 
-        return JSON.parse(JSON.stringify([...normalizedProducts, ...normalizedSalesPages]));
+        return parseData([...normalizedProducts, ...normalizedSalesPages]);
     } catch (error) {
         console.error("Error fetching featured items:", error);
         return [];
@@ -268,11 +269,11 @@ export async function getProductById(idOrSlug: string) {
         let product;
 
         if (mongoose.isValidObjectId(idOrSlug)) {
-            product = await Product.findById(idOrSlug);
+            product = await Product.findById(idOrSlug).lean();
         }
 
         if (!product) {
-            product = await Product.findOne({ slug: idOrSlug });
+            product = await Product.findOne({ slug: idOrSlug }).lean();
         }
 
         if (!product) {
@@ -287,8 +288,8 @@ export async function getProductById(idOrSlug: string) {
             await product.save();
         }
 
-        console.log(`[ProductAction] Successfully fetched product: ${product.title} (ID: ${product._id})`);
-        return JSON.parse(JSON.stringify(product));
+        console.log(`[ProductAction] Successfully fetched product: ${(product as any).title} (ID: ${(product as any)._id})`);
+        return parseData(product);
     } catch (error) {
         console.error(`[ProductAction] Error in getProductById for ${idOrSlug}:`, error);
         throw error;
@@ -306,9 +307,9 @@ export async function getProductsByPenName(penNameId: string) {
         await connectToDatabase();
         
         // Ensure penNameId is a valid search criteria (Mongoose will cast string to ObjectId if valid)
-        const products = await Product.find({ penNameId }).sort({ createdAt: -1 });
+        const products = await Product.find({ penNameId }).sort({ createdAt: -1 }).lean();
         console.log(`[ProductAction] Found ${products.length} products for pen name ${penNameId}`);
-        return JSON.parse(JSON.stringify(products));
+        return parseData(products);
     } catch (error) {
         console.error(`[ProductAction] Error in getProductsByPenName for ${penNameId}:`, error);
         throw error;
@@ -330,5 +331,5 @@ export async function deleteProduct(id: string) {
     revalidatePath("/products");
     revalidatePath("/admin");
 
-    return JSON.parse(JSON.stringify(deletedProduct));
+    return parseData(deletedProduct);
 }

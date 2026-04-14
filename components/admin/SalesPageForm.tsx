@@ -213,7 +213,7 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
     };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+        <form onSubmit={handleSubmit} className="w-full max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20 text-slate-900">
 
             {/* Header Control Panel */}
             <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-slate-200 shadow-xl border-t-blue-500 border-t-4 transition-all">

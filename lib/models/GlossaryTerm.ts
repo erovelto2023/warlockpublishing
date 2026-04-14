@@ -185,13 +185,15 @@ const GlossaryTermSchema = new Schema({
     isPremium: { type: Boolean, default: false },
     isPublished: { type: Boolean, default: true },
     imageUrl: { type: String },
-    lastUpdated: { type: Date, default: Date.now },
-    createdAt: { type: Date, default: Date.now },
     viewCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
+GlossaryTermSchema.index({ category: 1 });
+GlossaryTermSchema.index({ isPublished: 1 });
+GlossaryTermSchema.index({ isPremium: 1 });
+GlossaryTermSchema.index({ niche: 1 });
+
 GlossaryTermSchema.pre('save', async function () {
-    this.lastUpdated = new Date();
     if (!this.category && this.niche) {
         this.category = this.niche;
     }
