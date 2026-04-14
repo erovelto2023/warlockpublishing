@@ -13,7 +13,7 @@ interface EditPageProps {
 
 export default async function EditGlossaryPage({ params }: EditPageProps) {
     const { id } = await params;
-    const term = await getGlossaryTermById(id);
+    const term: any = await getGlossaryTermById(id);
 
     if (!term) {
         notFound();

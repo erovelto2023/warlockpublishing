@@ -8,7 +8,7 @@ export default async function EditOfferPage({ params }: { params: Promise<{ id: 
     if (!isUserAdmin) redirect('/');
 
     const { id } = await params;
-    const page = await getSalesPageById(id);
+    const page: any = await getSalesPageById(id);
 
     if (!page) notFound();
 

@@ -19,13 +19,13 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     }
 
     const { id } = await params;
-    const product = await getProductById(id);
+    const product: any = await getProductById(id);
     const penNames = await getPenNames();
 
     // Transform product data to match WizardData interface if necessary
     // The WizardData expects specific fields, ensure product has them or default them
     const wizardData = {
-        ...product,
+        ...(product as any),
         price: product.price.toString(), // Convert number to string for input
         // Ensure other fields match types
     };

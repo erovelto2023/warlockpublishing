@@ -8,7 +8,7 @@ interface EditPenNamePageProps {
 
 export default async function EditPenNamePage({ params }: EditPenNamePageProps) {
     const { id } = await params;
-    const penName = await getPenNameById(id);
+    const penName: any = await getPenNameById(id);
 
     if (!penName) {
         notFound();
