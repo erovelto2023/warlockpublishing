@@ -3,6 +3,7 @@
 import { connectToDatabase } from '@/lib/db';
 import GlossaryTerm from '@/lib/models/GlossaryTerm';
 import { revalidatePath } from 'next/cache';
+import { GlossaryTerm as GlossaryTermType } from '@/lib/types';
 
 // Slugify helper
 function slugify(text: string) {
@@ -23,9 +24,8 @@ async function makeUniqueSlug(baseSlug: string, existingSlugs: string[]) {
 }
 
 // Helper to serialize Mongoose documents (handles the new ROBUST high-fidelity fields)
-function serializeTerm(term: any) {
+function serializeTerm(term: any): GlossaryTermType | null {
     if (!term) return null;
-    // Using simple but effective JSON transition to strip Mongoose specific types
     return JSON.parse(JSON.stringify(term));
 }
 
@@ -55,9 +55,10 @@ export async function trackGlossaryView(slug: string) {
     }
 }
 
-export async function createGlossaryTerm(data: any) {
+export async function createGlossaryTerm(data: Partial<GlossaryTermType>) {
     await connectToDatabase();
     
+    if (!data.term) throw new Error("Term is required");
     let slug = data.slug || slugify(data.term);
     const existingTerms = await GlossaryTerm.find({}, { slug: 1 }).lean();
     const existingSlugs = existingTerms.map((t: any) => t.slug).filter(Boolean);
@@ -72,7 +73,7 @@ export async function createGlossaryTerm(data: any) {
     return serializeTerm(newTerm);
 }
 
-export async function updateGlossaryTerm(id: string, data: any) {
+export async function updateGlossaryTerm(id: string, data: Partial<GlossaryTermType>) {
     await connectToDatabase();
     
     // If term changed, we might want to update slug, but usually better to keep it for SEO

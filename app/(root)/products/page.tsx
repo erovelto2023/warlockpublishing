@@ -3,8 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { MarketplaceItem } from "@/lib/types";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export default async function ProductsPage({
   searchParams,
@@ -29,15 +31,15 @@ export default async function ProductsPage({
             <h1 className="text-3xl font-bold mb-8">All Products & Offers</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {paginatedItems.map((item: any) => (
+                {paginatedItems.map((item: MarketplaceItem) => (
                     <Card key={item.id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
                         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                             {item.imageUrl ? (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
+                                <Image
                                     src={item.imageUrl}
                                     alt={item.title}
-                                    className="w-full h-full object-cover transition-transform hover:scale-105"
+                                    fill
+                                    className="object-cover transition-transform hover:scale-105"
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-muted-foreground">

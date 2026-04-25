@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
+import { escapeRegExp } from '@/lib/utils';
 import Product from '@/lib/models/Product';
 import GlossaryTerm from '@/lib/models/GlossaryTerm';
 import BlogPost from '@/lib/models/BlogPost';
@@ -9,13 +10,16 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const q = searchParams.get('q');
 
-        if (!q) {
+        if (!q || q.length < 2) {
             return NextResponse.json({ products: [], glossary: [], blog: [] });
         }
 
+        // Limit query length to prevent ReDoS
+        const sanitizedQuery = escapeRegExp(q.slice(0, 100));
+
         await connectToDatabase();
 
-        const searchRegex = new RegExp(q, 'i');
+        const searchRegex = new RegExp(sanitizedQuery, 'i');
 
         const [products, glossary, blog] = await Promise.all([
             Product.find({ 

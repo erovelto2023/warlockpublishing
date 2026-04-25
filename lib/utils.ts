@@ -20,3 +20,11 @@ export function parseData<T>(data: T): T {
 export const safeArray = <T>(arr: any): T[] => Array.isArray(arr) ? arr : [];
 export const safeString = (str: any, fallback = ""): string => 
     typeof str === 'string' ? str : (str ? String(str) : fallback);
+
+/**
+ * Escapes special characters for use in regular expressions.
+ * Prevents ReDoS and unintended regex matching.
+ */
+export function escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

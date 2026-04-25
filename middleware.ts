@@ -15,7 +15,6 @@ const isPublicRoute = createRouteMatcher([
     '/license',
     '/author(.*)',
     '/glossary(.*)',
-    '/api/seed-glossary',
     '/uploads(.*)',
     '/offers(.*)',
 ]);

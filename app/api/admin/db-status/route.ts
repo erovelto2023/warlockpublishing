@@ -3,10 +3,15 @@ import { connectToDatabase } from "@/lib/db";
 import GlossaryTerm from "@/lib/models/GlossaryTerm";
 import Subscriber from "@/lib/models/Subscriber"; // Assuming this exists based on earlier context
 
+import { isAdmin } from "@/lib/admin";
+
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         await connectToDatabase();
         
         const glossaryCount = await GlossaryTerm.countDocuments();

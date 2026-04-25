@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getPostBySlug } from "@/lib/actions/blog";
 import { ArrowLeft, Calendar, User, Tag, Edit } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -6,10 +7,14 @@ import { Metadata } from "next";
 import ReactMarkdown from 'react-markdown';
 import { isAdmin } from "@/lib/admin";
 import { Button } from "@/components/ui/button";
+import { BlogPost } from "@/lib/types";
+
+export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const post = await getPostBySlug(slug);
+    const post = await getPostBySlug(slug) as BlogPost | null;
 
     if (!post) {
         return {
@@ -18,8 +23,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 
     return {
-        title: `${post.title} | Warlock Publishing Blog`,
+        title: post.title,
         description: post.excerpt,
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            images: post.coverImage ? [{ url: post.coverImage }] : [],
+            type: 'article',
+        },
     };
 }
 
@@ -80,11 +91,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </div>
 
                 {post.coverImage && (
-                    <div className="mb-12 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
-                        <img
+                    <div className="mb-12 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl relative aspect-video">
+                        <Image
                             src={post.coverImage}
                             alt={post.title}
-                            className="w-full h-auto"
+                            fill
+                            className="object-cover"
+                            priority
                         />
                     </div>
                 )}

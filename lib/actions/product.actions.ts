@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 
 import { isAdmin } from "@/lib/admin";
 import { parseData } from "@/lib/utils";
+import { Product as ProductType, MarketplaceItem } from "@/lib/types";
 
 function slugify(text: string) {
     return text
@@ -39,7 +40,7 @@ async function generateUniqueSlug(title: string, currentId?: string) {
     return uniqueSlug;
 }
 
-export async function createProduct(data: any) {
+export async function createProduct(data: Partial<ProductType>) {
     const { userId } = await auth();
     const isUserAdmin = await isAdmin();
 
@@ -47,6 +48,7 @@ export async function createProduct(data: any) {
 
     await connectToDatabase();
 
+    if (!data.title) throw new Error("Title is required");
     const slug = await generateUniqueSlug(data.title);
 
     // Sanitize data
@@ -80,7 +82,7 @@ export async function createProduct(data: any) {
     }
 }
 
-export async function updateProduct(id: string, data: any) {
+export async function updateProduct(id: string, data: Partial<ProductType>) {
     const { userId } = await auth();
     const isUserAdmin = await isAdmin();
 
@@ -92,7 +94,7 @@ export async function updateProduct(id: string, data: any) {
     // For now, let's only generate a slug if one doesn't exist, or if explicitly requested.
     // But to fulfill the user request "make the url seo optimized", we should probably ensure a slug exists.
 
-    let updateData = { ...data };
+    const updateData = { ...data };
 
     // Sanitize data
     if (updateData.penNameId === "") {
@@ -166,16 +168,17 @@ export async function getMarketplaceItems() {
         const salesPages = await SalesPage.find({ isPublished: true, showInMarketplace: true }).sort({ createdAt: -1 }).lean();
         
         // Normalize
-        const normalizedProducts = products.map((p: any) => ({
+        const normalizedProducts: MarketplaceItem[] = products.map((p: any) => ({
             id: p._id.toString(),
             title: p.title,
             description: p.description,
             price: p.price,
             slug: p.slug,
             imageUrl: p.imageUrl,
-            type: 'product',
+            type: 'product' as const,
             category: p.category,
-            externalUrl: p.externalUrl
+            externalUrl: p.externalUrl,
+            licenseType: p.licenseType
         }));
 
         const normalizedSalesPages = salesPages.map((s: any) => ({
@@ -185,7 +188,7 @@ export async function getMarketplaceItems() {
             price: s.price,
             slug: s.slug,
             imageUrl: s.marketplaceImage || s.ogImage,
-            type: 'offer',
+            type: 'offer' as const,
             category: 'Offers',
             externalUrl: `/offers/${s.slug}`
         }));
@@ -216,16 +219,17 @@ export async function getFeaturedItems() {
             showInMarketplace: true
         }).lean();
 
-        const normalizedProducts = products.map((p: any) => ({
+        const normalizedProducts: MarketplaceItem[] = products.map((p: any) => ({
             id: p._id.toString(),
             title: p.title,
             description: p.description,
             price: p.price,
             slug: p.slug,
             imageUrl: p.imageUrl,
-            type: 'product',
+            type: 'product' as const,
             category: p.category,
-            externalUrl: p.externalUrl
+            externalUrl: p.externalUrl,
+            licenseType: p.licenseType
         }));
 
         const normalizedSalesPages = salesPages.map((s: any) => ({
@@ -235,7 +239,7 @@ export async function getFeaturedItems() {
             price: s.price,
             slug: s.slug,
             imageUrl: s.marketplaceImage || s.ogImage,
-            type: 'offer',
+            type: 'offer' as const,
             category: 'Premium Offer',
             externalUrl: `/offers/${s.slug}`
         }));

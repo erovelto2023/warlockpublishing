@@ -1,4 +1,5 @@
 import { getProductById } from "@/lib/actions/product.actions";
+import Image from "next/image";
 import { GrooveSellTracking } from "@/components/groove-sell-tracking";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -14,21 +15,17 @@ import { ThankYouTemplateRenderer } from "@/components/templates/thankyou/ThankY
 import { AmazonTemplateRenderer } from "@/components/templates/amazon/AmazonTemplateRenderer";
 import { notFound, redirect } from "next/navigation";
 
-// Ensure models are registered for SSR to prevent "Schema not compiled" errors
-import "@/lib/models/Product";
-import "@/lib/models/PenName";
-import "@/lib/models/SalesPage";
-import "@/lib/models/Subscriber";
-import "@/lib/models/DigitalAsset";
+import { Product } from "@/lib/types";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
 
 export async function generateMetadata(props: { params: Promise<{ productId: string }> }): Promise<Metadata> {
     const params = await props.params;
     const productId = params.productId;
     
     try {
-        const product: any = await getProductById(productId);
+        const product = await getProductById(productId) as Product;
         if (!product) return constructMetadata({ title: 'Product Not Found', description: 'The requested product could not be found.' });
 
         return constructMetadata({
@@ -36,7 +33,7 @@ export async function generateMetadata(props: { params: Promise<{ productId: str
             description: product.description || `Explore ${product.title} at Warlock Publishing.`,
             image: product.imageUrl,
             type: 'product',
-            keywords: [product.category, product.format, 'Digital Asset'],
+            keywords: [product.category || 'Digital', product.format || 'Product', 'Digital Asset'],
             url: `https://warlockpublishing.com/products/${product.slug || product._id}`
         });
     } catch (error) {
@@ -72,76 +69,80 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
         redirect(`/products/${product.slug}`);
     }
 
-    // --- TEMPLATE RENDERING LOGIC ---
-    try {
-        // 1. Custom HTML Overrides (Highest priority)
-        if (product.htmlContent.trim() !== "") {
-            return (
-                <>
-                    <style dangerouslySetInnerHTML={{
-                        __html: `
-                        #site-navbar-wrapper, #site-footer-wrapper { display: none !important; }
-                        main { flex: 1 1 auto; display: block; width: 100%; }
-                    `}} />
-                    <GrooveSellTracking id={product.grooveSellId} />
-                    <div dangerouslySetInnerHTML={{ __html: product.htmlContent }} />
-                </>
-            );
-        }
+    // SEO: Redirect to slug URL if available and we are currently using ID
+    if (product.slug && productId !== product.slug) {
+        redirect(`/products/${product.slug}`);
+    }
 
-        // 2. Specialty Template Renderers
-        const commonProps = { id: product.grooveSellId };
-        
-        if (product.productType === 'software') {
-            return (
-                <>
-                    <GrooveSellTracking {...commonProps} />
-                    <SoftwareTemplateRenderer contentData={product.rawContentData} />
-                </>
-            );
-        }
-
-        if (product.productType === 'ebook' || product.productType === 'fiction') {
-            return (
-                <>
-                    <GrooveSellTracking {...commonProps} />
-                    <EbookTemplateRenderer contentData={product.rawContentData} />
-                </>
-            );
-        }
-
-        if (product.productType === 'course') {
-            return (
-                <>
-                    <GrooveSellTracking {...commonProps} />
-                    <CourseTemplateRenderer contentData={product.rawContentData} />
-                </>
-            );
-        }
-
-        if (product.productType === 'thankyou' || product.pageType === 'thankyou') {
-            return (
-                <>
-                    <GrooveSellTracking {...commonProps} />
-                    <ThankYouTemplateRenderer contentData={product.rawContentData} />
-                </>
-            );
-        }
-
-        if (product.productType === 'amazon') {
-            return (
-                <AmazonTemplateRenderer
-                    contentData={product.rawContentData}
-                    amazonLink={product.amazonLink}
-                    title={product.title}
-                    description={product.description}
-                    imageUrl={product.imageUrl}
-                />
-            );
-        }
-
-        // 3. Fallback: Standard Product View
+    // --- TEMPLATE RENDERING ---
+    // 1. Custom HTML Overrides (Highest priority)
+    if (product.htmlContent.trim() !== "") {
         return (
+            <>
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    #site-navbar-wrapper, #site-footer-wrapper { display: none !important; }
+                    main { flex: 1 1 auto; display: block; width: 100%; }
+                `}} />
+                <GrooveSellTracking id={product.grooveSellId} />
+                <div dangerouslySetInnerHTML={{ __html: product.htmlContent }} />
+            </>
+        );
+    }
+
+    // 2. Specialty Template Renderers
+    const commonProps = { id: product.grooveSellId };
+    
+    if (product.productType === 'software') {
+        return (
+            <>
+                <GrooveSellTracking {...commonProps} />
+                <SoftwareTemplateRenderer contentData={product.rawContentData} />
+            </>
+        );
+    }
+
+    if (product.productType === 'ebook' || product.productType === 'fiction') {
+        return (
+            <>
+                <GrooveSellTracking {...commonProps} />
+                <EbookTemplateRenderer contentData={product.rawContentData} />
+            </>
+        );
+    }
+
+    if (product.productType === 'course') {
+        return (
+            <>
+                <GrooveSellTracking {...commonProps} />
+                <CourseTemplateRenderer contentData={product.rawContentData} />
+            </>
+        );
+    }
+
+    if (product.productType === 'thankyou' || product.pageType === 'thankyou') {
+        return (
+            <>
+                <GrooveSellTracking {...commonProps} />
+                <ThankYouTemplateRenderer contentData={product.rawContentData} />
+            </>
+        );
+    }
+
+    if (product.productType === 'amazon') {
+        return (
+            <AmazonTemplateRenderer
+                contentData={product.rawContentData}
+                amazonLink={product.amazonLink}
+                title={product.title}
+                description={product.description}
+                imageUrl={product.imageUrl}
+            />
+        );
+    }
+
+    // 3. Fallback: Standard Product View
+    return (
             <div className="container py-10 px-4">
                 <GrooveSellTracking id={product.grooveSellId} />
 
@@ -149,11 +150,12 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                     {/* Product Image */}
                     <div className="relative aspect-square rounded-xl overflow-hidden border shadow-lg bg-muted">
                         {product.imageUrl ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
+                            <Image
                                 src={product.imageUrl}
                                 alt={product.title}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
+                                priority
                             />
                         ) : (
                             <div className="flex items-center justify-center h-full text-muted-foreground italic">
@@ -219,9 +221,4 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                 </div>
             </div>
         );
-    } catch (err) {
-        // If template rendering itself crashes, log details and redirect to an even simpler view if needed
-        console.error(`[ProductPage] Rendering crash for ${productId}:`, err);
-        throw err; // Still let the error boundary catch it, but we've logged it
-    }
 }

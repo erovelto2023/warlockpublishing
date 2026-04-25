@@ -3,6 +3,7 @@ import { unlink } from 'fs/promises';
 import { join } from 'path';
 import { connectToDatabase } from '@/lib/db';
 import GalleryImage from '@/lib/models/GalleryImage';
+import { isAdmin } from '@/lib/admin';
 
 // GET /api/gallery/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -20,6 +21,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 // PATCH /api/gallery/[id] — update metadata
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         await connectToDatabase();
         const { id } = await params;
         const body = await req.json();
@@ -39,6 +43,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 // DELETE /api/gallery/[id] — delete record + files
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         await connectToDatabase();
         const { id } = await params;
         const image = await GalleryImage.findById(id);

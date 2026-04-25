@@ -15,8 +15,13 @@ const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 const GALLERY_DIR = join(process.cwd(), 'public', 'uploads', 'gallery');
 const THUMB_DIR = join(GALLERY_DIR, 'thumbs');
 
+import { isAdmin } from '@/lib/admin';
+
 export async function POST(req: NextRequest) {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         // Parse multipart form
         const formData = await req.formData();
         const files = formData.getAll('files') as File[];

@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import GalleryImage from '@/lib/models/GalleryImage';
+import { isAdmin } from '@/lib/admin';
 
 // GET /api/gallery?status=published&tag=sales&page=1&limit=20
 export async function GET(req: NextRequest) {
@@ -13,8 +14,21 @@ export async function GET(req: NextRequest) {
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '50');
 
+        const isAdminUser = await isAdmin();
         const filter: any = {};
-        if (status) filter.status = status;
+        
+        if (status) {
+            // Only admins can filter by any status; public users only see published
+            if (isAdminUser) {
+                filter.status = status;
+            } else {
+                filter.status = 'published';
+            }
+        } else if (!isAdminUser) {
+            // Public users only see published by default
+            filter.status = 'published';
+        }
+        
         if (tag) filter.tags = tag;
 
         const images = await GalleryImage.find(filter)

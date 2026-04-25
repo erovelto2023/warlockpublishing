@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import GlobalSettings from '@/lib/models/GlobalSettings';
+import { isAdmin } from '@/lib/admin';
 
 // GET /api/settings
 export async function GET() {
@@ -25,6 +26,9 @@ export async function GET() {
 // POST /api/settings - Update or Create
 export async function POST(req: NextRequest) {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         await connectToDatabase();
         const body = await req.json();
         

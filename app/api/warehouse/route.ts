@@ -4,6 +4,8 @@ import { join } from 'path';
 import { connectToDatabase } from '@/lib/db';
 import DigitalAsset from '@/lib/models/DigitalAsset';
 
+import { isAdmin } from '@/lib/admin';
+
 export const runtime = 'nodejs';
 
 const WAREHOUSE_DIR = join(process.cwd(), '_warehouse_storage_');
@@ -11,6 +13,9 @@ const WAREHOUSE_DIR = join(process.cwd(), '_warehouse_storage_');
 // List all assets
 export async function GET(req: NextRequest) {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         await connectToDatabase();
         const assets = await DigitalAsset.find().sort({ createdAt: -1 });
         return NextResponse.json({ success: true, assets });
@@ -22,6 +27,9 @@ export async function GET(req: NextRequest) {
 // Delete an asset
 export async function DELETE(req: NextRequest) {
     try {
+        if (!await isAdmin()) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
         const { id } = await req.json();
         
         await connectToDatabase();
