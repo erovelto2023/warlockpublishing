@@ -5,8 +5,8 @@ export interface Product {
     price: number;
     imageUrl?: string;
     category?: string;
-    productType: 'ebook' | 'software' | 'amazon' | 'course';
-    pageType: 'sales' | 'upsell' | 'downsell' | 'thankyou';
+    productType?: string;
+    pageType?: string;
     templateId?: string;
     contentData?: any;
     format?: string;
@@ -252,7 +252,7 @@ export interface SalesPage {
     footerCode?: string;
     isPublished: boolean;
     showInMarketplace: boolean;
-    pageType: 'sales' | 'upsell' | 'downsell' | 'thank-you';
+    pageType?: string;
     price?: number;
     buyUrl?: string;
     ogImage?: string;
