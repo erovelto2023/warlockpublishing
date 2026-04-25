@@ -182,8 +182,9 @@ export interface GlossaryTerm {
         productId: string;
     };
     bestMarketingPlatforms?: {
-        platform: string;
-        priority: string;
+        platform?: string;
+        priority?: string;
+        reason?: string;
     }[];
     [key: string]: any;
 }
