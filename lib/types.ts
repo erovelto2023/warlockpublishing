@@ -122,16 +122,16 @@ export interface GlossaryTerm {
         pinterestPinIdeas?: string[];
         twitterTweetIdeas?: string[];
         questionsAndAnswers?: {
-            question: string;
-            answer: string;
+            question?: string;
+            answer?: string;
         }[];
     };
     headlines?: string[];
     youtubeTitles?: string[];
     pinterestIdeas?: string[];
     instagramIdeas?: string[];
-    faqs?: { question: string; answer: string }[];
-    caseStudies?: { title: string; description: string; url: string }[];
+    faqs?: { question?: string; answer?: string }[];
+    caseStudies?: { title?: string; description?: string; url?: string }[];
     relatedTermIds?: string[];
     synonyms?: string[];
     antonyms?: string[];
@@ -158,12 +158,12 @@ export interface GlossaryTerm {
     productPrompt?: string;
     socialPrompt?: string;
     relatedKeywords?: {
-        keyword: string;
+        keyword?: string;
         searchVolume?: string;
         competitionLevel?: string;
     }[];
-    referenceWebsites?: { name: string; url: string }[];
-    amazonProducts?: { name: string; url: string }[];
+    referenceWebsites?: { name?: string; url?: string }[];
+    amazonProducts?: { name?: string; url?: string }[];
     expertOpinion?: string;
     historicalContext?: string;
     originalUsage?: string;

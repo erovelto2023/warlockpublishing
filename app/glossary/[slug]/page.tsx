@@ -230,7 +230,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             {(term.faqs && term.faqs.length > 0 ? term.faqs : [
                                 { question: "How does this drive commercial authority?", answer: "By establishing terminology dominance, you position your brand as the primary reference point in the niche." },
                                 { question: "Is this scalable for small creators?", answer: "Exceedingly so. Small creators can leverage this clarity to out-maneuver larger, slower competitors." }
-                            ]).map((faq: { question: string; answer: string }, i: number) => (
+                            ]).map((faq, i) => (
                                 <details key={i} className="group bg-white border border-slate-200 rounded-3xl overflow-hidden hover:border-indigo-300 hover:shadow-md transition-all">
                                     <summary className="flex items-center justify-between p-10 cursor-pointer list-none hover:bg-slate-50 transition-all font-black text-slate-800 uppercase text-sm tracking-wide">
                                         {faq.question}
@@ -345,7 +345,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         <section className="space-y-8">
                             <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">Curated Prime Assets</h2>
                             <div className="grid sm:grid-cols-2 gap-6">
-                                {term.amazonProducts.map((p: { name: string; url?: string }, i: number) => (
+                                {term.amazonProducts.map((p, i) => (
                                     <Link key={i} href={p.url || '#'} target="_blank" className="flex items-center gap-6 p-6 bg-white border border-slate-200 shadow-sm rounded-3xl hover:shadow-lg hover:border-slate-300 transition-all group">
                                         <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-amber-500 transition-colors shrink-0">
                                             <ShoppingBag size={24} />
@@ -504,9 +504,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     <section className="bg-white p-10 rounded-3xl border border-slate-200 shadow-sm space-y-8">
                          <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Related Keywords</h3>
                          <div className="flex flex-wrap gap-3">
-                             {(term.relatedKeywords && term.relatedKeywords.length > 0 ? term.relatedKeywords : []).map((k: string | { keyword: string }, i: number) => (
+                             {(term.relatedKeywords && term.relatedKeywords.length > 0 ? term.relatedKeywords : []).map((k, i) => (
                                  <div key={i} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full flex items-center gap-3 hover: border-indigo-300 transition-all cursor-default">
-                                      <span className="text-[11px] font-bold text-slate-600">{typeof k === 'string' ? k : k.keyword}</span>
+                                      <span className="text-[11px] font-bold text-slate-600">{typeof k === 'string' ? k : (k as any).keyword || 'N/A'}</span>
                                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
                                  </div>
                              ))}
