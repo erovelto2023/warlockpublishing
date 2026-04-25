@@ -5,11 +5,20 @@ import { getGlossaryTerms, getGlossaryStats } from '@/lib/actions/glossary';
 import GlossaryTable from '@/components/admin/GlossaryTable';
 import GlossaryMaintenance from '@/components/admin/GlossaryMaintenance';
 import { BookOpen, ShieldCheck, Database, LayoutPanelLeft, Loader2 } from 'lucide-react';
+import { GlossaryTerm } from '@/lib/types';
+
+interface GlossaryStats {
+    total: number;
+    published: number;
+    missingVideo: number;
+    missingArticle: number;
+    totalViews: number;
+}
 
 export default function GlossaryAdminPage() {
     const [activeTab, setActiveTab] = useState<'registry' | 'arsenal'>('registry');
-    const [terms, setTerms] = useState<any[]>([]);
-    const [stats, setStats] = useState<any>(null);
+    const [terms, setTerms] = useState<GlossaryTerm[]>([]);
+    const [stats, setStats] = useState<GlossaryStats | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,7 +28,8 @@ export default function GlossaryAdminPage() {
                     getGlossaryTerms({ publishedOnly: false }),
                     getGlossaryStats()
                 ]);
-                setTerms(termsData);
+                const validTerms = (termsData as (GlossaryTerm | null)[]).filter((t): t is GlossaryTerm => t !== null);
+                setTerms(validTerms);
                 setStats(statsData);
             } catch (error) {
                 console.error("Failed to fetch glossary data", error);

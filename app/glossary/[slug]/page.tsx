@@ -75,7 +75,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const rotationPool = fullPool.filter(item => item.isFeaturedInRotation);
 
     // Choose a random item from the pool for rotation, or the pinned one
-    const randomIndex = Math.floor(Math.random() * rotationPool.length);
+    const seed = term.slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const randomIndex = seed % (rotationPool.length || 1);
     const featuredPoolItem = fullPool.find(item => item.id === term.marketplaceProduct?.productId) 
         || (rotationPool.length > 0 ? rotationPool[randomIndex] : fullPool[0]);
 
@@ -629,7 +630,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                  { platform: "Pinterest", priority: "High" },
                                  { platform: "Instagram", priority: "High" },
                                  { platform: "YouTube", priority: "Medium" }
-                             ]).map((plat: { platform: string; priority: string }, i: number) => (
+                             ]).map((plat, i) => (
                                  <div key={i} className="flex items-center gap-4 group">
                                       <div className={`w-8 h-8 rounded-lg ${
                                         plat.priority === 'High' ? 'bg-indigo-500' : 'bg-slate-500'

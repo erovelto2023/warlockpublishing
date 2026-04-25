@@ -9,10 +9,11 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { deleteGlossaryTerm, runGlossaryAudit } from '@/lib/actions/glossary';
+import { GlossaryTerm } from '@/lib/types';
 import BulkTermImport from './BulkTermImport';
 
 interface GlossaryTableProps {
-    terms: any[];
+    terms: GlossaryTerm[];
 }
 
 export default function GlossaryTable({ terms }: GlossaryTableProps) {
@@ -199,7 +200,7 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-semibold text-slate-800">{term.term}</span>
-                                                {term.blogContent?.body ? (
+                                                {term.blogArticle?.content ? (
                                                     <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[8px] font-bold uppercase tracking-widest border border-emerald-100 flex items-center gap-1">
                                                         <CheckCircle2 size={10} /> Live
                                                     </span>
@@ -209,8 +210,8 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                                                     </span>
                                                 )}
                                                 <div className="flex items-center gap-1">
-                                                    {term.video?.url && <Video size={12} className="text-indigo-400" />}
-                                                    {term.productIdeas?.length > 0 && <Zap size={12} className="text-cyan-400" />}
+                                                    {(term.videoUrl || term.youtubeVideo?.url) && <Video size={12} className="text-indigo-400" />}
+                                                    {(term.productIdeas && term.productIdeas.length > 0) && <Zap size={12} className="text-cyan-400" />}
                                                 </div>
                                             </div>
                                             <span className="text-[11px] text-slate-400 mt-0.5 line-clamp-1 max-w-xs">{term.definition || term.shortDefinition}</span>

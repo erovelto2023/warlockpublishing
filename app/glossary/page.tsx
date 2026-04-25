@@ -1,6 +1,7 @@
 import { getGlossaryTerms, getGlossaryCategories } from "@/lib/actions/glossary";
 import GlossaryClient from "@/components/glossary/GlossaryClient";
 import { BookOpen } from "lucide-react";
+import { GlossaryTerm } from "@/lib/types";
 
 export const metadata = {
     title: "The Glossary | Publishing & Writing Niche Hub",
@@ -9,7 +10,7 @@ export const metadata = {
 
 export default async function GlossaryPage() {
     try {
-        const terms = (await getGlossaryTerms()) as any[];
+        const terms = (await getGlossaryTerms()) as GlossaryTerm[];
         const categories = await getGlossaryCategories();
 
         return (

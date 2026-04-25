@@ -2,29 +2,14 @@
 
 import { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
+import { GlossaryTerm } from "@/lib/types";
 import { 
     Search as SearchIcon, 
     ArrowRight as ArrowIcon,
 } from "lucide-react";
 
-interface Term {
-    _id: string;
-    term: string;
-    slug: string;
-    category: string;
-    shortDefinition: string;
-    marketDemand: string;
-    monetizationPotential: string;
-    isPremium: boolean;
-    metrics: {
-        profitability: number;
-        difficulty: number;
-        popularity: number;
-    };
-}
-
 interface GlossaryClientProps {
-    initialTerms: Term[];
+    initialTerms: GlossaryTerm[];
     categories: string[];
 }
 
@@ -36,7 +21,7 @@ function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) 
         return initialTerms.filter((term) => {
             const matchesSearch = !search || 
                                  term.term.toLowerCase().includes(search.toLowerCase()) || 
-                                 term.shortDefinition.toLowerCase().includes(search.toLowerCase());
+                                 (term.shortDefinition || "").toLowerCase().includes(search.toLowerCase());
             const matchesCategory = selectedCategory === "all" || term.category === selectedCategory;
             return matchesSearch && matchesCategory;
         });

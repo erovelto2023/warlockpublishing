@@ -69,11 +69,6 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
         redirect(`/products/${product.slug}`);
     }
 
-    // SEO: Redirect to slug URL if available and we are currently using ID
-    if (product.slug && productId !== product.slug) {
-        redirect(`/products/${product.slug}`);
-    }
-
     // --- TEMPLATE RENDERING ---
     // 1. Custom HTML Overrides (Highest priority)
     if (product.htmlContent.trim() !== "") {
