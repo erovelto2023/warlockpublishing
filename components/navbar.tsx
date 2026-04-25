@@ -11,8 +11,17 @@ import {
 } from "@/components/ui/sheet";
 
 export default async function Navbar() {
-    const isUserAdmin = await isAdmin();
-    const { userId } = await auth();
+    let isUserAdmin = false;
+    let userId = null;
+
+    try {
+        isUserAdmin = await isAdmin();
+        const authData = await auth();
+        userId = authData.userId;
+    } catch (error) {
+        // Silently fail during static generation/prerendering
+        // console.log("Auth skipped during build");
+    }
 
     const navLinks = [
         { name: 'Ebooks', href: '/products' },

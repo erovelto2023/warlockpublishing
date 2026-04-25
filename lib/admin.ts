@@ -1,7 +1,13 @@
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function isAdmin() {
-    const user = await currentUser();
+    let user = null;
+    try {
+        user = await currentUser();
+    } catch (e) {
+        return false;
+    }
+    
     if (!user) return false;
 
     const adminEmail = process.env.ADMIN_EMAIL;

@@ -18,7 +18,14 @@ export async function logPageView(data: {
         }
 
         // 2. Skip logged-in users (admins browsing the public site)
-        const { userId } = await auth();
+        let userId = null;
+        try {
+            const authData = await auth();
+            userId = authData.userId;
+        } catch (e) {
+            // During static generation, auth() might fail. We continue as if not logged in.
+        }
+        
         if (userId) {
             return { success: true, hitId: null };
         }
