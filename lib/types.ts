@@ -32,6 +32,7 @@ export interface GlossaryTerm {
     _id: string;
     term: string;
     slug: string;
+    id?: string;
     shortDefinition?: string;
     definition: string;
     category: string;
@@ -41,13 +42,150 @@ export interface GlossaryTerm {
     niche?: string;
     publishingContext?: string;
     keyCharacteristics: string[];
-    isPublished: boolean;
+    origin?: string;
+    traditionalMeaning?: string;
+    modernUsage?: string;
+    expandedExplanation?: string;
+    howItWorks?: string;
+    benefits?: string;
+    commonPractices?: string;
+    useCases?: string;
+    whoUsesIt?: string;
+    targetAudience?: {
+        primaryDemographic?: string;
+        readerPersonas?: string[];
+        painPoints?: string[];
+        desiredOutcomes?: string[];
+    };
+    marketDemand?: {
+        trendStatus?: string;
+        searchVolume?: string;
+        competitionLevel?: string;
+        monetizationPotential?: string;
+        averagePriceRange?: string;
+        marketSize?: string;
+    };
+    howItMakesMoney?: string;
+    bestFor?: string;
+    commonMistakes?: string;
+    realExamples?: string;
+    startupCost?: string;
+    timeToFirstDollar?: string;
+    skillRequired?: string;
+    platformPreference?: string;
+    lowPhysicalEffort?: boolean;
+    productIdeas?: {
+        type?: string;
+        title?: string;
+        description?: string;
+        format?: string;
+        estimatedLength?: string;
+        pricePoint?: string;
+    }[];
+    competitorReferences?: {
+        title?: string;
+        author?: string;
+        url?: string;
+        price?: string;
+        rating?: string;
+        reviewCount?: string;
+        type?: string;
+    }[];
+    commonPitfalls?: {
+        pitfall?: string;
+        whyItHappens?: string;
+        howToAvoid?: string;
+    }[];
+    youtubeVideo?: {
+        title?: string;
+        url?: string;
+        channel?: string;
+        views?: string;
+        duration?: string;
+        publishedDate?: string;
+        relevance?: string;
+    };
+    videoUrl?: string;
+    blogArticle?: {
+        title?: string;
+        slug?: string;
+        wordCount?: string;
+        content?: string;
+        metaTitle?: string;
+        metaDescription?: string;
+        focusKeyword?: string;
+        sources?: string[];
+    };
+    marketingHooks?: {
+        videoHooks?: string[];
+        blogTitles?: string[];
+        pinterestPinIdeas?: string[];
+        twitterTweetIdeas?: string[];
+        questionsAndAnswers?: {
+            question: string;
+            answer: string;
+        }[];
+    };
+    headlines?: string[];
+    youtubeTitles?: string[];
+    pinterestIdeas?: string[];
+    instagramIdeas?: string[];
+    faqs?: { question: string; answer: string }[];
+    caseStudies?: { title: string; description: string; url: string }[];
+    relatedTermIds?: string[];
+    synonyms?: string[];
+    antonyms?: string[];
+    oppositeTerms?: string[];
+    seeAlso?: string[];
+    beginnerExplanation?: string;
+    advancedPerspective?: string;
+    misconceptions?: string;
+    warningsOrNotes?: string;
+    guidedPractice?: string;
+    affirmations?: string;
+    visualizations?: string;
+    audioOrVideoResources?: string;
+    whyItMatters?: string;
+    takeaways?: string[];
+    keyTakeaways?: string[];
+    gettingStartedChecklist?: string[];
+    aiPromptCommandCenter?: {
+        productIdeaPrompt?: string;
+        contentStrategyPrompt?: string;
+        aiImagePrompt?: string;
+    };
+    imagePrompt?: string;
+    productPrompt?: string;
+    socialPrompt?: string;
+    relatedKeywords?: {
+        keyword: string;
+        searchVolume?: string;
+        competitionLevel?: string;
+    }[];
+    referenceWebsites?: { name: string; url: string }[];
+    amazonProducts?: { name: string; url: string }[];
+    expertOpinion?: string;
+    historicalContext?: string;
+    originalUsage?: string;
+    currentUsage?: string;
+    expandedDefinition?: string;
+    simpleDefinition?: string;
+    technicalDefinition?: string;
+    checklist?: string[];
     isPremium: boolean;
+    isPublished: boolean;
     imageUrl?: string;
     viewCount: number;
     createdAt: string | Date;
     updatedAt: string | Date;
-    // ... many more optional fields can be added as needed
+    marketplaceProduct?: {
+        productId: string;
+    };
+    bestMarketingPlatforms?: {
+        platform: string;
+        priority: string;
+    }[];
+    [key: string]: any;
 }
 
 export interface BlogPost {

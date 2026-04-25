@@ -17,7 +17,7 @@ import CopyPromptButton from '@/components/glossary/CopyPromptButton';
 import PrintButton from '@/components/glossary/PrintButton';
 import { constructMetadata } from '@/lib/seo';
 import { Metadata } from 'next';
-import { GlossaryTerm, Product } from '@/lib/types';
+import { GlossaryTerm, Product, SalesPage } from '@/lib/types';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -32,7 +32,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
         title: term.term,
         description: term.shortDefinition || term.definition || `Learn about ${term.term} in the Warlock Publishing Glossary.`,
         type: 'article',
-        keywords: [term.category, term.subCategory, ...(term.keyCharacteristics || [])],
+        keywords: [term.category, term.subCategory, ...(term.keyCharacteristics || [])].filter((k): k is string => !!k),
         url: `https://warlockpublishing.com/glossary/${term.slug}`
     });
 }
@@ -75,8 +75,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const rotationPool = fullPool.filter(item => item.isFeaturedInRotation);
 
     // Choose a random item from the pool for rotation, or the pinned one
+    const randomIndex = Math.floor(Math.random() * rotationPool.length);
     const featuredPoolItem = fullPool.find(item => item.id === term.marketplaceProduct?.productId) 
-        || (rotationPool.length > 0 ? rotationPool[Math.floor(Math.random() * rotationPool.length)] : fullPool[0]);
+        || (rotationPool.length > 0 ? rotationPool[randomIndex] : fullPool[0]);
 
     // Handle external vs internal linking (used in the UI)
     const productLink = featuredPoolItem?.link || "/products";
@@ -141,7 +142,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 </div>
                                 <div className="space-y-1">
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Subcategory / Trope</span>
-                                    <span className="text-sm font-bold text-slate-700 flex items-center gap-2"><Compass size={14} className="text-emerald-500" /> {term.subcategory || 'Strategy'}</span>
+                                    <span className="text-sm font-bold text-slate-700 flex items-center gap-2"><Compass size={14} className="text-emerald-500" /> {term.subCategory || 'Strategy'}</span>
                                 </div>
                                 <div className="space-y-1">
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Publishing Context</span>
@@ -277,7 +278,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                  </div>
                              </div>
                              <div className="grid md:grid-cols-3 gap-6">
-                                    {(term.targetAudience && term.targetAudience.length > 0 ? term.targetAudience : [
+                                     {(Array.isArray(term.targetAudience) && term.targetAudience.length > 0 ? term.targetAudience : [
                                         { title: "Educators", benefit: "Curriculum tools and classroom modeling." },
                                         { title: "Publishers", benefit: "Data on high-demand tropes for new acquisitions." },
                                         { title: "Authors", benefit: "Strategic cues for writing character interactions." }
@@ -301,13 +302,13 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 { name: "Reference Asset A", type: "Amazon Book", url: "#" },
                                 { name: "Reference Asset B", type: "Affiliate Product", url: "#" },
                                 { name: "Reference Asset C", type: "Digital Guide", url: "#" }
-                            ]).map((ref: { name: string; type?: string; url?: string }, i: number) => (
+                            ]).map((ref: any, i: number) => (
                                 <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-200 flex flex-col gap-4 group hover:border-indigo-300 transition-all shadow-sm">
                                      <div className="flex justify-between items-start">
                                          <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">{ref.type || "Resource"}</span>
                                          <ExternalLink size={14} className="text-slate-300 group-hover:text-indigo-500" />
                                      </div>
-                                     <h4 className="text-lg font-extrabold text-slate-900 italic leading-tight">&quot;{ref.name}&quot;</h4>
+                                      <h4 className="text-lg font-extrabold text-slate-900 italic leading-tight">&quot;{ref.title || ref.name}&quot;</h4>
                                      <a href={ref.url || '#'} className="mt-auto text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1">
                                         View Reference <ArrowRight size={10} />
                                      </a>
@@ -323,7 +324,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             {(term.productIdeas && term.productIdeas.length > 0 ? term.productIdeas : [
                                 { title: "Blueprint Masterclass", type: "Course", pricePoint: "$147.00", description: "A comprehensive guide on deploying these strategies." },
                                 { title: "Niche Authority Kit", type: "Template", pricePoint: "$29.00", description: "Printable frameworks to prompt discussion." }
-                            ]).map((item: { title: string; type?: string; pricePoint?: string; price?: string; description?: string; desc?: string }, i: number) => (
+                            ]).map((item: any, i: number) => (
                                 <div key={i} className="p-8 bg-white border border-slate-200 rounded-[2rem] space-y-4 group hover:border-indigo-300 hover:shadow-lg transition-all shadow-sm">
                                     <div className="flex justify-between items-start">
                                         <div className="p-3 bg-slate-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"><Rocket size={20} /></div>
@@ -418,7 +419,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                  </div>
                                  <div className="md:col-span-2 space-y-4 flex flex-col justify-center">
                                       <h4 className="text-lg font-extrabold text-slate-900 leading-tight">Expert Analysis Overview</h4>
-                                      <p className="text-xs text-slate-500 italic">Auto-search Query: "{term.term} Strategies"</p>
+                                      <p className="text-xs text-slate-500 italic">Auto-search Query: &quot;{term.term} Strategies&quot;</p>
                                       <a href={term.videoUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg border border-indigo-100 flex items-center gap-2 hover:bg-indigo-100 transition-colors w-fit break-all">
                                           {term.videoUrl.substring(0, 30)}... <ExternalLink size={10} className="shrink-0" />
                                       </a>
