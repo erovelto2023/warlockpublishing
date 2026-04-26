@@ -91,6 +91,33 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
     const [loading, setLoading] = useState(false)
     const [mounted, setMounted] = useState(false)
 
+    const getSteps = () => {
+        if (data.productType === 'external') {
+            return [{ number: 1, title: "Basics" }];
+        }
+        if (data.productType === 'amazon') {
+            return [
+                { number: 1, title: "Basics" },
+                { number: 2, title: "Editor" }
+            ];
+        }
+        return [
+            { number: 1, title: "Basics" },
+            { number: 2, title: "Template" },
+            { number: 3, title: "Editor" },
+        ];
+    };
+
+    const steps = getSteps();
+    const totalSteps = steps.length;
+
+    // Ensure step doesn't exceed new totalSteps when switching product types
+    useEffect(() => {
+        if (step > totalSteps) {
+            setStep(totalSteps);
+        }
+    }, [totalSteps, step]);
+
     useEffect(() => {
         setMounted(true)
     }, [])
@@ -163,32 +190,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
         }
     }
 
-    const getSteps = () => {
-        if (data.productType === 'external') {
-            return [{ number: 1, title: "Basics" }];
-        }
-        if (data.productType === 'amazon') {
-            return [
-                { number: 1, title: "Basics" },
-                { number: 2, title: "Editor" }
-            ];
-        }
-        return [
-            { number: 1, title: "Basics" },
-            { number: 2, title: "Template" },
-            { number: 3, title: "Editor" },
-        ];
-    };
 
-    const steps = getSteps();
-    const totalSteps = steps.length;
-
-    // Ensure step doesn't exceed new totalSteps when switching product types
-    useEffect(() => {
-        if (step > totalSteps) {
-            setStep(totalSteps);
-        }
-    }, [totalSteps, step]);
 
     return (
         <div className="max-w-6xl mx-auto py-10 px-4">
