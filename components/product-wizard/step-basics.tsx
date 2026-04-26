@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { WizardData } from "./ProductWizard"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import MediaLibrary from '@/components/admin/MediaLibrary'
 
 interface StepBasicsProps {
     data: WizardData
@@ -14,6 +16,8 @@ interface StepBasicsProps {
 }
 
 export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
+    const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+
     // Auto-fill fields for Thank You page
     useEffect(() => {
         if (data.pageType === 'thankyou') {
@@ -168,13 +172,23 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                     <h3 className="text-lg font-bold text-slate-200">Content & Visuals</h3>
                     <div className="space-y-2">
                         <Label htmlFor="imageUrl">Cover Image URL</Label>
-                        <Input
-                            id="imageUrl"
-                            className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
-                            value={data.imageUrl}
-                            onChange={(e) => updateData({ imageUrl: e.target.value })}
-                            placeholder="https://..."
-                        />
+                        <div className="flex gap-2">
+                            <Input
+                                id="imageUrl"
+                                className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400 flex-1"
+                                value={data.imageUrl}
+                                onChange={(e) => updateData({ imageUrl: e.target.value })}
+                                placeholder="https://..."
+                            />
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                className="border-slate-700 bg-slate-800 text-slate-300 hover:text-white"
+                                onClick={() => setShowMediaLibrary(true)}
+                            >
+                                Browse
+                            </Button>
+                        </div>
                     </div>
                     
                     <div className="space-y-2">
@@ -290,6 +304,23 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                     )}
                 </div>
             </div>
+
+            {showMediaLibrary && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[80vh] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+                            <h2 className="text-xl font-bold dark:text-white">Select Media</h2>
+                            <button onClick={() => setShowMediaLibrary(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors font-bold text-slate-500 dark:text-slate-400">X</button>
+                        </div>
+                        <div className="flex-1 overflow-auto p-4 bg-slate-50 dark:bg-slate-900">
+                            <MediaLibrary onSelect={(url) => {
+                                updateData({ imageUrl: url });
+                                setShowMediaLibrary(false);
+                            }} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

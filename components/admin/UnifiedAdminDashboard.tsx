@@ -20,6 +20,7 @@ import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
+import { getSanitizedProduct } from '@/lib/product-utils';
 
 interface AdminDashboardProps {
     products: any[];
@@ -541,8 +542,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
-                                    {products.map((product: any) => (
-                                        <tr key={product._id} className="hover:bg-slate-50/80 transition-colors">
+                                    {products.map(getSanitizedProduct).map((product: any) => (
+                                        <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="font-bold text-slate-900">{product.title}</div>
                                                 <div className="text-[10px] text-slate-400 font-mono mt-1">/products/{product.slug}</div>
@@ -553,7 +554,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                             <td className="px-6 py-4 font-bold text-slate-700">${product.price}</td>
                                             <td className="px-6 py-4 text-center">
                                                 <button
-                                                    onClick={() => toggleRotation(product._id, !!product.isFeaturedInRotation)}
+                                                    onClick={() => toggleRotation(product.id, !!product.isFeaturedInRotation)}
                                                     className={`p-2 rounded-full transition-all ${product.isFeaturedInRotation ? 'text-indigo-600 bg-indigo-50' : 'text-slate-300 bg-slate-50'}`}
                                                     title={product.isFeaturedInRotation ? "In Rotation Pool" : "Not in Rotation"}
                                                 >
@@ -563,8 +564,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                             <td className="px-6 py-4 text-right space-x-2">
                                                 <a href={`/products/${product.slug}`} target="_blank" className="inline-block p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"><Eye size={16} /></a>
                                                 <button onClick={() => copyToClipboard(`${window.location.origin}/products/${product.slug}`)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><LinkIcon size={16} /></button>
-                                                <button onClick={() => router.push(`/admin/products/${product._id}/edit`)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"><Edit size={16} /></button>
-                                                <button onClick={() => handleDelete('product', product._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
+                                                <button onClick={() => router.push(`/admin/products/${product.id}/edit`)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"><Edit size={16} /></button>
+                                                <button onClick={() => handleDelete('product', product.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
                                             </td>
                                         </tr>
                                     ))}

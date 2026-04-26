@@ -173,12 +173,23 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
             return
         }
 
+        let finalPrice = Number(data.price) || 0;
+        if (data.productType === 'amazon') {
+            const buyBoxBlock = data.contentData?.blocks?.find((b: any) => b.id === 'buyBox');
+            if (buyBoxBlock?.data?.price) {
+                const parsed = parseFloat(String(buyBoxBlock.data.price).replace(/[^0-9.]/g, ''));
+                if (!isNaN(parsed)) {
+                    finalPrice = parsed;
+                }
+            }
+        }
+
         setLoading(true)
         try {
             if (initialProduct && initialProduct._id) {
                 await updateProduct(initialProduct._id, {
                     ...data,
-                    price: Number(data.price),
+                    price: finalPrice,
                     isAmazonProduct: data.productType === 'amazon' || data.isAmazonProduct
                 })
                 toast({
@@ -188,7 +199,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
             } else {
                 await createProduct({
                     ...data,
-                    price: Number(data.price),
+                    price: finalPrice,
                     // Ensure isAmazonProduct is set correctly based on productType if needed
                     isAmazonProduct: data.productType === 'amazon' || data.isAmazonProduct
                 })

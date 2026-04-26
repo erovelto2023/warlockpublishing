@@ -6,7 +6,9 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import MediaLibrary from '@/components/admin/MediaLibrary'
 import { EbookTemplateRenderer } from "../templates/ebook/EbookTemplateRenderer"
 import { ThankYouTemplateRenderer } from "../templates/thankyou/ThankYouTemplateRenderer"
 import { TEMPLATE_CONFIGS } from "./ebook-templates-config"
@@ -248,6 +250,8 @@ const THANK_YOU_BLOCKS = [
 
 
 export function StepEditor({ data, updateData }: StepEditorProps) {
+    const [mediaTarget, setMediaTarget] = useState<{blockId: string, fieldName: string} | null>(null);
+
     // Determine which blocks to use based on product type
     let currentBlocksConfig = data.productType === 'ebook' ? EBOOK_BLOCKS : SOFTWARE_BLOCKS;
 
@@ -378,12 +382,23 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
                                                     />
                                                 ) : field.type === 'image' ? (
                                                     <div className="space-y-2">
-                                                        <Input
-                                                            className="h-8 text-sm text-slate-900"
-                                                            value={block.data?.[field.name] || ''}
-                                                            onChange={(e) => updateBlockData(block.id, field.name, e.target.value)}
-                                                            placeholder="https://..."
-                                                        />
+                                                        <div className="flex gap-2">
+                                                            <Input
+                                                                className="h-8 text-sm text-slate-900 flex-1"
+                                                                value={block.data?.[field.name] || ''}
+                                                                onChange={(e) => updateBlockData(block.id, field.name, e.target.value)}
+                                                                placeholder="https://..."
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-8 text-xs bg-slate-200 text-slate-800 border-slate-300 hover:bg-slate-300"
+                                                                onClick={() => setMediaTarget({ blockId: block.id, fieldName: field.name })}
+                                                            >
+                                                                Browse
+                                                            </Button>
+                                                        </div>
                                                         {block.data?.[field.name] && (
                                                             <div className="relative w-full h-32 bg-slate-100 rounded overflow-hidden border">
                                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -463,6 +478,23 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
                     )}
                 </div>
             </div>
+
+            {mediaTarget && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[80vh] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+                            <h2 className="text-xl font-bold dark:text-white">Select Media</h2>
+                            <button onClick={() => setMediaTarget(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors font-bold text-slate-500 dark:text-slate-400">X</button>
+                        </div>
+                        <div className="flex-1 overflow-auto p-4 bg-slate-50 dark:bg-slate-900">
+                            <MediaLibrary onSelect={(url) => {
+                                updateBlockData(mediaTarget.blockId, mediaTarget.fieldName, url);
+                                setMediaTarget(null);
+                            }} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

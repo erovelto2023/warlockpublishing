@@ -14,12 +14,23 @@ export function getSanitizedProduct(product: any) {
 
     const blocks = Array.isArray(product.contentData?.blocks) ? product.contentData.blocks : [];
 
+    let finalPrice = Number(product.price) || 0;
+    if (String(product.productType) === 'amazon') {
+        const buyBoxBlock = blocks.find((b: any) => b.id === 'buyBox');
+        if (buyBoxBlock && buyBoxBlock.data && buyBoxBlock.data.price) {
+            const parsed = parseFloat(String(buyBoxBlock.data.price).replace(/[^0-9.]/g, ''));
+            if (!isNaN(parsed)) {
+                finalPrice = parsed;
+            }
+        }
+    }
+
     return {
         id: product._id?.toString() || "",
         title: String(product.title || "Untitled Product"),
         slug: String(product.slug || ""),
         description: String(product.description || ""),
-        price: Number(product.price) || 0,
+        price: finalPrice,
         imageUrl: String(product.imageUrl || ""),
         category: String(product.category || "General"),
         licenseType: String(product.licenseType || "Standard"),

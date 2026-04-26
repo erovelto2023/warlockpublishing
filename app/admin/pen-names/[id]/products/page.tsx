@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Eye, Edit3 } from "lucide-react";
 import { getProductsByPenName } from "@/lib/actions/product.actions";
+import { getSanitizedProduct } from "@/lib/product-utils";
 import { isAdmin } from "@/lib/admin";
 import { redirect } from "next/navigation";
 
@@ -44,8 +45,8 @@ export default async function PenNameProductsPage({ params }: PenNameProductsPag
                         <p className="text-sm">Add your first product to this pen name.</p>
                     </div>
                 ) : (
-                    products.map((product: any) => (
-                        <div key={product._id} className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
+                    products.map(getSanitizedProduct).map((product: any) => (
+                        <div key={product.id} className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full">
                             <div className="h-48 bg-slate-100 relative p-6 flex items-center justify-center text-center">
                                 {product.imageUrl ? (
                                     <img src={product.imageUrl} alt={product.title} className="max-h-full max-w-full object-contain shadow-md" />
@@ -53,12 +54,12 @@ export default async function PenNameProductsPage({ params }: PenNameProductsPag
                                     <div className="text-slate-400 font-medium">No Image</div>
                                 )}
                                 <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-[-10px] group-hover:translate-y-0">
-                                    <Link href={`/products/${product._id}`} target="_blank">
+                                    <Link href={`/products/${product.id}`} target="_blank">
                                         <button className="p-2 bg-white text-slate-900 rounded-full shadow-lg hover:bg-slate-100 tooltip" title="View Sales Page">
                                             <Eye size={16} />
                                         </button>
                                     </Link>
-                                    <Link href={`/admin/products/${product._id}/edit`}>
+                                    <Link href={`/admin/products/${product.id}/edit`}>
                                         <button className="p-2 bg-slate-900 text-white rounded-full shadow-lg hover:bg-slate-800">
                                             <Edit3 size={16} />
                                         </button>
