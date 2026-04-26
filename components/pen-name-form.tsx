@@ -27,13 +27,13 @@ const formSchema = z.object({
         message: "Name must be at least 2 characters.",
     }),
     bio: z.string().optional(),
-    avatarUrl: z.string().url().optional().or(z.literal("")),
-    coverImage: z.string().url().optional().or(z.literal("")),
+    avatarUrl: z.string().optional().or(z.literal("")),
+    coverImage: z.string().optional().or(z.literal("")),
     tagline: z.string().optional(),
     newsletterDescription: z.string().optional(),
     twitter: z.string().optional(),
     instagram: z.string().optional(),
-    website: z.string().url().optional().or(z.literal("")),
+    website: z.string().optional().or(z.literal("")),
     email: z.string().email().optional().or(z.literal("")),
 });
 
