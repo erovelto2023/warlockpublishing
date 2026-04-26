@@ -249,11 +249,70 @@ const THANK_YOU_BLOCKS = [
 // Default configuration for Amazon Product Template
 const AMAZON_BLOCKS = [
     {
-        id: "details", label: "Amazon Details", fields: [
-            { name: "subheadline", label: "Subheadline", type: "textarea", default: "" },
-            { name: "rating", label: "Rating (0-5)", type: "text", default: "4.5" },
-            { name: "reviewCount", label: "Review Count", type: "text", default: "120" },
-            { name: "features", label: "Key Features (One per line)", type: "textarea", default: "" },
+        id: "breadcrumbs", label: "Breadcrumbs", fields: [
+            { name: "category1", label: "Category 1", type: "text", default: "Books" },
+            { name: "category2", label: "Category 2", type: "text", default: "Self-Help" },
+            { name: "category3", label: "Category 3", type: "text", default: "Personal Transformation" },
+        ]
+    },
+    {
+        id: "authorAndRatings", label: "Author & Ratings", fields: [
+            { name: "authorName", label: "Author Name", type: "text", default: "Marcus Aurelius Jr." },
+            { name: "ratingsCount", label: "Ratings Count", type: "text", default: "4,821" },
+            { name: "answeredQuestions", label: "Answered Questions", type: "text", default: "128" },
+        ]
+    },
+    {
+        id: "formats", label: "Pricing & Formats", fields: [
+            { name: "format1Name", label: "Format 1 Name", type: "text", default: "Kindle" },
+            { name: "format1Price", label: "Format 1 Price", type: "text", default: "$9.99" },
+            { name: "format1Subtext", label: "Format 1 Subtext", type: "text", default: "Available instantly" },
+            { name: "format2Name", label: "Format 2 Name", type: "text", default: "Hardcover" },
+            { name: "format2Price", label: "Format 2 Price", type: "text", default: "$24.95" },
+            { name: "format2Subtext", label: "Format 2 Subtext", type: "text", default: "9 Used from $18.50" },
+            { name: "format3Name", label: "Format 3 Name", type: "text", default: "Paperback" },
+            { name: "format3Price", label: "Format 3 Price", type: "text", default: "$14.99" },
+            { name: "format3Subtext", label: "Format 3 Subtext", type: "text", default: "24 New from $12.00" },
+            { name: "format4Name", label: "Format 4 Name", type: "text", default: "Audiobook" },
+            { name: "format4Price", label: "Format 4 Price", type: "text", default: "$0.00" },
+            { name: "format4Subtext", label: "Format 4 Subtext", type: "text", default: "With Audible trial" },
+        ]
+    },
+    {
+        id: "about", label: "About This Book", fields: [
+            { name: "bullets", label: "Key Bullets (One per line)", type: "textarea", default: "Master your emotional responses to external events.\nLearn the secret habit of high-performers in high-stress environments.\nIncludes a 30-day \"Resilience Challenge\" workbook at the end.\nFeatured on \"Modern Minds Weekly\" and \"The Stoic Podcast\"." },
+        ]
+    },
+    {
+        id: "details", label: "Product Details", fields: [
+            { name: "publisher", label: "Publisher", type: "text", default: "Summit Books (May 2024)" },
+            { name: "language", label: "Language", type: "text", default: "English" },
+            { name: "pages", label: "Pages", type: "text", default: "342 pages" },
+            { name: "isbn", label: "ISBN", type: "text", default: "1234567890" },
+            { name: "dimensions", label: "Dimensions", type: "text", default: "6.1 x 1.2 x 9.2 inches" },
+        ]
+    },
+    {
+        id: "buyBox", label: "Buy Box", fields: [
+            { name: "price", label: "Main Price", type: "text", default: "$24.95" },
+            { name: "shippingText", label: "Shipping Text", type: "text", default: "Fast, Free Shipping with Amazon Prime" },
+            { name: "inStockText", label: "In Stock Text", type: "text", default: "In Stock" },
+            { name: "shipsFrom", label: "Ships From", type: "text", default: "Amazon.com" },
+            { name: "soldBy", label: "Sold By", type: "text", default: "Summit Books Direct" },
+        ]
+    },
+    {
+        id: "reviews", label: "Customer Reviews", fields: [
+            { name: "ratingNumber", label: "Rating Number", type: "text", default: "4.6 out of 5" },
+            { name: "globalRatings", label: "Global Ratings Text", type: "text", default: "4,821 global ratings" },
+            { name: "review1Name", label: "Review 1 Name", type: "text", default: "Sarah Jenkins" },
+            { name: "review1Title", label: "Review 1 Title", type: "text", default: "Life changing perspective!" },
+            { name: "review1Date", label: "Review 1 Date", type: "text", default: "Reviewed in the United States on June 12, 2024" },
+            { name: "review1Text", label: "Review 1 Text", type: "textarea", default: "I've read dozens of self-help books, but this one actually stuck. The chapters on \"Practical Stoicism\" were incredibly helpful for my workplace stress." },
+            { name: "review2Name", label: "Review 2 Name", type: "text", default: "D. Miller" },
+            { name: "review2Title", label: "Review 2 Title", type: "text", default: "Good, but some concepts repeat" },
+            { name: "review2Date", label: "Review 2 Date", type: "text", default: "Reviewed in the United States on August 5, 2024" },
+            { name: "review2Text", label: "Review 2 Text", type: "textarea", default: "Excellent insights, though I felt the middle section dragged a bit as it reiterated previous points. Still, the advice is solid." },
         ]
     }
 ]
@@ -453,9 +512,8 @@ export function StepEditor({ data, updateData }: StepEditorProps) {
                     ) : data.productType === 'ebook' ? (
                         <EbookTemplateRenderer contentData={data.contentData} />
                     ) : data.productType === 'amazon' ? (
-                        // Mocking image/title/desc here as they are top-level wizard fields, not block fields
                         <AmazonTemplateRenderer
-                            contentData={data.contentData?.blocks?.find((b: any) => b.id === 'details')?.data || {}}
+                            contentData={data.contentData}
                             amazonLink={data.amazonLink}
                             title={data.title || "Product Title"}
                             description={data.description || "Product description..."}

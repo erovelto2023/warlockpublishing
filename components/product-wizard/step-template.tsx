@@ -29,14 +29,12 @@ const TEMPLATES = {
         { id: "ebook-professional", name: "Professional & Career", description: "Business and career development.", image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Professional" },
         { id: "ebook-shortform", name: "Short-Form & Specialty", description: "Pamphlets, poetry, and niche topics.", image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Short-Form" },
     ],
-    amazon: [
-        { id: "amazon-review", name: "Review Page", description: "Detailed product review format to warm up traffic.", image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Review+Page" },
-        { id: "amazon-direct", name: "Direct Bridge", description: "Quick bridge page before sending to Amazon.", image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Direct+Bridge" },
-    ],
+    amazon: [],
     course: [
         { id: "course-masterclass", name: "Masterclass", description: "Video-heavy layout for selling courses.", image: "https://placehold.co/400x300/e2e8f0/1e293b?text=Masterclass" },
-    ]
-}
+    ],
+    external: []
+} as Record<string, { id: string; name: string; description: string; image: string; }[]>;
 
 export function StepTemplate({ data, updateData }: StepTemplateProps) {
     if (data.pageType === 'custom_html') {

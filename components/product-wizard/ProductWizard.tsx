@@ -16,7 +16,7 @@ export type WizardData = {
     // Basics
     penNameId: string
     title: string
-    productType: "ebook" | "software" | "amazon" | "course"
+    productType: "ebook" | "software" | "amazon" | "course" | "external"
     pageType: "sales" | "upsell" | "downsell" | "thankyou" | "custom_html"
 
     // Template
@@ -163,11 +163,32 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
         }
     }
 
-    const steps = [
-        { number: 1, title: "Basics" },
-        { number: 2, title: "Template" },
-        { number: 3, title: "Editor" },
-    ]
+    const getSteps = () => {
+        if (data.productType === 'external') {
+            return [{ number: 1, title: "Basics" }];
+        }
+        if (data.productType === 'amazon') {
+            return [
+                { number: 1, title: "Basics" },
+                { number: 2, title: "Editor" }
+            ];
+        }
+        return [
+            { number: 1, title: "Basics" },
+            { number: 2, title: "Template" },
+            { number: 3, title: "Editor" },
+        ];
+    };
+
+    const steps = getSteps();
+    const totalSteps = steps.length;
+
+    // Ensure step doesn't exceed new totalSteps when switching product types
+    useEffect(() => {
+        if (step > totalSteps) {
+            setStep(totalSteps);
+        }
+    }, [totalSteps, step]);
 
     return (
         <div className="max-w-6xl mx-auto py-10 px-4">
@@ -196,8 +217,9 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
             <Card className="p-6 min-h-[500px] flex flex-col">
                 <div className="flex-1">
                     {step === 1 && <StepBasics data={data} updateData={updateData} penNames={penNames} />}
-                    {step === 2 && <StepTemplate data={data} updateData={updateData} />}
-                    {step === 3 && <StepEditor data={data} updateData={updateData} />}
+                    {step === 2 && data.productType === 'amazon' && <StepEditor data={data} updateData={updateData} />}
+                    {step === 2 && data.productType !== 'amazon' && data.productType !== 'external' && <StepTemplate data={data} updateData={updateData} />}
+                    {step === 3 && data.productType !== 'amazon' && data.productType !== 'external' && <StepEditor data={data} updateData={updateData} />}
                 </div>
 
                 <div className="flex justify-between mt-8 pt-4 border-t">
@@ -209,7 +231,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
                         <ChevronLeft className="w-4 h-4 mr-2" /> Back
                     </Button>
 
-                    {step < 3 ? (
+                    {step < totalSteps ? (
                         <Button onClick={nextStep}>
                             Next <ChevronRight className="w-4 h-4 ml-2" />
                         </Button>
