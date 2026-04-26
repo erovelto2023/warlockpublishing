@@ -36,7 +36,7 @@ export function AmazonTemplateRenderer({
 
     // helper for rendering stars
     const renderStars = (ratingStr: string) => {
-        const rating = parseFloat(ratingStr) || 4.5;
+        const rating = parseFloat(ratingStr) || 0;
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             if (i <= Math.floor(rating)) {
@@ -77,14 +77,6 @@ export function AmazonTemplateRenderer({
                         <div className="sticky top-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-center">
                             <div className="relative group cursor-zoom-in">
                                 <img src={mainImage} alt={title} className="rounded-lg shadow-lg max-h-[500px] w-auto transition duration-300 transform group-hover:scale-[1.02]" />
-                                <div className="mt-4 flex justify-center space-x-2">
-                                    <div className="w-12 h-16 border-2 border-orange-500 rounded cursor-pointer overflow-hidden">
-                                        <img src={mainImage} className="object-cover h-full w-full" alt="thumb1" />
-                                    </div>
-                                    <div className="w-12 h-16 border border-gray-200 rounded hover:border-orange-500 cursor-pointer overflow-hidden transition">
-                                        <img src={mainImage} className="object-cover h-full w-full" alt="thumb2" />
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -161,21 +153,9 @@ export function AmazonTemplateRenderer({
                             <div className="text-green-700 text-lg font-medium">{buyBox.inStockText || "In Stock"}</div>
                             
                             <div className="space-y-3">
-                                <div className="flex items-center space-x-2 text-sm">
-                                    <span className="text-gray-600">Quantity:</span>
-                                    <select className="bg-gray-100 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                    </select>
-                                </div>
-                                
-                                <button className="w-full amazon-bg-yellow py-2.5 rounded-full text-sm font-medium shadow-sm border border-[#F2C200] transition active:scale-[0.98]">
-                                    Add to Cart
-                                </button>
                                 <a href={amazonLink} target="_blank" rel="noopener noreferrer" className="block w-full">
-                                    <button className="w-full amazon-bg-orange py-2.5 rounded-full text-sm font-medium shadow-sm border border-[#E68A00] transition active:scale-[0.98]">
-                                        Buy Now
+                                    <button className="w-full amazon-bg-yellow py-2.5 rounded-full text-sm font-medium shadow-sm border border-[#F2C200] transition hover:bg-[#F7CA00] active:scale-[0.98]">
+                                        Visit Amazon
                                     </button>
                                 </a>
                             </div>
@@ -190,12 +170,6 @@ export function AmazonTemplateRenderer({
                                     <span className="text-gray-800">{buyBox.soldBy || "Summit Books"}</span>
                                 </div>
                             </div>
-
-                            <hr className="border-gray-200" />
-
-                            <button className="w-full py-1.5 border border-gray-300 rounded shadow-sm text-sm hover:bg-gray-50">
-                                Add to List
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -250,6 +224,7 @@ export function AmazonTemplateRenderer({
 
                             {[1, 2].map((num) => {
                                 const revName = reviews[`review${num}Name`];
+                                const revRating = reviews[`review${num}Rating`] || (num === 1 ? "5" : "4");
                                 const revTitle = reviews[`review${num}Title`];
                                 const revDate = reviews[`review${num}Date`];
                                 const revText = reviews[`review${num}Text`];
@@ -266,7 +241,7 @@ export function AmazonTemplateRenderer({
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <div className="flex text-orange-400 text-xs">
-                                                {renderStars(num === 1 ? "5" : "4")}
+                                                {renderStars(revRating)}
                                             </div>
                                             <span className="font-bold text-sm">{revTitle}</span>
                                         </div>
