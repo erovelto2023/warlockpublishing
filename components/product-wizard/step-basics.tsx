@@ -137,21 +137,23 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
 
                 {/* Amazon Link Field - Only visible when Product Type is Amazon */}
                 {isAmazon && (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <Label htmlFor="amazonLink" className="text-cyan-400 font-bold flex items-center gap-2">
-                            Amazon Product Link (Affiliate URL)
-                            <span className="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Required</span>
-                        </Label>
-                        <Input
-                            id="amazonLink"
-                            className="text-white bg-slate-800 border-cyan-600 focus:border-cyan-400 placeholder:text-slate-400 ring-offset-slate-900"
-                            value={data.amazonLink}
-                            onChange={(e) => updateData({ amazonLink: e.target.value })}
-                            placeholder="https://amzn.to/..."
-                        />
-                        <p className="text-xs text-slate-400">
-                            This link will be used for the "Buy on Amazon" button.
-                        </p>
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-2">
+                            <Label htmlFor="amazonLink" className="text-cyan-400 font-bold flex items-center gap-2">
+                                Amazon Product Link (Affiliate URL)
+                                <span className="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Required</span>
+                            </Label>
+                            <Input
+                                id="amazonLink"
+                                className="text-white bg-slate-800 border-cyan-600 focus:border-cyan-400 placeholder:text-slate-400 ring-offset-slate-900"
+                                value={data.amazonLink}
+                                onChange={(e) => updateData({ amazonLink: e.target.value })}
+                                placeholder="https://amzn.to/..."
+                            />
+                            <p className="text-xs text-slate-400">
+                                This link will be used for the "Buy on Amazon" button.
+                            </p>
+                        </div>
                     </div>
                 )}
 

@@ -8,6 +8,7 @@ import { Check, ChevronRight, ChevronLeft } from "lucide-react"
 import { StepBasics } from "./step-basics"
 import { StepTemplate } from "./step-template"
 import { StepEditor } from "./step-editor"
+import { StepAmazon } from "./step-amazon"
 import { createProduct, updateProduct } from "@/lib/actions/product.actions"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -98,7 +99,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
         if (data.productType === 'amazon') {
             return [
                 { number: 1, title: "Basics" },
-                { number: 2, title: "Editor" }
+                { number: 2, title: "Amazon Details" }
             ];
         }
         return [
@@ -219,7 +220,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
             <Card className="p-6 min-h-[500px] flex flex-col">
                 <div className="flex-1">
                     {step === 1 && <StepBasics data={data} updateData={updateData} penNames={penNames} />}
-                    {step === 2 && data.productType === 'amazon' && <StepEditor data={data} updateData={updateData} />}
+                    {step === 2 && data.productType === 'amazon' && <StepAmazon data={data} updateData={updateData} />}
                     {step === 2 && data.productType !== 'amazon' && data.productType !== 'external' && <StepTemplate data={data} updateData={updateData} />}
                     {step === 3 && data.productType !== 'amazon' && data.productType !== 'external' && <StepEditor data={data} updateData={updateData} />}
                 </div>
