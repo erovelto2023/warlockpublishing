@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Check, ChevronRight, ChevronLeft } from "lucide-react"
 import { StepBasics } from "./step-basics"
-import { StepTemplate } from "./step-template"
-import { StepEditor } from "./step-editor"
+import { StepHtmlBuilder } from "./step-html-builder"
 import { StepAmazon } from "./step-amazon"
 import { createProduct, updateProduct } from "@/lib/actions/product.actions"
 import { useToast } from "@/components/ui/use-toast"
@@ -104,8 +103,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
         }
         return [
             { number: 1, title: "Basics" },
-            { number: 2, title: "Template" },
-            { number: 3, title: "Editor" },
+            { number: 2, title: "HTML Builder" },
         ];
     };
 
@@ -255,8 +253,7 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
                 <div className="flex-1">
                     {step === 1 && <StepBasics data={data} updateData={updateData} penNames={penNames} />}
                     {step === 2 && data.productType === 'amazon' && <StepAmazon data={data} updateData={updateData} />}
-                    {step === 2 && data.productType !== 'amazon' && data.productType !== 'external' && <StepTemplate data={data} updateData={updateData} />}
-                    {step === 3 && data.productType !== 'amazon' && data.productType !== 'external' && <StepEditor data={data} updateData={updateData} />}
+                    {step === 2 && data.productType !== 'amazon' && data.productType !== 'external' && <StepHtmlBuilder data={data} updateData={updateData} />}
                 </div>
 
                 <div className="flex justify-between mt-8 pt-4 border-t">

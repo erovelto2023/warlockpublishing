@@ -41,6 +41,7 @@ export function getSanitizedProduct(product: any) {
         grooveSellId: String(product.grooveSellId || ""),
         grooveSellEmbed: String(product.grooveSellEmbed || ""),
         htmlContent: String(product.htmlContent || ""),
+        externalUrl: String(product.externalUrl || ""),
         format: String(product.format || "Digital"),
         penName: product.penNameId || null,
         

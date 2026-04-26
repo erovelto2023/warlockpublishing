@@ -8,10 +8,7 @@ import { getSanitizedProduct } from "@/lib/product-utils";
 import { constructMetadata } from "@/lib/seo";
 import { Metadata } from 'next';
 
-import { SoftwareTemplateRenderer } from "@/components/templates/software/SoftwareTemplateRenderer";
-import { EbookTemplateRenderer } from "@/components/templates/ebook/EbookTemplateRenderer";
-import { CourseTemplateRenderer } from "@/components/templates/course/CourseTemplateRenderer";
-import { ThankYouTemplateRenderer } from "@/components/templates/thankyou/ThankYouTemplateRenderer";
+
 import { AmazonTemplateRenderer } from "@/components/templates/amazon/AmazonTemplateRenderer";
 import { notFound, redirect } from "next/navigation";
 
@@ -72,6 +69,11 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
     // --- TEMPLATE RENDERING ---
     // 1. Custom HTML Overrides (Highest priority)
     if (product.htmlContent.trim() !== "") {
+        let finalHtml = product.htmlContent;
+        if (product.externalUrl) {
+            finalHtml = finalHtml.replace(/\{\{CHECKOUT_LINK\}\}/g, product.externalUrl);
+        }
+
         return (
             <>
                 <style dangerouslySetInnerHTML={{
@@ -79,51 +81,17 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                     #site-navbar-wrapper, #site-footer-wrapper { display: none !important; }
                     main { flex: 1 1 auto; display: block; width: 100%; }
                 `}} />
-                <GrooveSellTracking id={product.grooveSellId} />
-                <div dangerouslySetInnerHTML={{ __html: product.htmlContent }} />
+                {product.grooveSellEmbed ? (
+                    <div dangerouslySetInnerHTML={{ __html: product.grooveSellEmbed }} />
+                ) : (
+                    <GrooveSellTracking id={product.grooveSellId} />
+                )}
+                <div dangerouslySetInnerHTML={{ __html: finalHtml }} />
             </>
         );
     }
 
     // 2. Specialty Template Renderers
-    const commonProps = { id: product.grooveSellId };
-    
-    if (product.productType === 'software') {
-        return (
-            <>
-                <GrooveSellTracking {...commonProps} />
-                <SoftwareTemplateRenderer contentData={product.rawContentData} />
-            </>
-        );
-    }
-
-    if (product.productType === 'ebook' || product.productType === 'fiction') {
-        return (
-            <>
-                <GrooveSellTracking {...commonProps} />
-                <EbookTemplateRenderer contentData={product.rawContentData} />
-            </>
-        );
-    }
-
-    if (product.productType === 'course') {
-        return (
-            <>
-                <GrooveSellTracking {...commonProps} />
-                <CourseTemplateRenderer contentData={product.rawContentData} />
-            </>
-        );
-    }
-
-    if (product.productType === 'thankyou' || product.pageType === 'thankyou') {
-        return (
-            <>
-                <GrooveSellTracking {...commonProps} />
-                <ThankYouTemplateRenderer contentData={product.rawContentData} />
-            </>
-        );
-    }
-
     if (product.productType === 'amazon') {
         return (
             <AmazonTemplateRenderer
