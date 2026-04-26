@@ -267,11 +267,11 @@ export async function getProductById(idOrSlug: string) {
         let product;
 
         if (mongoose.isValidObjectId(idOrSlug)) {
-            product = await Product.findById(idOrSlug).lean();
+            product = await Product.findById(idOrSlug).populate('penNameId').lean();
         }
 
         if (!product) {
-            product = await Product.findOne({ slug: idOrSlug }).lean();
+            product = await Product.findOne({ slug: idOrSlug }).populate('penNameId').lean();
         }
 
         if (!product) {

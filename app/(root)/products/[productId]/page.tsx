@@ -132,6 +132,8 @@ export default async function ProductPage(props: { params: Promise<{ productId: 
                 title={product.title}
                 description={product.description}
                 imageUrl={product.imageUrl}
+                category={product.category}
+                authorName={(product.penName as any)?.name}
             />
         );
     }

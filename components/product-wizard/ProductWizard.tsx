@@ -134,8 +134,6 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
 
     const handleSubmit = async () => {
         // Validation
-        const isSpecialPage = data.pageType === 'thankyou' || data.pageType === 'custom_html';
-
         if (!data.title) {
             toast({
                 title: "Missing Title",
@@ -145,7 +143,28 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
             return
         }
 
-        if (!isSpecialPage && (!data.description || !data.category || !data.format || !data.imageUrl)) {
+        if (data.productType === 'amazon' && !data.amazonLink) {
+            toast({
+                title: "Missing Amazon Link",
+                description: "Please provide the Amazon Affiliate URL.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        if (data.productType === 'external' && !data.externalUrl) {
+            toast({
+                title: "Missing External URL",
+                description: "Please provide the External Destination URL.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        const isSpecialPage = data.pageType === 'thankyou' || data.pageType === 'custom_html';
+        const isStandardProduct = data.productType !== 'amazon' && data.productType !== 'external';
+
+        if (isStandardProduct && !isSpecialPage && (!data.description || !data.category || !data.format || !data.imageUrl)) {
             toast({
                 title: "Missing Fields",
                 description: "Please fill in Description, Category, Format, and Image URL.",

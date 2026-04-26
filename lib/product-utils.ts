@@ -31,6 +31,7 @@ export function getSanitizedProduct(product: any) {
         grooveSellEmbed: String(product.grooveSellEmbed || ""),
         htmlContent: String(product.htmlContent || ""),
         format: String(product.format || "Digital"),
+        penName: product.penNameId || null,
         
         // Sanitized content blocks
         blocks: {

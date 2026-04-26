@@ -11,40 +11,27 @@ interface StepAmazonProps {
     updateData: (data: Partial<WizardData>) => void
 }
 
-const AMAZON_FIELDS_CONFIG = [
+export const AMAZON_FIELDS_CONFIG = [
     {
-        id: "breadcrumbs", label: "Breadcrumbs", fields: [
-            { name: "category1", label: "Category 1", type: "text", default: "Books" },
-            { name: "category2", label: "Category 2", type: "text", default: "Self-Help" },
-            { name: "category3", label: "Category 3", type: "text", default: "Personal Transformation" },
+        id: 'authorAndRatings',
+        label: 'Author & Ratings',
+        fields: [
+            { name: 'ratingsCount', label: 'Total Ratings', type: 'text', default: '4,821' },
+            { name: 'answeredQuestions', label: 'Answered Questions', type: 'text', default: '128' }
         ]
     },
     {
-        id: "authorAndRatings", label: "Author & Ratings", fields: [
-            { name: "authorName", label: "Author Name", type: "text", default: "Marcus Aurelius Jr." },
-            { name: "ratingsCount", label: "Ratings Count", type: "text", default: "4,821" },
-            { name: "answeredQuestions", label: "Answered Questions", type: "text", default: "128" },
-        ]
-    },
-    {
-        id: "formats", label: "Pricing & Formats", fields: [
-            { name: "format1Name", label: "Format 1 Name", type: "text", default: "Kindle" },
-            { name: "format1Price", label: "Format 1 Price", type: "text", default: "$9.99" },
-            { name: "format1Subtext", label: "Format 1 Subtext", type: "text", default: "Available instantly" },
-            { name: "format2Name", label: "Format 2 Name", type: "text", default: "Hardcover" },
-            { name: "format2Price", label: "Format 2 Price", type: "text", default: "$24.95" },
-            { name: "format2Subtext", label: "Format 2 Subtext", type: "text", default: "9 Used from $18.50" },
-            { name: "format3Name", label: "Format 3 Name", type: "text", default: "Paperback" },
-            { name: "format3Price", label: "Format 3 Price", type: "text", default: "$14.99" },
-            { name: "format3Subtext", label: "Format 3 Subtext", type: "text", default: "24 New from $12.00" },
-            { name: "format4Name", label: "Format 4 Name", type: "text", default: "Audiobook" },
-            { name: "format4Price", label: "Format 4 Price", type: "text", default: "$0.00" },
-            { name: "format4Subtext", label: "Format 4 Subtext", type: "text", default: "With Audible trial" },
-        ]
-    },
-    {
-        id: "about", label: "About This Book", fields: [
-            { name: "bullets", label: "Key Bullets (One per line)", type: "textarea", default: "Master your emotional responses to external events.\nLearn the secret habit of high-performers in high-stress environments.\nIncludes a 30-day \"Resilience Challenge\" workbook at the end.\nFeatured on \"Modern Minds Weekly\" and \"The Stoic Podcast\"." },
+        id: 'formats',
+        label: 'Pricing & Formats',
+        fields: [
+            { name: 'kindlePrice', label: 'Kindle Price', type: 'text', default: '$9.99' },
+            { name: 'kindleSub', label: 'Kindle Subtext', type: 'text', default: 'Available instantly' },
+            { name: 'hardcoverPrice', label: 'Hardcover Price', type: 'text', default: '$24.95' },
+            { name: 'hardcoverSub', label: 'Hardcover Subtext', type: 'text', default: '9 Used from $18.50' },
+            { name: 'paperbackPrice', label: 'Paperback Price', type: 'text', default: '$14.99' },
+            { name: 'paperbackSub', label: 'Paperback Subtext', type: 'text', default: '24 New from $12.00' },
+            { name: 'audiobookPrice', label: 'Audiobook Price', type: 'text', default: '$0.00' },
+            { name: 'audiobookSub', label: 'Audiobook Subtext', type: 'text', default: 'With Audible trial' }
         ]
     },
     {

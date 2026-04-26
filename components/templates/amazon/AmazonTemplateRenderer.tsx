@@ -7,6 +7,8 @@ interface AmazonTemplateRendererProps {
     title?: string;
     description?: string;
     imageUrl?: string;
+    category?: string;
+    authorName?: string;
 }
 
 export function AmazonTemplateRenderer({ 
@@ -14,7 +16,9 @@ export function AmazonTemplateRenderer({
     amazonLink = "#", 
     title = "The Art of Resilience", 
     description = "", 
-    imageUrl 
+    imageUrl,
+    category,
+    authorName 
 }: AmazonTemplateRendererProps) {
     const blocks = contentData?.blocks || [];
     
@@ -23,7 +27,6 @@ export function AmazonTemplateRenderer({
     const breadcrumbs = getBlockData('breadcrumbs');
     const authorAndRatings = getBlockData('authorAndRatings');
     const formats = getBlockData('formats');
-    const about = getBlockData('about');
     const details = getBlockData('details');
     const buyBox = getBlockData('buyBox');
     const reviews = getBlockData('reviews');
@@ -63,7 +66,7 @@ export function AmazonTemplateRenderer({
 
             {/* Breadcrumbs */}
             <div className="max-w-7xl mx-auto px-4 py-3 text-xs text-gray-600">
-                {breadcrumbs.category1 || "Books"} &gt; {breadcrumbs.category2 || "Self-Help"} &gt; {breadcrumbs.category3 || "Personal Transformation"} &gt; <span className="text-orange-700">{title}</span>
+                Books &gt; {category || "Self-Help"} &gt; <span className="text-orange-700">{title}</span>
             </div>
 
             <main className="max-w-7xl mx-auto px-4 py-4 md:py-8">
@@ -91,7 +94,7 @@ export function AmazonTemplateRenderer({
                         <div>
                             <h1 className="text-3xl font-bold text-gray-800 leading-tight">{title}</h1>
                             <div className="mt-2 flex items-center space-x-2">
-                                <span className="text-blue-600 hover:text-orange-700 hover:underline cursor-pointer">{authorAndRatings.authorName || "Author Name"}</span>
+                                <span className="text-blue-600 hover:text-orange-700 hover:underline cursor-pointer">{authorName || authorAndRatings.authorName || "Author Name"}</span>
                                 <span className="text-gray-400">|</span>
                                 <span className="text-gray-500 text-sm">Follow the Author</span>
                             </div>
@@ -125,17 +128,9 @@ export function AmazonTemplateRenderer({
 
                         <div className="space-y-4">
                             <h3 className="font-bold text-lg">About this book</h3>
-                            <div className="text-gray-700 leading-relaxed text-sm">
+                            <div className="text-gray-700 leading-relaxed text-sm prose max-w-none">
                                 <ReactMarkdown>{description || "Description coming soon."}</ReactMarkdown>
                             </div>
-                            
-                            {about.bullets && (
-                                <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700 mt-4">
-                                    {about.bullets.split('\\n').filter((b: string) => b.trim() !== '').map((bullet: string, i: number) => (
-                                        <li key={i}>{bullet}</li>
-                                    ))}
-                                </ul>
-                            )}
                             
                             <button className="text-blue-600 hover:text-orange-700 font-medium text-sm flex items-center mt-2">
                                 Read more <i className="fas fa-chevron-down ml-1 text-xs"></i>
