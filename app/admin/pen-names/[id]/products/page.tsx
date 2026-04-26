@@ -5,6 +5,7 @@ import { getProductsByPenName } from "@/lib/actions/product.actions";
 import { getSanitizedProduct } from "@/lib/product-utils";
 import { isAdmin } from "@/lib/admin";
 import { redirect } from "next/navigation";
+import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
 export const dynamic = 'force-dynamic';
 
@@ -64,6 +65,7 @@ export default async function PenNameProductsPage({ params }: PenNameProductsPag
                                             <Edit3 size={16} />
                                         </button>
                                     </Link>
+                                    <DeleteProductButton id={product.id} />
                                 </div>
                             </div>
 

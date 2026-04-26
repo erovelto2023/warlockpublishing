@@ -256,14 +256,40 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
                     {step === 2 && data.productType !== 'amazon' && data.productType !== 'external' && <StepHtmlBuilder data={data} updateData={updateData} />}
                 </div>
 
-                <div className="flex justify-between mt-8 pt-4 border-t">
-                    <Button
-                        variant="outline"
-                        onClick={prevStep}
-                        disabled={step === 1 || loading}
-                    >
-                        <ChevronLeft className="w-4 h-4 mr-2" /> Back
-                    </Button>
+                <div className="flex justify-between mt-8 pt-4 border-t items-center">
+                    <div className="flex gap-2">
+                        {initialProduct && (
+                            <Button
+                                variant="destructive"
+                                type="button"
+                                onClick={async () => {
+                                    if (confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
+                                        setLoading(true);
+                                        try {
+                                            // Import deleteProduct at top dynamically or add to props if needed. Wait, we can import it.
+                                            const { deleteProduct } = await import("@/lib/actions/product.actions");
+                                            await deleteProduct(initialProduct._id as string);
+                                            toast({ title: "Product Deleted" });
+                                            router.push("/admin");
+                                        } catch(e) {
+                                            toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
+                                        }
+                                        setLoading(false);
+                                    }
+                                }}
+                                disabled={loading}
+                            >
+                                Delete
+                            </Button>
+                        )}
+                        <Button
+                            variant="outline"
+                            onClick={prevStep}
+                            disabled={step === 1 || loading}
+                        >
+                            <ChevronLeft className="w-4 h-4 mr-2" /> Back
+                        </Button>
+                    </div>
 
                     {step < totalSteps ? (
                         <Button onClick={nextStep}>
