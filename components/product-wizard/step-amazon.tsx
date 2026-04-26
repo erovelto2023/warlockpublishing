@@ -120,23 +120,23 @@ export function StepAmazon({ data, updateData }: StepAmazonProps) {
     return (
         <div className="max-w-3xl mx-auto space-y-8">
             <div className="space-y-2">
-                <h2 className="text-2xl font-bold">Amazon Template Details</h2>
-                <p className="text-slate-500">Fill out the fields below to populate your Amazon Product Page template.</p>
+                <h2 className="text-2xl font-bold text-white">Amazon Template Details</h2>
+                <p className="text-slate-400">Fill out the fields below to populate your Amazon Product Page template.</p>
             </div>
 
             <div className="space-y-8">
                 {AMAZON_FIELDS_CONFIG.map((section) => (
-                    <div key={section.id} className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-800 border-b pb-2">{section.label}</h3>
+                    <div key={section.id} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 space-y-4 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-200 border-b border-slate-700 pb-2">{section.label}</h3>
                         
                         <div className={`grid gap-4 ${section.id === 'formats' ? 'grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
                             {section.fields.map((field) => (
                                 <div key={field.name} className={`space-y-2 ${field.type === 'textarea' ? 'col-span-full' : ''}`}>
-                                    <Label htmlFor={`${section.id}-${field.name}`} className="text-slate-600 font-medium">{field.label}</Label>
+                                    <Label htmlFor={`${section.id}-${field.name}`} className="text-slate-300 font-medium">{field.label}</Label>
                                     {field.type === 'textarea' ? (
                                         <Textarea
                                             id={`${section.id}-${field.name}`}
-                                            className="bg-white border-slate-300 min-h-[100px]"
+                                            className="text-white bg-slate-900 border-slate-700 min-h-[100px] placeholder:text-slate-500"
                                             value={getFieldValue(section.id, field.name)}
                                             onChange={(e) => handleFieldChange(section.id, field.name, e.target.value)}
                                             placeholder={field.default}
@@ -144,7 +144,7 @@ export function StepAmazon({ data, updateData }: StepAmazonProps) {
                                     ) : (
                                         <Input
                                             id={`${section.id}-${field.name}`}
-                                            className="bg-white border-slate-300"
+                                            className="text-white bg-slate-900 border-slate-700 placeholder:text-slate-500"
                                             value={getFieldValue(section.id, field.name)}
                                             onChange={(e) => handleFieldChange(section.id, field.name, e.target.value)}
                                             placeholder={field.default}
