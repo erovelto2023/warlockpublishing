@@ -19,6 +19,8 @@ import { createPenName, updatePenName } from "@/lib/actions/pen-name.actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import MediaLibrary from "@/components/admin/MediaLibrary";
+import { Image as ImageIcon } from "lucide-react";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -44,6 +46,14 @@ export function PenNameForm({ initialData, isEditing = false }: PenNameFormProps
     const router = useRouter();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+    const [mediaTarget, setMediaTarget] = useState<'avatarUrl' | 'coverImage' | null>(null);
+
+    const handleMediaSelect = (url: string) => {
+        if (mediaTarget) {
+            form.setValue(mediaTarget, url, { shouldValidate: true, shouldDirty: true });
+        }
+        setMediaTarget(null);
+    };
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -142,9 +152,19 @@ export function PenNameForm({ initialData, isEditing = false }: PenNameFormProps
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Avatar URL</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="https://..." {...field} />
-                                </FormControl>
+                                <div className="flex gap-2">
+                                    <FormControl>
+                                        <Input placeholder="https://..." {...field} />
+                                    </FormControl>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setMediaTarget('avatarUrl')}
+                                        className="shrink-0"
+                                    >
+                                        <ImageIcon className="w-4 h-4 mr-2" /> Browse
+                                    </Button>
+                                </div>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -155,9 +175,19 @@ export function PenNameForm({ initialData, isEditing = false }: PenNameFormProps
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Cover Image URL</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="https://..." {...field} />
-                                </FormControl>
+                                <div className="flex gap-2">
+                                    <FormControl>
+                                        <Input placeholder="https://..." {...field} />
+                                    </FormControl>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setMediaTarget('coverImage')}
+                                        className="shrink-0"
+                                    >
+                                        <ImageIcon className="w-4 h-4 mr-2" /> Browse
+                                    </Button>
+                                </div>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -258,6 +288,24 @@ export function PenNameForm({ initialData, isEditing = false }: PenNameFormProps
                     {loading ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Pen Name" : "Create Pen Name")}
                 </Button>
             </form>
+
+            {/* Media Library Modal */}
+            {mediaTarget && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[80vh] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+                            <div>
+                                <h2 className="text-xl font-bold dark:text-white">Select Image</h2>
+                                <p className="text-xs text-slate-500 mt-1">Select an image to use for this field.</p>
+                            </div>
+                            <button type="button" onClick={() => setMediaTarget(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors font-bold text-slate-500 dark:text-slate-400">X</button>
+                        </div>
+                        <div className="flex-1 overflow-auto p-4 bg-slate-50 dark:bg-slate-900">
+                            <MediaLibrary onSelect={handleMediaSelect} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </Form>
     );
 }
