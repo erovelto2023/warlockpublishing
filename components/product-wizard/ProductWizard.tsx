@@ -197,7 +197,11 @@ export function ProductWizard({ penNames, initialProduct }: ProductWizardProps) 
                     description: "Product created successfully",
                 })
             }
-            router.push("/admin")
+            if (data.penNameId) {
+                router.push(`/admin/pen-names/${data.penNameId}/products`)
+            } else {
+                router.push("/admin")
+            }
         } catch (error) {
             console.error(error)
             toast({
