@@ -258,7 +258,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
                                 <div className="space-y-2 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
                                     <div className="flex items-center gap-2 text-amber-400 mb-1">
                                         <BookOpen size={16} />
@@ -283,6 +283,23 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         </div>
                                     </div>
                                 </div>
+                                
+                                {featuredPoolItem && (
+                                    <Link 
+                                        href={featuredPoolItem.link}
+                                        className="space-y-2 p-6 bg-white/10 rounded-3xl border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all group/featured"
+                                    >
+                                        <div className="flex items-center justify-between text-indigo-200 mb-1">
+                                            <div className="flex items-center gap-2">
+                                                <ShoppingBag size={16} />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Featured Resource</span>
+                                            </div>
+                                            <ArrowRight size={14} className="group-hover/featured:translate-x-1 transition-transform" />
+                                        </div>
+                                        <h4 className="text-xs font-black uppercase tracking-tight text-white line-clamp-1">{featuredPoolItem.title}</h4>
+                                        <p className="text-[9px] text-indigo-200 font-bold uppercase tracking-tighter">Recommended For {term.term} Strategy</p>
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </section>
@@ -381,16 +398,26 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     </div>
                                     <div className="space-y-6">
                                         {[
-                                            { act: "Act I: Setup & Trigger", range: "0–25%", desc: term.masterclass?.threeActStructure?.act1 || "Introduces the protagonist and the catalyst for action." },
-                                            { act: "Act II: Conflict & Friction", range: "25–75%", desc: term.masterclass?.threeActStructure?.act2 || "The core drama where stakes rise and lead takes control." },
-                                            { act: "Act III: Payoff & Resolution", range: "75–100%", desc: term.masterclass?.threeActStructure?.act3 || "The final push toward the Climax and HEA/HFN." }
+                                            { act: "Act I: Setup & Trigger", range: "0–25%", desc: term.masterclass?.threeActStructure?.act1 || "Introduces the protagonist and the catalyst for action.", example: `Introduce the ${term.term} catalyst within the first 5k words.` },
+                                            { act: "Act II: Conflict & Friction", range: "25–75%", desc: term.masterclass?.threeActStructure?.act2 || "The core drama where stakes rise and lead takes control.", example: `Escalate the ${term.term} tension by removing the lead's safety net.` },
+                                            { act: "Act III: Payoff & Resolution", range: "75–100%", desc: term.masterclass?.threeActStructure?.act3 || "The final push toward the Climax and HEA/HFN.", example: `Resolve the ${term.term} arc with a transformative grand gesture.` }
                                         ].map((act, i) => (
-                                            <div key={i} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                                                <div className="flex justify-between items-center">
-                                                    <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{act.act}</h5>
-                                                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{act.range}</span>
+                                            <div key={i} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between items-center">
+                                                        <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{act.act}</h5>
+                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{act.range}</span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-500 leading-relaxed font-medium">{act.desc}</p>
                                                 </div>
-                                                <p className="text-xs text-slate-500 leading-relaxed font-medium">{act.desc}</p>
+                                                <div className="pt-3 border-t border-slate-200/50">
+                                                    <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                        <Sparkles size={10} /> Writing Example
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-400 font-bold italic leading-relaxed">
+                                                        &quot;{act.example}&quot;
+                                                    </p>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -407,12 +434,20 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         ]).map((beat: any, i: number) => (
                                             <div key={i} className="flex gap-4 group/beat">
                                                 <div className="shrink-0 w-1 bg-indigo-500/30 rounded-full group-hover/beat:bg-indigo-500 transition-colors"></div>
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-xs font-black uppercase tracking-tight">{beat.title}</span>
-                                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">{beat.timing}</span>
+                                                <div className="space-y-1 flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-xs font-black uppercase tracking-tight">{beat.title}</span>
+                                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">{beat.timing}</span>
+                                                        </div>
                                                     </div>
-                                                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed">{beat.description}</p>
+                                                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed mb-2">{beat.description}</p>
+                                                    <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover/beat:border-indigo-500/30 transition-all">
+                                                        <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Writing Example</p>
+                                                        <p className="text-[9px] text-slate-300 font-bold italic leading-tight">
+                                                            &quot;The {beat.title} should trigger a major {term.term} pivot.&quot;
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -436,13 +471,22 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         { role: "The Relatable Proxy", description: "The character the reader identifies with." },
                                         { role: "The Foil", description: "Highlights traits by stark contrast." }
                                     ]).map((char: any, i: number) => (
-                                        <div key={i} className="bg-slate-50 border border-slate-200 rounded-[2.5rem] p-8 space-y-4">
-                                            <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-sm">
-                                                {i + 1}
+                                        <div key={i} className="bg-slate-50 border border-slate-200 rounded-[2.5rem] p-8 space-y-6 flex flex-col h-full">
+                                            <div className="flex items-center justify-between">
+                                                <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-sm">
+                                                    {i + 1}
+                                                </div>
+                                                <span className="text-[8px] font-black text-indigo-600/50 uppercase tracking-[0.2em]">Archetype</span>
                                             </div>
-                                            <div className="space-y-2">
+                                            <div className="space-y-2 flex-1">
                                                 <h6 className="text-sm font-black text-slate-900 uppercase tracking-tight">{char.role}</h6>
                                                 <p className="text-xs text-slate-500 font-medium leading-relaxed">{char.description}</p>
+                                            </div>
+                                            <div className="pt-4 border-t border-slate-200">
+                                                <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-1">Writing Example</p>
+                                                <p className="text-[10px] text-slate-400 font-bold italic leading-relaxed">
+                                                    &quot;Use this {char.role} to challenge the {term.term} status quo.&quot;
+                                                </p>
                                             </div>
                                         </div>
                                     ))}
@@ -483,11 +527,19 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                             {term.masterclass?.technicalComponents?.tropes?.join(', ') || "Algorithm categorization tags."}
                                         </p>
                                     </div>
-                                    <div className="space-y-2 group/tech">
+                                    <div className="space-y-3 group/tech">
                                         <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">The High-Convert Hook (Blurb Line)</h6>
-                                        <p className="text-xs text-slate-600 font-bold leading-relaxed border-l-2 border-slate-100 pl-4">
-                                            {term.masterclass?.technicalComponents?.hook || "Blurb's first line designed to convert browsers to buyers."}
-                                        </p>
+                                        <div className="space-y-3">
+                                            <p className="text-xs text-slate-600 font-bold leading-relaxed border-l-2 border-slate-100 pl-4">
+                                                {term.masterclass?.technicalComponents?.hook || "Blurb's first line designed to convert browsers to buyers."}
+                                            </p>
+                                            <div className="ml-4 p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Writing Example</p>
+                                                <p className="text-[9px] text-indigo-900/60 font-bold italic leading-tight">
+                                                    &quot;I thought {term.term} was just a myth... until I met him.&quot;
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                              </div>
@@ -622,60 +674,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 desc="Thematic cover/Pinterest art."
                                 prompt={term.aiPromptCommandCenter?.aiImagePrompt || `Cinematic book cover art representing ${term.term} with high emotional contrast.`}
                             />
-                        </div>
-                    </section>
-
-                    {/*  STRATEGIC PATH FORWARD (FINAL CALL TO ACTION)  */}
-                    <section className="space-y-12 py-12" id="roadmap">
-                        <div className="bg-slate-950 text-white rounded-[4rem] p-12 md:p-24 relative overflow-hidden shadow-2xl border border-white/5">
-                            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.15),transparent)] pointer-events-none"></div>
-                            
-                            <div className="relative z-10 space-y-16">
-                                <div className="text-center space-y-6 max-w-4xl mx-auto">
-                                    <div className="inline-block px-6 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 mb-4">
-                                        Strategic Path Forward
-                                    </div>
-                                    <h2 id="roadmap" className="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none">
-                                        Strategic <span className="text-indigo-500">Path Forward</span>
-                                    </h2>
-                                    <p className="text-lg md:text-xl font-medium text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                                        Stop consuming. Start creating. Our vetted implementation tools are the difference between a &quot;hobbyist&quot; and a dominant market authority.
-                                    </p>
-                                </div>
-
-                                <div className="grid md:grid-cols-3 gap-8">
-                                    {[
-                                        { title: "Eliminate Guesswork", desc: "Proven implementation protocols", icon: <Target size={24} /> },
-                                        { title: "Strategic Blueprints", desc: "Expert-grade execution docs", icon: <FileText size={24} /> },
-                                        { title: "Accelerated Revenue", desc: "Shorten your monetization path", icon: <TrendingUp size={24} /> }
-                                    ].map((feature, i) => (
-                                        <div key={i} className="p-8 bg-white/5 border border-white/10 rounded-3xl space-y-4 hover:bg-white/[0.08] transition-all">
-                                            <div className="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 mb-2">
-                                                {feature.icon}
-                                            </div>
-                                            <h4 className="text-lg font-black uppercase tracking-tight">{feature.title}</h4>
-                                            <p className="text-sm text-slate-400 font-medium">{feature.desc}</p>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="flex flex-col items-center gap-10 pt-8">
-                                    <div className="flex flex-col md:flex-row items-center gap-6 w-full md:w-auto">
-                                        <Link 
-                                            href={productLink}
-                                            className="w-full md:w-auto px-12 py-8 bg-indigo-600 text-white rounded-[2.5rem] font-black uppercase tracking-widest text-xs hover:bg-indigo-50 transition-all shadow-[0_20px_50px_rgba(79,70,229,0.3)] hover:scale-105 active:scale-95 flex items-center justify-center gap-4 group"
-                                        >
-                                            Claim Mastery Resource <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                                        </Link>
-                                        <Link 
-                                            href="/glossary"
-                                            className="w-full md:w-auto px-12 py-8 bg-white/5 text-white border border-white/10 rounded-[2.5rem] font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-all flex items-center justify-center gap-4"
-                                        >
-                                            Browse Full Vault <ShoppingBag size={20} />
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </section>
 
