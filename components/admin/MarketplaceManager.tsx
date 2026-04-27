@@ -52,10 +52,24 @@ export default function MarketplaceManager() {
         setSaving(false);
     };
 
-    const cleanseText = (text: string) => {
-        return text
-            .replace(/javascript:void\(0\)/g, '')
-            .replace(/amazon\.com(?!\/)/g, 'amazon.com/');
+    const repairRow = (parts: string[]) => {
+        const sUrl = (parts[2] || '').trim();
+        const fUrl = (parts[3] || '').trim();
+        
+        // If Column 4 is broken (void), try to heal it with Column 3
+        if (fUrl.includes('javascript:void') && sUrl.startsWith('http') && !sUrl.includes('javascript:void')) {
+            parts[3] = sUrl;
+        }
+        // If Column 3 is broken or empty, try to heal it with Column 4
+        else if ((sUrl === '' || sUrl.includes('/dp//')) && fUrl.startsWith('http') && !fUrl.includes('javascript:void')) {
+            parts[2] = fUrl;
+        }
+
+        // Final cleanup for any residual artifacts
+        parts[2] = parts[2].replace(/javascript:void\(0\)/g, '').replace(/amazon\.com(?!\/)/g, 'amazon.com/');
+        parts[3] = parts[3].replace(/javascript:void\(0\)/g, '').replace(/amazon\.com(?!\/)/g, 'amazon.com/');
+        
+        return parts;
     };
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,30 +80,45 @@ export default function MarketplaceManager() {
         reader.onload = (event) => {
             let text = event.target?.result as string;
             if (text) {
-                // Auto-clean the incoming file
-                text = cleanseText(text);
+                const lines = text.split('\n').filter(l => l.trim());
+                const repairedLines = lines.map(line => {
+                    const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
+                    if (parts.length < 4) return line;
+                    const repaired = repairRow(parts);
+                    return `"${repaired.join('","')}"`;
+                });
 
-                let finalAppend = text;
+                const finalContent = repairedLines.join('\n');
+                let finalAppend = finalContent;
+
                 if (content.length > 0 && (text.includes('keyword') || text.includes('asin'))) {
-                    const lines = text.split('\n');
-                    if (lines.length > 1) {
-                        finalAppend = lines.slice(1).join('\n');
+                    const l = finalContent.split('\n');
+                    if (l.length > 1) {
+                        finalAppend = l.slice(1).join('\n');
                     }
                 }
+
                 setContent(prev => {
                     const separator = prev.length > 0 && !prev.endsWith('\n') ? '\n' : '';
                     return prev + separator + finalAppend;
                 });
-                setMessage({ type: 'success', text: 'New records cleaned and appended. Save to finalize.' });
+                setMessage({ type: 'success', text: 'Imported and healed links. Save to finalize.' });
             }
         };
         reader.readAsText(file);
     };
 
-    const cleanseAll = () => {
-        const cleaned = cleanseText(content);
-        setContent(cleaned);
-        setMessage({ type: 'success', text: 'Deep cleanse complete. All "void" artifacts removed. Click SAVE to apply.' });
+    const repairLibrary = () => {
+        const lines = content.split('\n').filter(l => l.trim());
+        const repaired = lines.map(line => {
+            const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
+            if (parts.length < 4) return line;
+            const fixed = repairRow(parts);
+            return `"${fixed.join('","')}"`;
+        });
+        
+        setContent(repaired.join('\n'));
+        setMessage({ type: 'success', text: 'Deep Repair Complete: Links cross-referenced and healed. Click SAVE.' });
     };
 
     const removeDuplicates = () => {
@@ -199,9 +228,9 @@ export default function MarketplaceManager() {
                         <Copy size={20} />
                     </button>
                     <button 
-                        onClick={cleanseAll}
+                        onClick={repairLibrary}
                         className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all"
-                        title="Remove all 'void' artifacts from library"
+                        title="Cross-reference and heal broken links"
                     >
                         <ShieldCheck size={20} />
                     </button>
