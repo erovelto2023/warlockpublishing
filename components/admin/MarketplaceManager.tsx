@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     ShoppingBag, Upload, Save, RefreshCw, FileText, 
     AlertCircle, Check, Database, Search, Download, ExternalLink,
-    ChevronRight, Info, Trash2, Edit, X, ChevronLeft
+    ChevronRight, Info, Trash2, Edit, X, ChevronLeft, ShieldCheck, Copy
 } from 'lucide-react';
 import { getAmazonCsvContent, updateAmazonCsvContent } from '@/lib/actions/marketplace';
 import { formatAmazonLink } from '@/lib/utils';
@@ -52,14 +52,23 @@ export default function MarketplaceManager() {
         setSaving(false);
     };
 
+    const cleanseText = (text: string) => {
+        return text
+            .replace(/javascript:void\(0\)/g, '')
+            .replace(/amazon\.com(?!\/)/g, 'amazon.com/');
+    };
+
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = (event) => {
-            const text = event.target?.result as string;
+            let text = event.target?.result as string;
             if (text) {
+                // Auto-clean the incoming file
+                text = cleanseText(text);
+
                 let finalAppend = text;
                 if (content.length > 0 && (text.includes('keyword') || text.includes('asin'))) {
                     const lines = text.split('\n');
@@ -71,10 +80,36 @@ export default function MarketplaceManager() {
                     const separator = prev.length > 0 && !prev.endsWith('\n') ? '\n' : '';
                     return prev + separator + finalAppend;
                 });
-                setMessage({ type: 'success', text: 'New records appended. Save to apply changes.' });
+                setMessage({ type: 'success', text: 'New records cleaned and appended. Save to finalize.' });
             }
         };
         reader.readAsText(file);
+    };
+
+    const cleanseAll = () => {
+        const cleaned = cleanseText(content);
+        setContent(cleaned);
+        setMessage({ type: 'success', text: 'Deep cleanse complete. All "void" artifacts removed. Click SAVE to apply.' });
+    };
+
+    const removeDuplicates = () => {
+        const lines = content.split('\n').filter(l => l.trim());
+        const seen = new Set();
+        const uniqueLines = lines.filter(line => {
+            const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
+            const asin = (parts[8] || parts[2] || parts[3] || '').trim();
+            if (!asin || seen.has(asin)) return false;
+            seen.add(asin);
+            return true;
+        });
+        
+        if (lines.length === uniqueLines.length) {
+            setMessage({ type: 'success', text: 'No duplicates found. Your signal vault is optimal.' });
+            return;
+        }
+
+        setContent(uniqueLines.join('\n'));
+        setMessage({ type: 'success', text: `Intelligence Refined: Removed ${lines.length - uniqueLines.length} duplicate nodes. Click SAVE.` });
     };
 
     const parsedData = React.useMemo(() => {
@@ -128,9 +163,9 @@ export default function MarketplaceManager() {
         const lines = content.split('\n').filter(l => l.trim());
         const parts = [...editingRow.rawParts];
         
-        // Update specific columns
+        // Update specific columns with cleaning
         parts[1] = editForm.keyword;
-        parts[3] = editForm.url;
+        parts[3] = cleanseText(editForm.url);
         parts[9] = editForm.title;
         parts[26] = editForm.price;
         
@@ -139,7 +174,7 @@ export default function MarketplaceManager() {
         
         setContent(lines.join('\n'));
         setEditingRow(null);
-        setMessage({ type: 'success', text: 'Changes applied to local session. Click SAVE to finalize.' });
+        setMessage({ type: 'success', text: 'Changes applied and cleaned. Click SAVE to finalize.' });
     };
 
     return (
@@ -156,6 +191,20 @@ export default function MarketplaceManager() {
                     <p className="text-slate-500 text-sm mt-2 font-medium italic">Command center for your Amazon reference library.</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <button 
+                        onClick={removeDuplicates}
+                        className="p-3 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-2xl transition-all"
+                        title="Remove duplicate entries (based on ASIN)"
+                    >
+                        <Copy size={20} />
+                    </button>
+                    <button 
+                        onClick={cleanseAll}
+                        className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all"
+                        title="Remove all 'void' artifacts from library"
+                    >
+                        <ShieldCheck size={20} />
+                    </button>
                     <button 
                         onClick={loadContent}
                         className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
