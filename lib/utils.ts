@@ -28,3 +28,26 @@ export const safeString = (str: any, fallback = ""): string =>
 export function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+// Global Store ID
+export const AMAZON_AFFILIATE_ID = "weightlo0f57d-20";
+
+/**
+ * Universal Amazon Affiliate Link Formatter
+ */
+export function formatAmazonLink(url: string, affiliateId: string = AMAZON_AFFILIATE_ID): string {
+    if (!url || typeof url !== 'string' || !url.includes('amazon.com')) return url;
+    try {
+        const u = new URL(url.trim());
+        u.searchParams.set('tag', affiliateId);
+        return u.toString();
+    } catch (e) {
+        // Fallback for malformed URLs
+        const trimUrl = url.trim();
+        const sep = trimUrl.includes('?') ? '&' : '?';
+        if (!trimUrl.includes(`tag=${affiliateId}`)) {
+            return `${trimUrl}${sep}tag=${affiliateId}`;
+        }
+        return trimUrl;
+    }
+}

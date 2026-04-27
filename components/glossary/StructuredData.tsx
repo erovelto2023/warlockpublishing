@@ -17,7 +17,8 @@ export default function StructuredData({ term }: StructuredDataProps) {
                 "name": "Warlock Publishing Creator Glossary",
                 "url": `${baseUrl}/glossary`
             },
-            "url": termUrl
+            "url": termUrl,
+            "alternateName": term.synonyms || []
         },
         {
             "@type": "BreadcrumbList",

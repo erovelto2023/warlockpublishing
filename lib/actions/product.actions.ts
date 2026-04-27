@@ -9,7 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import mongoose from "mongoose";
 
 import { isAdmin } from "@/lib/admin";
-import { parseData } from "@/lib/utils";
+import { parseData, formatAmazonLink } from "@/lib/utils";
 import { Product as ProductType, MarketplaceItem } from "@/lib/types";
 
 function slugify(text: string) {
@@ -63,6 +63,10 @@ export async function createProduct(data: Partial<ProductType>) {
         }
     });
 
+    // Auto-format Amazon links
+    if (sanitizedData.amazonLink) sanitizedData.amazonLink = formatAmazonLink(sanitizedData.amazonLink);
+    if (sanitizedData.externalUrl) sanitizedData.externalUrl = formatAmazonLink(sanitizedData.externalUrl);
+
     console.log("Creating Product with data:", sanitizedData);
     try {
         const newProduct = await Product.create({
@@ -106,6 +110,10 @@ export async function updateProduct(id: string, data: Partial<ProductType>) {
             delete updateData[field];
         }
     });
+
+    // Auto-format Amazon links
+    if (updateData.amazonLink) updateData.amazonLink = formatAmazonLink(updateData.amazonLink);
+    if (updateData.externalUrl) updateData.externalUrl = formatAmazonLink(updateData.externalUrl);
 
     // Check if product has a slug, if not generate one from title (new or existing)
     const currentProduct = await Product.findById(id);

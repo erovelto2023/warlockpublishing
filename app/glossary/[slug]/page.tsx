@@ -18,6 +18,9 @@ import PrintButton from '@/components/glossary/PrintButton';
 import { constructMetadata } from '@/lib/seo';
 import { Metadata } from 'next';
 import { GlossaryTerm, Product, SalesPage } from '@/lib/types';
+import TermTabs from '@/components/glossary/TermTabs';
+import TableOfContents from '@/components/glossary/TableOfContents';
+import ConnectivityHub from '@/components/glossary/ConnectivityHub';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -154,10 +157,15 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                 </div>
             </div>
 
-            <div className="max-w-[1440px] mx-auto px-4 py-8 md:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4">
+            <div className="max-w-[1440px] mx-auto px-4 py-8 md:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 mt-4 relative">
+                
+                {/*  LEFT SIDEBAR: Table of Contents (Sticky)  */}
+                <aside className="hidden xl:block xl:col-span-2">
+                    <TableOfContents />
+                </aside>
                 
                 {/*  MAIN CONTENT AREA  */}
-                <div className="lg:col-span-8 space-y-12">
+                <div className="lg:col-span-8 xl:col-span-7 space-y-20">
                     
                     {/*  1. IDENTITY & TAXONOMY SECTION  */}
                     <section className="bg-white rounded-[2.5rem] p-8 md:p-14 border border-slate-200 shadow-sm relative overflow-hidden">
@@ -203,60 +211,77 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </section>
 
                     {/*  2. CONTEXTUAL MEANING SECTION  */}
-                    <section className="space-y-8">
-                        <h2 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
-                            <History className="text-indigo-600" size={24} /> Contextual Meaning
+                    <section className="space-y-10" id="context">
+                        <h2 id="context" className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
+                            <History className="text-indigo-600" size={24} /> Semantic Connectivity
                         </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
-                                <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">Historical Context & Original Usage</h4>
-                                <p className="text-sm text-slate-600 leading-relaxed">
-                                    {term.origin || "Intelligence on historical origins is currently being indexed for this terminology node."}
-                                </p>
-                            </div>
-                            <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
-                                <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Current Usage</h4>
-                                <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                                    {term.modernUsage || "In a modern publishing framework, this concept defines the high-level boundary of commercial engagement."}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="p-10 bg-slate-900 text-white rounded-[2.5rem] shadow-xl relative overflow-hidden group">
-                           <div className="absolute right-0 bottom-0 p-8 opacity-10 group-hover:scale-110 transition-transform"><MessageSquareQuote size={120} /></div>
-                           <h4 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-4">Expanded Definition</h4>
-                           <p className="text-xl font-light leading-relaxed text-slate-200">
-                                {term.expandedExplanation || term.definition}
-                           </p>
-                        </div>
+                        
+                        <TermTabs 
+                            origin={term.origin} 
+                            modernUsage={term.modernUsage} 
+                            expandedExplanation={term.expandedExplanation} 
+                        />
+
+                        <ConnectivityHub 
+                            synonyms={term.synonyms} 
+                            antonyms={term.antonyms} 
+                        />
                     </section>
                     
-                    {/*  IN-CONTENT PRODUCT CTA (HIGH CONVERSION)  */}
+                    {/*  IN-CONTENT SOLUTION CTA (CONVERSION FOCUSED)  */}
                     {featuredPoolItem && (
-                        <section className="bg-white border-2 border-indigo-600 rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-8 opacity-5"><ShoppingBag size={100} /></div>
-                            <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                        <section className="bg-white border-2 border-indigo-600 rounded-[2.5rem] p-8 md:p-14 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><ShoppingBag size={120} /></div>
+                            
+                            {/* Problem/Solution Bridge */}
+                            <div className="mb-10 text-center md:text-left">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
+                                    <AlertTriangle size={12} /> Addressing the Challenge
+                                </div>
+                                <h3 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                                    Struggling with {term.targetAudience?.painPoints?.[0] || term.term + " implementation"}?
+                                </h3>
+                                <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
+                                    Understanding the definition is only the first step. To truly dominate this niche, you need the right tools to bridge the gap between concept and profit.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col md:flex-row items-stretch gap-10 relative z-10 bg-slate-50 p-8 rounded-[2rem] border border-slate-200">
                                 {featuredPoolItem.imageUrl && (
-                                    <div className="w-full md:w-48 aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border border-slate-100 flex-shrink-0">
+                                    <div className="w-full md:w-60 aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white flex-shrink-0 relative">
                                         <img src={featuredPoolItem.imageUrl} alt={featuredPoolItem.title} className="w-full h-full object-cover" />
+                                        <div className="absolute bottom-4 left-4 right-4 py-2 bg-indigo-600/90 backdrop-blur text-white text-center rounded-xl text-[9px] font-black uppercase tracking-widest">
+                                            Recommended Solution
+                                        </div>
                                     </div>
                                 )}
-                                <div className="flex-1 text-center md:text-left">
-                                    <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4 inline-block">Recommended Resource</span>
-                                    <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-3 tracking-tight leading-tight">
-                                        Master {term.term} with this {featuredPoolItem.type}
-                                    </h3>
-                                    <p className="text-slate-600 mb-6 text-sm md:text-base leading-relaxed">
-                                        Elevate your {term.category} business with our professional-grade tools and training. {featuredPoolItem.title} is specifically designed to help creators implement these concepts faster.
-                                    </p>
-                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                <div className="flex-1 flex flex-col justify-center">
+                                    <h4 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">
+                                        {featuredPoolItem.title}
+                                    </h4>
+                                    
+                                    {/* Benefit List */}
+                                    <div className="space-y-4 mb-8">
+                                        {(term.targetAudience?.desiredOutcomes?.slice(0, 3) || ["Scale your creative output", "Increase commercial authority", "Automate implementation"]).map((outcome: string, i: number) => (
+                                            <div key={i} className="flex items-start gap-3">
+                                                <div className="mt-1 p-0.5 bg-emerald-100 text-emerald-600 rounded-full"><CheckCircle2 size={14} /></div>
+                                                <span className="text-sm font-bold text-slate-700">{outcome}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-6 mt-auto">
                                         <Link 
                                             href={productLink}
-                                            className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-indigo-100 flex items-center gap-2"
+                                            className="px-10 py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-indigo-100 flex items-center gap-3 group/btn"
                                         >
-                                            Get Instant Access <ArrowRight size={14} />
+                                            Solve My {term.term} Challenges <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                                         </Link>
-                                        <div className="text-lg font-black text-slate-900">
-                                            {featuredPoolItem.price ? `$${featuredPoolItem.price}` : 'Free Access'}
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Today&apos;s Price</span>
+                                            <span className="text-2xl font-black text-slate-900">
+                                                {featuredPoolItem.price ? `$${featuredPoolItem.price}` : 'Free Access'}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -282,7 +307,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </section>
 
                     {/*  4. GETTING STARTED CHECKLIST  */}
-                    <section className="p-10 md:p-14 bg-white border border-slate-200 shadow-sm rounded-[3rem] relative overflow-hidden flex flex-col justify-center">
+                    <section className="p-10 md:p-14 bg-white border border-slate-200 shadow-sm rounded-[3rem] relative overflow-hidden flex flex-col justify-center" id="checklist">
+                        <h2 id="checklist" className="sr-only">Checklist</h2>
                         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-bl-full -z-10 opacity-40"></div>
                         <div className="flex items-center justify-between mb-10">
                             <h2 className="text-3xl font-bold text-slate-900 uppercase tracking-tighter leading-none">Getting Started Checklist</h2>
@@ -305,9 +331,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </section>
 
                     {/*  5. FAQ ACCORDION BUILDER  */}
-                    <section className="space-y-8">
+                    <section className="space-y-8" id="faq">
                         <div className="flex items-center justify-between px-2">
-                            <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Strategic FAQ</h2>
+                            <h2 id="faq" className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Strategic FAQ</h2>
                             {/* <button className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100 hover:bg-indigo-100 transition-all">+ Add FAQ Entry</button> */}
                         </div>
                         <div className="space-y-4">
@@ -329,8 +355,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </section>
 
                     {/*  6. PROFIT & CREATION BLUEPRINT + TARGET AUDIENCE  */}
-                    <section className="space-y-8">
-                         <h2 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
+                    <section className="space-y-8" id="monetization">
+                         <h2 id="monetization" className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
                             <PieChart className="text-indigo-600" size={24} /> Profit & Creation Blueprint
                         </h2>
                         <div className="grid md:grid-cols-2 gap-6">
@@ -402,8 +428,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </section>
 
                     {/*  8. 10 PRODUCT IDEAS PIPELINE  */}
-                    <section className="space-y-8">
-                        <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">10 Product Ideas Pipeline</h2>
+                    <section className="space-y-8" id="ideas">
+                        <h2 id="ideas" className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">10 Product Ideas Pipeline</h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             {(term.productIdeas && term.productIdeas.length > 0 ? term.productIdeas : [
                                 { title: "Blueprint Masterclass", type: "Course", pricePoint: "$147.00", description: "A comprehensive guide on deploying these strategies." },
@@ -426,8 +452,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
                     {/*  EXTRA SECTIONS: Amazon Curated Products (Kept to ensure all areas are there)  */}
                     {term.amazonProducts && term.amazonProducts.length > 0 && (
-                        <section className="space-y-8">
-                            <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">Curated Prime Assets</h2>
+                        <section className="space-y-8" id="resources">
+                            <h2 id="resources" className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">Curated Prime Assets</h2>
                             <div className="grid sm:grid-cols-2 gap-6">
                                 {term.amazonProducts.map((p, i) => (
                                     <Link key={i} href={p.url || '#'} target="_blank" className="flex items-center gap-6 p-6 bg-white border border-slate-200 shadow-sm rounded-3xl hover:shadow-lg hover:border-slate-300 transition-all group">
@@ -451,10 +477,10 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     )}
 
                     {/*  9. COMMON PITFALLS  */}
-                    <section className="p-10 md:p-14 bg-rose-50/50 border border-rose-100 rounded-[3rem] shadow-sm">
+                    <section className="p-10 md:p-14 bg-rose-50/50 border border-rose-100 rounded-[3rem] shadow-sm" id="pitfalls">
                         <div className="flex items-center gap-4 mb-10 text-rose-600">
                             <AlertTriangle size={24} strokeWidth={2.5} />
-                            <h2 className="text-2xl font-bold uppercase tracking-tight">Common Pitfalls</h2>
+                            <h2 id="pitfalls" className="text-2xl font-bold uppercase tracking-tight">Common Pitfalls</h2>
                         </div>
                         <div className="space-y-4">
                             {(term.commonPitfalls && term.commonPitfalls.length > 0 ? term.commonPitfalls : [
@@ -514,14 +540,14 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
                     {/*  11. BLOG / ARTICLE SECTION  */}
                     {term.blogArticle?.content && (
-                        <section className="p-16 bg-white border border-slate-200 shadow-sm rounded-[4rem] relative overflow-hidden print-break">
+                        <section className="p-16 bg-white border border-slate-200 shadow-sm rounded-[4rem] relative overflow-hidden print-break" id="article">
                             <div className="absolute top-0 right-0 p-8 opacity-5"><FileText size={160}/></div>
                             <div className="mb-12 border-b border-slate-100 pb-8 relative z-10">
                                 <div className="flex items-center gap-3 text-indigo-600 mb-6">
                                     <Layout size={20}/>
                                     <h3 className="text-[10px] font-black uppercase tracking-[0.3em]">Blog & Editorial Center</h3>
                                 </div>
-                                <h2 className="text-4xl font-extrabold text-slate-900 uppercase tracking-tighter leading-tight italic mb-8">
+                                <h2 id="article" className="text-4xl font-extrabold text-slate-900 uppercase tracking-tighter leading-tight italic mb-8">
                                     {term.blogArticle.title || `Mastering ${term.term}`}
                                 </h2>
                                 
@@ -623,11 +649,11 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </section>
 
                     {/*  15. AI PROMPT COMMAND CENTER  */}
-                    <section className="p-10 md:p-14 bg-slate-900 text-white rounded-[3rem] relative overflow-hidden border border-slate-800">
+                    <section className="p-10 md:p-14 bg-slate-900 text-white rounded-[3rem] relative overflow-hidden border border-slate-800" id="ai">
                          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-500/10 to-transparent -z-10"></div>
                          <div className="flex items-center gap-3 mb-12">
                              <Zap className="text-amber-400" size={24} />
-                             <h2 className="text-2xl font-bold uppercase tracking-widest italic">AI Command Center</h2>
+                             <h2 id="ai" className="text-2xl font-bold uppercase tracking-widest italic">AI Command Center</h2>
                          </div>
                          <div className="space-y-6">
                               {[
@@ -648,12 +674,68 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                          </div>
                     </section>
 
-                    {/*  16. RELATED PRODUCTS GALLERY  */}
+                    {/*  16. THE SOLUTION ROADMAP (FINAL PITCH)  */}
+                    <section className="bg-slate-900 text-white rounded-[3.5rem] p-10 md:p-20 relative overflow-hidden shadow-2xl text-center md:text-left">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-[120px] opacity-20 -mr-48 -mt-48"></div>
+                        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500 rounded-full blur-[120px] opacity-10 -ml-48 -mb-48"></div>
+                        
+                        <div className="relative z-10 grid md:grid-cols-2 gap-16 items-center">
+                            <div className="space-y-8">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-black uppercase tracking-[0.3em] rounded-full">
+                                    <Sparkles size={14} /> The Strategic Path Forward
+                                </div>
+                                <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none italic uppercase">
+                                    Turn Knowledge <br/> Into <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 underline decoration-indigo-500/30">Commercial Profit</span>
+                                </h2>
+                                <p className="text-lg text-slate-400 leading-relaxed font-light">
+                                    Don&apos;t just read about {term.term}. Implement it. Our vetted tools and offers are the secret weapons used by elite creators to dominate the {term.category} market.
+                                </p>
+                                <div className="space-y-4">
+                                    {[
+                                        "Eliminate guesswork in your implementation",
+                                        "Access professional-grade strategic blueprints",
+                                        "Shorten your path to monetization by weeks"
+                                    ].map((benefit, i) => (
+                                        <div key={i} className="flex items-center gap-4">
+                                            <div className="w-6 h-6 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center border border-emerald-500/20"><CheckCircle2 size={14} /></div>
+                                            <span className="text-sm font-bold text-slate-300">{benefit}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-10 rounded-[2.5rem] space-y-8">
+                                <div className="text-center space-y-2">
+                                    <h3 className="text-xl font-black uppercase tracking-tight">Ready to start?</h3>
+                                    <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Choose your path to {term.term} mastery</p>
+                                </div>
+                                <div className="space-y-4">
+                                    <Link 
+                                        href={productLink}
+                                        className="w-full py-5 bg-white text-slate-900 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-all shadow-xl flex items-center justify-center gap-3"
+                                    >
+                                        Access Featured Resource <ArrowRight size={16} />
+                                    </Link>
+                                    <Link 
+                                        href="/products"
+                                        className="w-full py-5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-indigo-600/30 transition-all flex items-center justify-center gap-3"
+                                    >
+                                        Browse Full Offer Vault <ShoppingBag size={16} />
+                                    </Link>
+                                </div>
+                                <div className="pt-6 border-t border-white/5 text-center">
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">100% Secure Access • Instant Delivery</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/*  17. RELATED PRODUCTS GALLERY  */}
                     {relatedProducts.length > 0 && (
                         <section className="space-y-8 no-print">
                             <div className="flex items-center justify-between px-2">
                                 <h2 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3">
-                                    <ShoppingBag className="text-indigo-600" size={24} /> Recommended Resource Library
+                                    <ShoppingBag className="text-indigo-600" size={24} /> Resource Library
                                 </h2>
                                 <Link href="/products" className="text-xs font-bold text-indigo-600 hover:underline uppercase tracking-widest">View All Assets</Link>
                             </div>
@@ -670,6 +752,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-300"><BookDashed size={40} /></div>
                                             )}
+                                            <div className="absolute top-2 right-2 px-2 py-0.5 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-widest rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                                Best Seller
+                                            </div>
                                         </div>
                                         <h4 className="text-xs font-black text-slate-900 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors uppercase tracking-tight mb-2">
                                             {item.title}
@@ -723,8 +808,39 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     </div>
                     
 
-
-
+                    {/*  Entity Vital Signs (New)  */}
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-8 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5"><TrendingUp size={60} /></div>
+                        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-900 italic underline decoration-emerald-200 underline-offset-4">
+                             Entity Vital Signs
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Market Status</span>
+                                <span className="text-[10px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-1 rounded w-fit block">
+                                    {term.marketDemand?.trendStatus || 'Stable'}
+                                </span>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Potential</span>
+                                <span className="text-[10px] font-black text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded w-fit block">
+                                    {term.marketDemand?.monetizationPotential || 'High'}
+                                </span>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Authority</span>
+                                <span className="text-[10px] font-black text-amber-600 uppercase bg-amber-50 px-2 py-1 rounded w-fit block">
+                                    Verified
+                                </span>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Risk Level</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase bg-slate-50 px-2 py-1 rounded w-fit block">
+                                    Low
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                     {/*  Related Terms Cloud  */}
                     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-8">
                         <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-900 italic underline decoration-indigo-200 underline-offset-4">

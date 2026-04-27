@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/lib/db';
 import GlossaryTerm from '@/lib/models/GlossaryTerm';
 import { revalidatePath } from 'next/cache';
 import { GlossaryTerm as GlossaryTermType } from '@/lib/types';
+import { AMAZON_AFFILIATE_ID, formatAmazonLink } from '@/lib/utils';
 
 // Slugify helper
 function slugify(text: string) {
@@ -31,19 +32,20 @@ function serializeTerm(term: any): GlossaryTermType | null {
 
 // Normalize any YouTube URL format to a standard watch URL
 function normalizeYouTubeUrl(url: string): string | null {
-    if (!url) return null;
+    if (!url || typeof url !== 'string') return null;
+    const u = url.trim();
     // Already a full watch URL
-    if (url.includes('youtube.com/watch')) return url;
+    if (u.includes('youtube.com/watch')) return u;
     // youtu.be short link
-    const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
+    const shortMatch = u.match(/youtu\.be\/([^?&]+)/);
     if (shortMatch) return `https://www.youtube.com/watch?v=${shortMatch[1]}`;
     // youtube.com/embed/ID
-    const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
+    const embedMatch = u.match(/youtube\.com\/embed\/([^?&]+)/);
     if (embedMatch) return `https://www.youtube.com/watch?v=${embedMatch[1]}`;
     // Raw video ID (11 alphanumeric chars)
-    if (/^[a-zA-Z0-9_-]{11}$/.test(url.trim())) return `https://www.youtube.com/watch?v=${url.trim()}`;
-    // Unknown format – return as-is and let oEmbed decide
-    return url;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(u)) return `https://www.youtube.com/watch?v=${u}`;
+    // Unknown format – return as-is
+    return u;
 }
 
 export async function trackGlossaryView(slug: string) {
@@ -64,8 +66,15 @@ export async function createGlossaryTerm(data: Partial<GlossaryTermType>) {
     const existingSlugs = existingTerms.map((t: any) => t.slug).filter(Boolean);
     slug = await makeUniqueSlug(slug, existingSlugs);
 
+    // Auto-format Amazon links
+    const termData = { ...data };
+    if (termData.amazonProducts) termData.amazonProducts = termData.amazonProducts.map((p: any) => ({ ...p, url: formatAmazonLink(p.url) }));
+    if (termData.competitorReferences) termData.competitorReferences = termData.competitorReferences.map((p: any) => ({ ...p, url: formatAmazonLink(p.url) }));
+    if (termData.referenceWebsites) termData.referenceWebsites = termData.referenceWebsites.map((p: any) => ({ ...p, url: formatAmazonLink(p.url) }));
+    if (termData.videoUrl) termData.videoUrl = normalizeYouTubeUrl(termData.videoUrl) || termData.videoUrl;
+
     const newTerm = await GlossaryTerm.create({
-        ...data,
+        ...termData,
         slug,
     });
     revalidatePath('/glossary');
@@ -79,8 +88,15 @@ export async function updateGlossaryTerm(id: string, data: Partial<GlossaryTermT
     // If term changed, we might want to update slug, but usually better to keep it for SEO
     // unless explicitly changed in data.
     
+    // Auto-format Amazon links
+    const termData = { ...data };
+    if (termData.amazonProducts) termData.amazonProducts = termData.amazonProducts.map((p: any) => ({ ...p, url: formatAmazonLink(p.url) }));
+    if (termData.competitorReferences) termData.competitorReferences = termData.competitorReferences.map((p: any) => ({ ...p, url: formatAmazonLink(p.url) }));
+    if (termData.referenceWebsites) termData.referenceWebsites = termData.referenceWebsites.map((p: any) => ({ ...p, url: formatAmazonLink(p.url) }));
+    if (termData.videoUrl) termData.videoUrl = normalizeYouTubeUrl(termData.videoUrl) || termData.videoUrl;
+
     const updatedTerm = await GlossaryTerm.findByIdAndUpdate(id, {
-        ...data,
+        ...termData,
         lastUpdated: new Date()
     }, { new: true });
     
@@ -382,6 +398,26 @@ export async function importDetailedJson(data: any[]) {
                 item.youtubeVideo = { ...item.youtubeVideo, url: item.videoUrl };
             }
 
+            // Normalize Links for Optimization
+            if (item.youtubeVideo?.url) {
+                item.youtubeVideo.url = normalizeYouTubeUrl(item.youtubeVideo.url) || item.youtubeVideo.url;
+            }
+            if (item.videoUrl) {
+                item.videoUrl = normalizeYouTubeUrl(item.videoUrl) || item.videoUrl;
+            }
+            if (Array.isArray(item.amazonProducts)) {
+                item.amazonProducts = item.amazonProducts.map((p: any) => ({
+                    ...p,
+                    url: formatAmazonLink(p.url)
+                }));
+            }
+            if (Array.isArray(item.competitorReferences)) {
+                item.competitorReferences = item.competitorReferences.map((p: any) => ({
+                    ...p,
+                    url: formatAmazonLink(p.url)
+                }));
+            }
+
             return {
                 updateOne: {
                     filter: { slug },
@@ -513,12 +549,13 @@ export async function scrubGlossaryUrls() {
     return { success: true, updatedCount };
 }
 
-export async function backfillAffiliateTags(affiliateId: string = "weightlo0f57d-20") {
+export async function backfillAffiliateTags(affiliateId: string = AMAZON_AFFILIATE_ID) {
     await connectToDatabase();
     const terms = await GlossaryTerm.find({ 
         $or: [
             { amazonProducts: { $exists: true, $ne: [] } },
-            { competitorReferences: { $exists: true, $ne: [] } }
+            { competitorReferences: { $exists: true, $ne: [] } },
+            { referenceWebsites: { $exists: true, $ne: [] } }
         ]
     });
 
@@ -528,9 +565,9 @@ export async function backfillAffiliateTags(affiliateId: string = "weightlo0f57d
         const updateLinks = (array: any[]) => {
             if (!Array.isArray(array)) return array;
             return array.map(item => {
-                if (item.url && item.url.includes("amazon.com") && !item.url.includes(`tag=${affiliateId}`)) {
-                    const sep = item.url.includes("?") ? "&" : "?";
-                    item.url = `${item.url}${sep}tag=${affiliateId}`;
+                const cleaned = formatAmazonLink(item.url, affiliateId);
+                if (item.url !== cleaned) {
+                    item.url = cleaned;
                     changed = true;
                 }
                 return item;
@@ -539,12 +576,66 @@ export async function backfillAffiliateTags(affiliateId: string = "weightlo0f57d
 
         term.amazonProducts = updateLinks(term.amazonProducts);
         term.competitorReferences = updateLinks(term.competitorReferences);
+        term.referenceWebsites = updateLinks(term.referenceWebsites);
 
         if (changed) { await term.save(); updatedCount++; }
     }
 
     revalidatePath('/admin/glossary');
     return { success: true, updatedCount };
+}
+
+// Helper to find high-quality YouTube videos
+async function searchYouTubeForTerm(term: string, category: string = ""): Promise<{ url: string, title: string, channel: string } | null> {
+    try {
+        const query = `${term} ${category} explained strategy tutorial`.trim();
+        const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+        });
+        const html = await searchRes.text();
+        const match = html.match(/ytInitialData\s*=\s*({.+?});/);
+        if (!match) return null;
+
+        const data = JSON.parse(match[1]);
+        const contents = data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents || [];
+        
+        for (const item of contents) {
+            if (item.videoRenderer) {
+                const video = item.videoRenderer;
+                const videoId = video.videoId;
+                const title = video.title?.runs?.[0]?.text || '';
+                const channel = video.ownerText?.runs?.[0]?.text || '';
+                const lengthText = video.lengthText?.simpleText || "";
+
+                // FILTER: Avoid "Shorts" or extremely short videos (< 1:30)
+                if (lengthText.includes(':')) {
+                    const parts = lengthText.split(':');
+                    const minutes = parseInt(parts[parts.length - 2] || "0");
+                    const seconds = parseInt(parts[parts.length - 1] || "0");
+                    const totalSeconds = (minutes * 60) + seconds;
+                    if (totalSeconds < 90 && parts.length === 2) continue; 
+                } else {
+                    continue; 
+                }
+
+                // FILTER: Title Relevance Check
+                const termLower = term.toLowerCase();
+                const titleLower = title.toLowerCase();
+                const relevanceKeywords = termLower.split(' ').filter(k => k.length > 3);
+                const matchCount = relevanceKeywords.filter(k => titleLower.includes(k)).length;
+                if (relevanceKeywords.length > 0 && matchCount === 0) continue;
+
+                const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                const verifyRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(newUrl)}&format=json`);
+                if (verifyRes.status === 200) {
+                    return { url: newUrl, title, channel };
+                }
+            }
+        }
+    } catch (e) {
+        console.error('YouTube search failed:', e);
+    }
+    return null;
 }
 
 export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
@@ -560,53 +651,28 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
         const rawUrl = term.youtubeVideo?.url || term.videoUrl;
         if (!rawUrl) continue;
         
-        // Normalize the stored value to a proper YouTube watch URL before checking
         const url = normalizeYouTubeUrl(rawUrl);
         if (!url) continue;
 
         try {
             const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
-            // 404 = Deleted/Not Found, 401 = Private/Unauthorized, 403 = Forbidden/Embedding Disabled, 400 = Bad Request (malformed URL)
             if (res.status !== 200) {
                 let fixed = false;
                 
                 if (autoFix) {
-                    try {
-                        const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(term.term + " explanation")}`, {
-                            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-                        });
-                        const html = await searchRes.text();
-                        const match = html.match(/ytInitialData\s*=\s*({.+?});/);
-                        if (match) {
-                            const data = JSON.parse(match[1]);
-                            const contents = data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents || [];
-                            for (const item of contents) {
-                                if (item.videoRenderer) {
-                                    const newUrl = `https://www.youtube.com/watch?v=${item.videoRenderer.videoId}`;
-                                    const title = item.videoRenderer.title?.runs?.[0]?.text || '';
-                                    const channel = item.videoRenderer.ownerText?.runs?.[0]?.text || '';
-                                    
-                                    // Verify the replacement video is actually live before saving
-                                    const verifyRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(newUrl)}&format=json`);
-                                    if (verifyRes.status !== 200) continue;
-
-                                    term.videoUrl = newUrl;
-                                    term.youtubeVideo = {
-                                        ...(term.youtubeVideo?.toObject?.() || term.youtubeVideo || {}),
-                                        url: newUrl,
-                                        title: title,
-                                        channel: channel
-                                    };
-                                    term.markModified('youtubeVideo');
-                                    await term.save();
-                                    fixed = true;
-                                    updatedCount++;
-                                    break;
-                                }
-                            }
-                        }
-                    } catch (searchError) {
-                        console.error('Failed to auto-fix video for', term.term);
+                    const bestVideo = await searchYouTubeForTerm(term.term, term.category);
+                    if (bestVideo) {
+                        term.videoUrl = bestVideo.url;
+                        term.youtubeVideo = {
+                            ...(term.youtubeVideo?.toObject?.() || term.youtubeVideo || {}),
+                            url: bestVideo.url,
+                            title: bestVideo.title,
+                            channel: bestVideo.channel
+                        };
+                        term.markModified('youtubeVideo');
+                        await term.save();
+                        fixed = true;
+                        updatedCount++;
                     }
                 }
                 
@@ -614,9 +680,7 @@ export async function verifyYouTubeLinksBatch(autoFix: boolean = false) {
                     broken.push({ id: term._id.toString(), term: term.term, url: rawUrl, status: res.status });
                 }
             }
-        } catch (e) {
-            // Network error or timeout, skip
-        }
+        } catch (e) { }
     }
     
     if (autoFix && updatedCount > 0) {
@@ -720,42 +784,19 @@ export async function runGlossaryAudit(type: 'video' | 'affiliate' | 'article') 
         const stillMissing = [];
         
         for (const term of missingVideoTerms) {
-            let fixed = false;
-            try {
-                const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(term.term + " explanation")}`, {
-                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-                });
-                const html = await searchRes.text();
-                const match = html.match(/ytInitialData\s*=\s*({.+?});/);
-                if (match) {
-                    const data = JSON.parse(match[1]);
-                    const contents = data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents || [];
-                    for (const item of contents) {
-                        if (item.videoRenderer) {
-                            const newUrl = `https://www.youtube.com/watch?v=${item.videoRenderer.videoId}`;
-                            const title = item.videoRenderer.title?.runs?.[0]?.text || '';
-                            const channel = item.videoRenderer.ownerText?.runs?.[0]?.text || '';
-                            
-                            term.videoUrl = newUrl;
-                            term.youtubeVideo = {
-                                ...(term.youtubeVideo || {}),
-                                url: newUrl,
-                                title: title,
-                                channel: channel
-                            };
-                            
-                            term.markModified('youtubeVideo');
-                            await term.save();
-                            fixed = true;
-                            break;
-                        }
-                    }
-                }
-            } catch (searchError) {
-                console.error('Failed to auto-fix video for', term.term);
-            }
-            
-            if (!fixed) {
+            const bestVideo = await searchYouTubeForTerm(term.term, term.category);
+            if (bestVideo) {
+                term.videoUrl = bestVideo.url;
+                term.youtubeVideo = {
+                    ...(term.youtubeVideo || {}),
+                    url: bestVideo.url,
+                    title: bestVideo.title,
+                    channel: bestVideo.channel
+                };
+                
+                term.markModified('youtubeVideo');
+                await term.save();
+            } else {
                 stillMissing.push({ _id: term._id.toString(), term: term.term });
             }
         }

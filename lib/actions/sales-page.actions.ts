@@ -3,6 +3,7 @@
 import { connectToDatabase } from "@/lib/db";
 import SalesPage from "@/lib/models/SalesPage";
 import { revalidatePath } from "next/cache";
+import { formatAmazonLink } from "@/lib/utils";
 
 export async function getSalesPages() {
     try {
@@ -53,6 +54,10 @@ export async function getSalesPageById(id: string) {
 export async function createOrUpdateSalesPage(id: string | null, data: any) {
     try {
         await connectToDatabase();
+        
+        // Auto-format Amazon links
+        if (data.buyUrl) data.buyUrl = formatAmazonLink(data.buyUrl);
+        if (data.externalUrl) data.externalUrl = formatAmazonLink(data.externalUrl);
 
         if (id) {
             const updated = await SalesPage.findByIdAndUpdate(id, data, { new: true });
