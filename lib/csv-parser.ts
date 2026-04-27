@@ -38,11 +38,17 @@ export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
             // Very basic CSV split (handle quotes)
             const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
             
+            const shortUrl = (parts[2] || '').trim();
+            const fullUrl = (parts[3] || '').trim();
+            
+            // Intelligence: If fullUrl is broken (javascript:void), favor the shortUrl if it looks valid
+            const preferredUrl = (fullUrl.includes('javascript:void') && shortUrl.startsWith('http')) ? shortUrl : (fullUrl || shortUrl);
+
             return {
                 index: parts[0] || '',
                 keyword: parts[1] || '',
-                shortUrl: parts[2] || '',
-                fullUrl: parts[3] || '',
+                shortUrl: shortUrl,
+                fullUrl: preferredUrl, // Store the fixed/preferred one here
                 imageUrl: parts[4] || '',
                 rank: parts[5] || '',
                 store: parts[6] || '',

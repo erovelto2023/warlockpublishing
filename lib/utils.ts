@@ -37,13 +37,25 @@ export const AMAZON_AFFILIATE_ID = "weightlo0f57d-20";
  */
 export function formatAmazonLink(url: string, affiliateId: string = AMAZON_AFFILIATE_ID): string {
     if (!url || typeof url !== 'string' || !url.includes('amazon.com')) return url;
+    
+    // Sanitize broken links (handle the javascript:void(0) issue and missing slashes)
+    let sanitized = url.trim().replace(/javascript:void\(0\)/g, '');
+    
+    // Ensure there is a slash after the TLD if missing
+    if (sanitized.includes('amazon.com') && !sanitized.includes('amazon.com/')) {
+        sanitized = sanitized.replace('amazon.com', 'amazon.com/');
+    }
+
+    // Clean up potential double slashes (excluding the protocol)
+    sanitized = sanitized.replace(/([^:])\/\//g, '$1/');
+
     try {
-        const u = new URL(url.trim());
+        const u = new URL(sanitized);
         u.searchParams.set('tag', affiliateId);
         return u.toString();
     } catch (e) {
         // Fallback for malformed URLs
-        const trimUrl = url.trim();
+        const trimUrl = sanitized;
         const sep = trimUrl.includes('?') ? '&' : '?';
         if (!trimUrl.includes(`tag=${affiliateId}`)) {
             return `${trimUrl}${sep}tag=${affiliateId}`;
