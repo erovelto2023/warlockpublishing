@@ -28,41 +28,68 @@ export const revalidate = 3600;
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await props.params;
-    const term = await getGlossaryTermBySlug(slug) as GlossaryTerm | null;
-    
-    if (!term) return constructMetadata({ title: 'Not Found', description: 'The requested resource could not be found.' });
+    try {
+        const term = await getGlossaryTermBySlug(slug) as GlossaryTerm | null;
+        if (!term) return constructMetadata({ title: 'Term Not Found' });
 
-    return constructMetadata({
-        title: `${term.term}: Definition & Implementation Strategy`,
-        description: term.shortDefinition 
-            ? `What is ${term.term}? ${term.shortDefinition} Learn how to use ${term.term} to scale your ${term.category || 'creative'} business.`
-            : `Discover the definition and strategic usage of ${term.term}. Explore checklists, AI prompts, and implementation steps for ${term.category || 'creators'}.`,
-        type: 'article',
-        keywords: [
-            term.term, 
-            `what is ${term.term}`, 
-            `${term.term} definition`, 
-            term.category, 
-            term.niche, 
-            term.subCategory, 
-            ...(term.keyCharacteristics || [])
-        ].filter((k): k is string => !!k),
-        url: `https://warlockpublishing.com/glossary/${term.slug}`,
-        section: term.category || 'Taxonomy',
-        tags: term.keyCharacteristics || []
-    });
+        return constructMetadata({
+            title: `${term.term} | Premium Strategy & Definition`,
+            description: term.blogArticle?.metaDescription || term.shortDefinition || `Deep dive into ${term.term} for publishers and creators.`,
+            canonical: `/glossary/${slug}`
+        });
+    } catch (err) {
+        console.error("Metadata generation failed:", err);
+        return constructMetadata({ title: 'Glossary Term' });
+    }
 }
 
 export default async function RegistryDetailPage(props: { params: Promise<{ slug: string }> }) {
     const params = await props.params;
-    const term = await getGlossaryTermBySlug(params.slug);
+    let term;
+    try {
+        term = await getGlossaryTermBySlug(params.slug) as GlossaryTerm | null;
+    } catch (err) {
+        console.error("Database fetch failed:", err);
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+                <div className="max-w-md w-full bg-white p-10 rounded-3xl border border-slate-200 shadow-xl text-center space-y-6">
+                    <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle size={40} />
+                    </div>
+                    <h1 className="text-2xl font-black text-slate-900 uppercase">System Maintenance</h1>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                        We are currently optimizing our neural engine. This resource will be back online shortly. Please try refreshing the page.
+                    </p>
+                    <a 
+                        href={`/glossary/${params.slug}`}
+                        className="block w-full py-4 bg-slate-900 text-white rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-slate-800 transition-all text-center"
+                    >
+                        Retry Connection
+                    </a>
+                </div>
+            </div>
+        );
+    }
+    
     if (!term) return notFound();
 
-    const [relatedTerms, products, offers] = await Promise.all([
-        getRelatedGlossaryTerms(term.category || 'General', term.slug),
-        getPublishedProducts(),
-        getPublishedSalesPages()
-    ]);
+    // Data orchestration for connected entities
+    let relatedTerms: GlossaryTerm[] = [];
+    let products: Product[] = [];
+    let offers: SalesPage[] = [];
+    
+    try {
+        const results = await Promise.all([
+            getRelatedGlossaryTerms(term.category || 'General', term.slug),
+            getPublishedProducts(),
+            getPublishedSalesPages()
+        ]);
+        relatedTerms = (results[0] || []) as GlossaryTerm[];
+        products = (results[1] || []) as Product[];
+        offers = (results[2] || []) as SalesPage[];
+    } catch (err) {
+        console.error("Secondary data fetch failed:", err);
+    };
 
     // Normalize both products and offers into a single rotation pool
     const normalizedProducts = products.map((p: any) => ({
@@ -120,25 +147,35 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     // Handle external vs internal linking (used in the UI)
     // Heuristic: If video is missing, try to find one
     let finalVideoUrl = term.videoUrl;
-    if (!finalVideoUrl || finalVideoUrl.includes('example.com')) {
-        const found = await searchYouTubeForTerm(term.term, term.category);
-        if (found) finalVideoUrl = found.url;
+    try {
+        if (!finalVideoUrl || finalVideoUrl.includes('example.com')) {
+            const found = await searchYouTubeForTerm(term.term, term.category || '');
+            if (found) finalVideoUrl = found.url;
+        }
+    } catch (err) {
+        console.error("Auto-heal failed:", err);
     }
     
     // Robust YouTube Embed Formatter
     const getEmbedUrl = (url: string) => {
         if (!url) return '';
-        let id = '';
-        if (url.includes('v=')) id = url.split('v=')[1].split('&')[0];
-        else if (url.includes('be/')) id = url.split('be/')[1].split('?')[0];
-        else if (url.includes('shorts/')) id = url.split('shorts/')[1].split('?')[0];
-        return id ? `https://www.youtube.com/embed/${id}` : url;
+        try {
+            let id = '';
+            if (url.includes('v=')) id = url.split('v=')[1].split('&')[0];
+            else if (url.includes('be/')) id = url.split('be/')[1].split('?')[0];
+            else if (url.includes('shorts/')) id = url.split('shorts/')[1].split('?')[0];
+            return id ? `https://www.youtube.com/embed/${id}` : url;
+        } catch (e) {
+            return url;
+        }
     };
     
     const embedUrl = getEmbedUrl(finalVideoUrl || '');
 
     // Fire-and-forget view tracking (non-blocking)
-    void trackGlossaryView(params.slug);
+    try {
+        void trackGlossaryView(params.slug);
+    } catch (err) {}
 
     const productLink = featuredPoolItem?.link || "/products";
 
