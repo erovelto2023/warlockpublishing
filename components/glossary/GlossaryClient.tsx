@@ -23,7 +23,7 @@ interface GlossaryClientProps {
 }
 
 const AZ_LETTERS = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 16;
 
 function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) {
     const [search, setSearch] = useState("");
@@ -184,12 +184,12 @@ function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) 
                 <div className="flex-1 space-y-12">
                     {paginatedTerms.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {paginatedTerms.map((item) => (
                                     <Link 
                                         key={item._id}
                                         href={`/glossary/${item.slug}`}
-                                        className="bg-white border border-slate-200 p-8 rounded-[2.5rem] hover:shadow-2xl hover:shadow-indigo-100 hover:border-indigo-200 transition-all flex flex-col h-full group relative overflow-hidden"
+                                        className="bg-white border border-slate-200 p-6 rounded-[2rem] hover:shadow-2xl hover:shadow-indigo-100 hover:border-indigo-200 transition-all flex flex-col h-full group relative overflow-hidden"
                                     >
                                         <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full blur-2xl -mr-12 -mt-12 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         
@@ -202,11 +202,11 @@ function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) 
                                             </div>
                                         </div>
                                         
-                                        <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tight leading-none uppercase italic group-hover:text-indigo-600 transition-colors">
+                                        <h3 className="text-xl font-black text-slate-900 mb-4 tracking-tight leading-tight uppercase italic group-hover:text-indigo-600 transition-colors line-clamp-2 min-h-[3rem]">
                                             {item.term}
                                         </h3>
                                         
-                                        <p className="text-sm text-slate-500 leading-relaxed mb-10 flex-grow font-medium line-clamp-3 italic opacity-80 group-hover:opacity-100 transition-opacity">
+                                        <p className="text-xs text-slate-500 leading-relaxed mb-6 flex-grow font-medium line-clamp-3 italic opacity-80 group-hover:opacity-100 transition-opacity">
                                             {item.shortDefinition || item.definition}
                                         </p>
                                         

@@ -138,6 +138,13 @@ export default function AdminModuleGrid({ stats, setActiveTab }: AdminModuleGrid
             description: 'Global configurations, themes, and identity rules.',
             icon: Settings,
             color: 'bg-neutral-500',
+        },
+        {
+            id: 'marketplace',
+            title: 'Marketplace Nexus',
+            description: 'Amazon product CSV, external inventory, and reference library.',
+            icon: ShoppingBag,
+            color: 'bg-violet-600',
         }
     ];
 

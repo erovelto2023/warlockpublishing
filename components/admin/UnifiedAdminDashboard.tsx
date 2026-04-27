@@ -13,6 +13,7 @@ import MediaLibrary from '@/components/admin/MediaLibrary';
 import AssetWarehouse from '@/components/admin/AssetWarehouse';
 import SiteSettings from '@/components/admin/SiteSettings';
 import AdminModuleGrid from '@/components/admin/AdminModuleGrid';
+import MarketplaceManager from '@/components/admin/MarketplaceManager';
 import TrafficIntelligence from '@/components/admin/TrafficIntelligence';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
@@ -34,7 +35,7 @@ interface AdminDashboardProps {
 }
 
 export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [], analytics }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse' | 'settings'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse' | 'settings' | 'marketplace'>('overview');
     const router = useRouter();
 
     // Stats
@@ -225,6 +226,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'media', label: 'Media', icon: Image },
                             { id: 'warehouse', label: 'Warehouse', icon: Package },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
+                            { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
                             { id: 'settings', label: 'Site Config', icon: Settings },
                         ].map((tab) => (
                             <button
@@ -833,6 +835,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
                 {activeTab === 'settings' && (
                     <SiteSettings />
+                )}
+
+                {activeTab === 'marketplace' && (
+                    <MarketplaceManager />
                 )}
 
             </main>
