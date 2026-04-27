@@ -24,6 +24,7 @@ import TableOfContents from '@/components/glossary/TableOfContents';
 import ConnectivityHub from '@/components/glossary/ConnectivityHub';
 import AmazonLibrarySection from '@/components/glossary/AmazonLibrarySection';
 import { getAmazonProductsFromCsv } from '@/lib/actions/glossary';
+import { AmazonProduct } from '@/lib/csv-parser';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -84,7 +85,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     let products: Product[] = [];
     let offers: SalesPage[] = [];
     
-    let csvProducts = [];
+    let csvProducts: AmazonProduct[] = [];
     
     try {
         const results = await Promise.all([
