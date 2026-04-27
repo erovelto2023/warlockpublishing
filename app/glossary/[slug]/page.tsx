@@ -7,7 +7,7 @@ import { getPublishedSalesPages } from '@/lib/actions/sales-page.actions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { 
-  History, Globe, BookOpen, CheckCircle2, AlertTriangle, Zap, DollarSign, 
+  History as HistoryIcon, Globe, BookOpen, CheckCircle2, AlertTriangle, Zap, DollarSign, 
   ArrowRight, Copy, ChevronDown, ShoppingBag, Star, ExternalLink, 
   FileText, Users, Monitor, TrendingUp, Rocket, Compass, ShieldCheck,
   MessageSquareQuote, Youtube, Layout, Clock, Hash, Tag, Share2, 
@@ -59,7 +59,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
             <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
                 <div className="max-w-md w-full bg-white p-10 rounded-3xl border border-slate-200 shadow-xl text-center space-y-6">
                     <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlertTriangle size={40} />
                     </div>
                     <h1 className="text-2xl font-black text-slate-900 uppercase">System Maintenance</h1>
                     <p className="text-slate-600 text-sm leading-relaxed">
@@ -275,7 +274,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     {/*  2. CONTEXTUAL MEANING SECTION  */}
                     <section className="space-y-10" id="context">
                         <h2 id="context" className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
-                            <History className="text-indigo-600" size={24} /> Semantic Connectivity
+                            <HistoryIcon className="text-indigo-600" size={24} /> Semantic Connectivity
                         </h2>
                         
                         <TermTabs 
@@ -298,7 +297,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             {/* Problem/Solution Bridge */}
                             <div className="mb-10 text-center md:text-left">
                                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
-                                    <AlertTriangle size={12} /> Addressing the Challenge
                                 </div>
                                 <h3 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                                     Struggling with {term.targetAudience?.painPoints?.[0] || term.term + " implementation"}?
@@ -541,7 +539,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                     {/*  9. COMMON PITFALLS  */}
                     <section className="p-10 md:p-14 bg-rose-50/50 border border-rose-100 rounded-[3rem] shadow-sm" id="pitfalls">
                         <div className="flex items-center gap-4 mb-10 text-rose-600">
-                            <AlertTriangle size={24} strokeWidth={2.5} />
                             <h2 id="pitfalls" className="text-2xl font-bold uppercase tracking-tight">Common Pitfalls</h2>
                         </div>
                         <div className="space-y-4">
@@ -727,15 +724,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                       <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{p.label}</h4>
                                       <div className="bg-white/5 border border-white/10 p-5 rounded-2xl text-xs font-mono text-slate-400 relative group/prompt">
                                           <code className="block leading-relaxed">{p.prompt}</code>
-                                          <button 
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(p.prompt || '');
-                                                alert('Prompt copied to clipboard');
-                                            }}
-                                            className="absolute top-3 right-3 p-2 bg-indigo-600 rounded-lg text-white opacity-0 group-hover/prompt:opacity-100 transition-opacity"
-                                          >
-                                            <Copy size={14} />
-                                          </button>
+                                          <div className="absolute top-3 right-3 opacity-0 group-hover/prompt:opacity-100 transition-opacity">
+                                              <CopyPromptButton prompt={p.prompt as string} className="!p-2 !rounded-lg !bg-indigo-600 !text-white" />
+                                          </div>
                                       </div>
                                   </div>
                               ))}
@@ -855,7 +846,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                  {featuredPoolItem?.imageUrl ? (
                                     <Image 
                                         src={featuredPoolItem.imageUrl} 
-                                        alt={featuredPoolItem.title} 
+                                        alt={featuredPoolItem.title || 'Product'} 
                                         fill 
                                         className="object-cover rounded-3xl" 
                                     />
@@ -867,8 +858,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                  )}
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-xl font-extrabold leading-tight">{featuredPoolItem?.title || "Premium Toolkit"}</h3>
-                                <div className="flex items-center gap-2 font-bold"><span className="text-lg font-black">${featuredPoolItem?.price || "49.00"}</span></div>
+                                <h3 className="text-xl font-extrabold leading-tight">{featuredPoolItem?.title || "Premium Strategy Resource"}</h3>
+                                <div className="flex items-center gap-2 font-bold"><span className="text-lg font-black">${featuredPoolItem?.price || "0.00"}</span></div>
                             </div>
                             <Link 
                                 href={productLink} 
