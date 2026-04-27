@@ -13,7 +13,8 @@ import {
     Library,
     Globe,
     TrendingUp,
-    Zap
+    Zap,
+    ChevronLeft
 } from "lucide-react";
 
 interface GlossaryClientProps {
@@ -22,11 +23,13 @@ interface GlossaryClientProps {
 }
 
 const AZ_LETTERS = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const PAGE_SIZE = 12;
 
 function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) {
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [selectedLetter, setSelectedLetter] = useState<string>("all");
+    const [currentPage, setCurrentPage] = useState(1);
 
     const filteredTerms = useMemo(() => {
         return initialTerms.filter((term) => {
@@ -40,6 +43,18 @@ function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) 
             return matchesSearch && matchesCategory && matchesLetter;
         });
     }, [initialTerms, search, selectedCategory, selectedLetter]);
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredTerms.length / PAGE_SIZE);
+    const paginatedTerms = useMemo(() => {
+        const start = (currentPage - 1) * PAGE_SIZE;
+        return filteredTerms.slice(start, start + PAGE_SIZE);
+    }, [filteredTerms, currentPage]);
+
+    // Reset to page 1 when filters change
+    useMemo(() => {
+        setCurrentPage(1);
+    }, [search, selectedCategory, selectedLetter]);
 
     return (
         <div className="bg-[#F8FAFC] text-slate-900 min-h-screen font-sans antialiased">
@@ -166,47 +181,94 @@ function GlossaryClientInner({ initialTerms, categories }: GlossaryClientProps) 
                     </div>
                 </aside>
 
-                <div className="flex-1">
-                    {filteredTerms.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {filteredTerms.map((item) => (
-                                <Link 
-                                    key={item._id}
-                                    href={`/glossary/${item.slug}`}
-                                    className="bg-white border border-slate-200 p-8 rounded-[2.5rem] hover:shadow-2xl hover:shadow-indigo-100 hover:border-indigo-200 transition-all flex flex-col h-full group relative overflow-hidden"
-                                >
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full blur-2xl -mr-12 -mt-12 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    
-                                    <div className="flex justify-between items-start mb-8 relative z-10">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
-                                            {item.category}
-                                        </span>
-                                        <div className="p-3 bg-slate-50 text-slate-300 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-12 transition-all">
-                                            <ArrowIcon size={18} />
+                <div className="flex-1 space-y-12">
+                    {paginatedTerms.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {paginatedTerms.map((item) => (
+                                    <Link 
+                                        key={item._id}
+                                        href={`/glossary/${item.slug}`}
+                                        className="bg-white border border-slate-200 p-8 rounded-[2.5rem] hover:shadow-2xl hover:shadow-indigo-100 hover:border-indigo-200 transition-all flex flex-col h-full group relative overflow-hidden"
+                                    >
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full blur-2xl -mr-12 -mt-12 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        
+                                        <div className="flex justify-between items-start mb-8 relative z-10">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                                                {item.category}
+                                            </span>
+                                            <div className="p-3 bg-slate-50 text-slate-300 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-12 transition-all">
+                                                <ArrowIcon size={18} />
+                                            </div>
                                         </div>
+                                        
+                                        <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tight leading-none uppercase italic group-hover:text-indigo-600 transition-colors">
+                                            {item.term}
+                                        </h3>
+                                        
+                                        <p className="text-sm text-slate-500 leading-relaxed mb-10 flex-grow font-medium line-clamp-3 italic opacity-80 group-hover:opacity-100 transition-opacity">
+                                            {item.shortDefinition || item.definition}
+                                        </p>
+                                        
+                                        <div className="pt-8 border-t border-slate-100 flex items-center justify-between relative z-10">
+                                            <div className="flex items-center gap-2">
+                                                <Globe size={14} className="text-slate-400" />
+                                                <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Authority Node</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <TrendingUp size={14} className="text-emerald-500" />
+                                                <span className="text-[10px] font-black text-emerald-600 uppercase">Tier 1</span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div className="flex items-center justify-center gap-2 pt-12">
+                                    <button 
+                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        disabled={currentPage === 1}
+                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-600 disabled:opacity-30 disabled:hover:text-slate-400 disabled:hover:border-slate-200 transition-all"
+                                    >
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: totalPages }).map((_, i) => {
+                                            const page = i + 1;
+                                            if (totalPages > 7 && Math.abs(page - currentPage) > 2 && page !== 1 && page !== totalPages) {
+                                                if (page === 2 || page === totalPages - 1) return <span key={page} className="px-2 text-slate-300">...</span>;
+                                                return null;
+                                            }
+                                            
+                                            return (
+                                                <button 
+                                                    key={page}
+                                                    onClick={() => setCurrentPage(page)}
+                                                    className={`w-12 h-12 rounded-xl text-[10px] font-black transition-all ${
+                                                        currentPage === page 
+                                                        ? "bg-indigo-600 text-white shadow-xl shadow-indigo-100" 
+                                                        : "bg-white border border-slate-200 text-slate-500 hover:border-indigo-600 hover:text-indigo-600"
+                                                    }`}
+                                                >
+                                                    {page}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
-                                    
-                                    <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tight leading-none uppercase italic group-hover:text-indigo-600 transition-colors">
-                                        {item.term}
-                                    </h3>
-                                    
-                                    <p className="text-sm text-slate-500 leading-relaxed mb-10 flex-grow font-medium line-clamp-3 italic opacity-80 group-hover:opacity-100 transition-opacity">
-                                        {item.shortDefinition || item.definition}
-                                    </p>
-                                    
-                                    <div className="pt-8 border-t border-slate-100 flex items-center justify-between relative z-10">
-                                        <div className="flex items-center gap-2">
-                                            <Globe size={14} className="text-slate-400" />
-                                            <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Authority Node</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <TrendingUp size={14} className="text-emerald-500" />
-                                            <span className="text-[10px] font-black text-emerald-600 uppercase">Tier 1</span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
+
+                                    <button 
+                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                        disabled={currentPage === totalPages}
+                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:border-indigo-600 disabled:opacity-30 disabled:hover:text-slate-400 disabled:hover:border-slate-200 transition-all"
+                                    >
+                                        <ChevronRight size={18} />
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <div className="text-center py-40 bg-white rounded-[4rem] border border-slate-200 shadow-sm">
                             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-10 text-slate-300">
