@@ -97,27 +97,27 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     };
 
     // Normalize both products and offers into a single rotation pool
-    const normalizedProducts = products.map((p: any) => ({
-        id: p._id.toString(),
-        title: p.title,
-        price: p.price,
-        imageUrl: p.imageUrl,
-        category: p.category,
-        niche: p.niche,
-        link: p.externalUrl || `/products/${p.slug || p._id}`,
+    const normalizedProducts = (products || []).map((p: any) => ({
+        id: p._id?.toString() || p.id || Math.random().toString(),
+        title: p.title || 'Product Asset',
+        price: p.price || '0.00',
+        imageUrl: p.imageUrl || '',
+        category: p.category || '',
+        niche: p.niche || '',
+        link: p.externalUrl || `/products/${p.slug || p._id || ''}`,
         isExternal: !!p.externalUrl,
         isFeaturedInRotation: p.isFeaturedInRotation !== false,
         type: 'product'
     }));
 
-    const normalizedOffers = offers.map((o: any) => ({
-        id: o._id.toString(),
-        title: o.title,
-        price: o.price,
-        imageUrl: o.marketplaceImage || o.ogImage,
-        category: o.category,
-        niche: o.niche,
-        link: o.externalUrl || `/offers/${o.slug}`,
+    const normalizedOffers = (offers || []).map((o: any) => ({
+        id: o._id?.toString() || o.id || Math.random().toString(),
+        title: o.title || 'Special Offer',
+        price: o.price || '0.00',
+        imageUrl: o.marketplaceImage || o.ogImage || '',
+        category: o.category || '',
+        niche: o.niche || '',
+        link: o.externalUrl || `/offers/${o.slug || ''}`,
         isExternal: !!o.externalUrl,
         isFeaturedInRotation: o.isFeaturedInRotation !== false,
         type: 'offer'
