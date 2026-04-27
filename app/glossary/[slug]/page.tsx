@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import { getGlossaryTermBySlug, getRelatedGlossaryTerms, trackGlossaryView } from '@/lib/actions/glossary';
+import { getGlossaryTermBySlug, getRelatedGlossaryTerms, trackGlossaryView, searchYouTubeForTerm } from '@/lib/actions/glossary';
+import { formatAmazonLink } from '@/lib/utils';
 import { getPublishedProducts } from '@/lib/actions/product.actions';
 import { getPublishedSalesPages } from '@/lib/actions/sales-page.actions';
 import Link from 'next/link';
@@ -117,10 +118,29 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         .slice(0, 4);
 
     // Handle external vs internal linking (used in the UI)
-    const productLink = featuredPoolItem?.link || "/products";
+    // Heuristic: If video is missing, try to find one
+    let finalVideoUrl = term.videoUrl;
+    if (!finalVideoUrl || finalVideoUrl.includes('example.com')) {
+        const found = await searchYouTubeForTerm(term.term, term.category);
+        if (found) finalVideoUrl = found.url;
+    }
+    
+    // Robust YouTube Embed Formatter
+    const getEmbedUrl = (url: string) => {
+        if (!url) return '';
+        let id = '';
+        if (url.includes('v=')) id = url.split('v=')[1].split('&')[0];
+        else if (url.includes('be/')) id = url.split('be/')[1].split('?')[0];
+        else if (url.includes('shorts/')) id = url.split('shorts/')[1].split('?')[0];
+        return id ? `https://www.youtube.com/embed/${id}` : url;
+    };
+    
+    const embedUrl = getEmbedUrl(finalVideoUrl || '');
 
     // Fire-and-forget view tracking (non-blocking)
     void trackGlossaryView(params.slug);
+
+    const productLink = featuredPoolItem?.link || "/products";
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 pb-20">
@@ -157,15 +177,15 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                 </div>
             </div>
 
-            <div className="max-w-[1440px] mx-auto px-4 py-8 md:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 mt-4 relative">
+            <div className="max-w-[1440px] mx-auto px-4 py-8 md:px-8 flex flex-col lg:flex-row justify-center gap-16 mt-4 relative">
                 
                 {/*  LEFT SIDEBAR: Table of Contents (Sticky)  */}
-                <aside className="hidden xl:block xl:col-span-2">
+                <aside className="hidden xl:block w-64 flex-shrink-0">
                     <TableOfContents />
                 </aside>
                 
                 {/*  MAIN CONTENT AREA  */}
-                <div className="lg:col-span-8 xl:col-span-7 space-y-24 pb-32">
+                <div className="flex-1 max-w-4xl space-y-24 pb-32">
                     
                     {/*  1. IDENTITY & TAXONOMY SECTION  */}
                     <section className="bg-white rounded-[2.5rem] p-8 md:p-14 border border-slate-200 shadow-sm relative overflow-hidden">
@@ -450,13 +470,13 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         </div>
                     </section>
 
-                    {/*  EXTRA SECTIONS: Amazon Curated Products (Kept to ensure all areas are there)  */}
+                    {/*  EXTRA SECTIONS: Amazon Curated Products (Forced Affiliate Sync)  */}
                     {term.amazonProducts && term.amazonProducts.length > 0 && (
                         <section className="space-y-8" id="resources">
                             <h2 id="resources" className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">Curated Prime Assets</h2>
                             <div className="grid sm:grid-cols-2 gap-6">
                                 {term.amazonProducts.map((p, i) => (
-                                    <Link key={i} href={p.url || '#'} target="_blank" className="flex items-center gap-6 p-6 bg-white border border-slate-200 shadow-sm rounded-3xl hover:shadow-lg hover:border-slate-300 transition-all group">
+                                    <Link key={i} href={formatAmazonLink(p.url || '')} target="_blank" className="flex items-center gap-6 p-6 bg-white border border-slate-200 shadow-sm rounded-3xl hover:shadow-lg hover:border-slate-300 transition-all group">
                                         <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-amber-500 transition-colors shrink-0">
                                             <ShoppingBag size={24} />
                                         </div>
@@ -519,7 +539,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                       <div className="w-full aspect-video bg-slate-900 rounded-2xl flex items-center justify-center border-4 border-white shadow-2xl relative overflow-hidden group">
                                           <iframe 
                                               className="absolute inset-0 w-full h-full opacity-90 group-hover:opacity-100 transition-opacity z-10"
-                                              src={term.videoUrl.replace('watch?v=', 'embed/')} 
+                                              src={embedUrl} 
                                               title="YouTube video player"
                                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                               allowFullScreen
@@ -657,78 +677,89 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                          </div>
                          <div className="space-y-6">
                               {[
-                                  { label: "Product Idea Prompt", text: term.productIdeaPrompt || term.aiPromptCommandCenter?.productIdeaPrompt || `Brainstorm 5 product ideas for '${term.term}' including target audience...` },
-                                  { label: "AI Image Prompt", text: term.aiImagePrompt || term.aiPromptCommandCenter?.aiImagePrompt || `3D render abstraction of ${term.term}, octane render, vibrant, 8k --v 6.0` },
-                                  { label: "Content Strategy Prompt", text: term.contentStrategyPrompt || term.aiPromptCommandCenter?.contentStrategyPrompt || `Create a 7-day social media content plan regarding ${term.term} and its applications...` }
-                              ].map((p, i) => (
-                                  <div key={i} className="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-3 group">
-                                      <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-3">
-                                           <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{p.label}</span>
-                                           <div className="shrink-0">
-                                               <CopyPromptButton prompt={p.text} className="!w-auto !px-3 !py-1 !text-[9px]" />
-                                           </div>
+                                  { label: "Product Idea Pipeline", prompt: term.aiPromptCommandCenter?.productIdeaPrompt },
+                                  { label: "Content Strategy Protocol", prompt: term.aiPromptCommandCenter?.contentStrategyPrompt },
+                                  { label: "Visual Asset Synthesis", prompt: term.aiPromptCommandCenter?.aiImagePrompt }
+                              ].filter(p => p.prompt).map((p, i) => (
+                                  <div key={i} className="space-y-3">
+                                      <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{p.label}</h4>
+                                      <div className="bg-white/5 border border-white/10 p-5 rounded-2xl text-xs font-mono text-slate-400 relative group/prompt">
+                                          <code className="block leading-relaxed">{p.prompt}</code>
+                                          <button 
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(p.prompt || '');
+                                                alert('Prompt copied to clipboard');
+                                            }}
+                                            className="absolute top-3 right-3 p-2 bg-indigo-600 rounded-lg text-white opacity-0 group-hover/prompt:opacity-100 transition-opacity"
+                                          >
+                                            <Copy size={14} />
+                                          </button>
                                       </div>
-                                      <p className="text-sm text-slate-400 italic font-mono bg-black/20 p-4 rounded-lg leading-relaxed">&quot;{p.text}&quot;</p>
                                   </div>
                               ))}
                          </div>
                     </section>
 
-                    {/*  16. THE SOLUTION ROADMAP (FINAL PITCH)  */}
-                    <section className="bg-slate-900 text-white rounded-[3.5rem] p-10 md:p-20 relative overflow-hidden shadow-2xl text-center md:text-left">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-[120px] opacity-20 -mr-48 -mt-48"></div>
-                        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500 rounded-full blur-[120px] opacity-10 -ml-48 -mb-48"></div>
-                        
-                        <div className="relative z-10 grid md:grid-cols-2 gap-16 items-center">
-                            <div className="space-y-8">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-black uppercase tracking-[0.3em] rounded-full">
-                                    <Sparkles size={14} /> The Strategic Path Forward
-                                </div>
-                                <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none italic uppercase">
-                                    Turn Knowledge <br/> Into <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 underline decoration-indigo-500/30">Commercial Profit</span>
-                                </h2>
-                                <p className="text-lg text-slate-400 leading-relaxed font-light">
-                                    Don&apos;t just read about {term.term}. Implement it. Our vetted tools and offers are the secret weapons used by elite creators to dominate the {term.category} market.
-                                </p>
-                                <div className="space-y-4">
-                                    {[
-                                        "Eliminate guesswork in your implementation",
-                                        "Access professional-grade strategic blueprints",
-                                        "Shorten your path to monetization by weeks"
-                                    ].map((benefit, i) => (
-                                        <div key={i} className="flex items-center gap-4">
-                                            <div className="w-6 h-6 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center border border-emerald-500/20"><CheckCircle2 size={14} /></div>
-                                            <span className="text-sm font-bold text-slate-300">{benefit}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-10 rounded-[2.5rem] space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h3 className="text-xl font-black uppercase tracking-tight">Ready to start?</h3>
-                                    <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">Choose your path to {term.term} mastery</p>
-                                </div>
-                                <div className="space-y-4">
-                                    <Link 
-                                        href={productLink}
-                                        className="w-full py-5 bg-white text-slate-900 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-all shadow-xl flex items-center justify-center gap-3"
-                                    >
-                                        Access Featured Resource <ArrowRight size={16} />
-                                    </Link>
-                                    <Link 
-                                        href="/products"
-                                        className="w-full py-5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-indigo-600/30 transition-all flex items-center justify-center gap-3"
-                                    >
-                                        Browse Full Offer Vault <ShoppingBag size={16} />
-                                    </Link>
-                                </div>
-                                <div className="pt-6 border-t border-white/5 text-center">
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">100% Secure Access • Instant Delivery</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    {/*  16. THE SOLUTION ROADMAP (ULTRA-PREMIUM REDESIGN)  */}
+                                        <section className="bg-slate-900 text-white rounded-[4rem] p-12 md:p-20 lg:p-32 relative overflow-hidden shadow-[0_40px_80px_-20px_rgba(49,46,129,0.5)] border border-slate-800" id="roadmap">
+                                            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-600 rounded-full blur-[200px] opacity-20 -mr-96 -mt-96 animate-pulse"></div>
+                                            <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-emerald-600 rounded-full blur-[200px] opacity-10 -ml-96 -mb-96"></div>
+                                            
+                                            <div className="relative z-10 max-w-4xl mx-auto text-center space-y-24">
+                                                <div className="space-y-8">
+                                                    <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-white/10 text-indigo-300 text-[11px] font-black uppercase tracking-[0.5em] rounded-full mx-auto backdrop-blur-md">
+                                                        <Sparkles size={16} className="text-amber-400" /> Strategic Path Forward
+                                                    </div>
+                                                    <h2 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] italic uppercase">
+                                                        Turn Knowledge <br/> Into <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-emerald-400">Commercial Profit</span>
+                                                    </h2>
+                                                    <p className="text-2xl text-slate-400 leading-relaxed font-light max-w-3xl mx-auto italic">
+                                                        Stop consuming. Start creating. Our vetted implementation tools are the difference between a &quot;hobbyist&quot; and a dominant market authority.
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid md:grid-cols-3 gap-10">
+                                                    {[
+                                                        { title: "Eliminate Guesswork", desc: "Proven implementation protocols", icon: <Zap size={24}/> },
+                                                        { title: "Strategic Blueprints", desc: "Expert-grade execution docs", icon: <CheckCircle2 size={24}/> },
+                                                        { title: "Accelerated Revenue", desc: "Shorten your monetization path", icon: <TrendingUp size={24}/> }
+                                                    ].map((benefit, i) => (
+                                                        <div key={i} className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] space-y-6 hover:bg-white/10 transition-all group backdrop-blur-sm relative overflow-hidden">
+                                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                            <div className="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-3xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all">
+                                                                {benefit.icon}
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <h4 className="font-black uppercase tracking-tight text-md text-white">{benefit.title}</h4>
+                                                                <p className="text-xs text-slate-500 font-bold leading-relaxed">{benefit.desc}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                
+                                                <div className="space-y-12 pt-12 border-t border-white/5">
+                                                    <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+                                                        <Link 
+                                                            href={productLink}
+                                                            className="w-full md:w-auto px-16 py-8 bg-white text-slate-900 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-4 group"
+                                                        >
+                                                            Claim Mastery Resource <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                                        </Link>
+                                                        <Link 
+                                                            href="/products"
+                                                            className="w-full md:w-auto px-16 py-8 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs hover:bg-indigo-600/30 transition-all flex items-center justify-center gap-4"
+                                                        >
+                                                            Browse Full Vault <ShoppingBag size={20} />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="flex flex-wrap justify-center gap-8 opacity-40">
+                                                        <span className="text-[10px] font-black uppercase tracking-[0.4em]">100% Secure Access</span>
+                                                        <span className="text-[10px] font-black uppercase tracking-[0.4em]">Instant Digital Delivery</span>
+                                                        <span className="text-[10px] font-black uppercase tracking-[0.4em]">Expert Vetted</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
 
                     {/*  17. RELATED PRODUCTS GALLERY  */}
                     {relatedProducts.length > 0 && (

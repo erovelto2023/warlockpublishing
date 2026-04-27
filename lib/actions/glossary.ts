@@ -408,13 +408,13 @@ export async function importDetailedJson(data: any[]) {
             if (Array.isArray(item.amazonProducts)) {
                 item.amazonProducts = item.amazonProducts.map((p: any) => ({
                     ...p,
-                    url: formatAmazonLink(p.url)
+                    url: formatAmazonLink(p.url || '')
                 }));
             }
             if (Array.isArray(item.competitorReferences)) {
                 item.competitorReferences = item.competitorReferences.map((p: any) => ({
                     ...p,
-                    url: formatAmazonLink(p.url)
+                    url: formatAmazonLink(p.url || '')
                 }));
             }
 
@@ -586,7 +586,7 @@ export async function backfillAffiliateTags(affiliateId: string = AMAZON_AFFILIA
 }
 
 // Helper to find high-quality YouTube videos
-async function searchYouTubeForTerm(term: string, category: string = ""): Promise<{ url: string, title: string, channel: string } | null> {
+export async function searchYouTubeForTerm(term: string, category: string = ""): Promise<{ url: string, title: string, channel: string } | null> {
     try {
         const query = `${term} ${category} explained strategy tutorial`.trim();
         const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
