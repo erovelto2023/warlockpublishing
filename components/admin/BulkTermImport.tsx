@@ -265,7 +265,9 @@ SCHEMA STRUCTURE:
   }
 }
 
-CRITICAL: For the "masterclass" section, provide specific, high-value advice tailored to the keyword. If it's a fiction trope, focus on plot architecture. If it's a technical term, focus on project structure.
+CRITICAL: For the "masterclass" section, provide specific, high-value advice tailored to the keyword. 
+- If the keyword is a NARRATIVE TROPE (e.g., Secret Baby, Enemies to Lovers), focus on plot architecture, character archetypes, and profit beats within the story.
+- If the keyword is a PRODUCTION/MARKETING ASSET (e.g., Book Cover, TikTok Video, Blurb Checklist), focus on high-converting sales tactics, technical optimization, and marketing personas (High-LTV Buyer, Newsletter Subscriber).
 
 KEYWORDS TO RESEARCH:
 [PASTE KEYWORDS HERE]`;

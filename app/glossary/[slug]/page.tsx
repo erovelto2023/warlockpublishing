@@ -184,6 +184,19 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     } catch (err) {}
 
     const productLink = featuredPoolItem?.link || "/products";
+    
+    // Marketing/Production keyword detection logic
+    const marketingKeywords = ['cover', 'video', 'checklist', 'marketing', 'sales', 'blurb', 'design', 'art', 'promo', 'ad', 'social', 'email', 'funnel'];
+    const isMarketingFocus = marketingKeywords.some(k => term.term.toLowerCase().includes(k) || term.slug.includes(k));
+    
+    const writingLabel = isMarketingFocus ? "The Marketing Angle" : "The Writing Aspect";
+    const masterclassTitle = isMarketingFocus ? "Marketing Mastery" : "Writers Masterclass";
+    const masterclassDesc = isMarketingFocus ? "The technical sales framework designed to maximize visibility and conversion." : "The 3-Act Profit Structure designed to manage reader engagement and maximize ROI.";
+    const structuralTitle = isMarketingFocus ? "Campaign Structure" : "3-Act Profit Structure";
+    const pacingTitle = isMarketingFocus ? "Conversion Beats" : "Profit Beats (Pacing)";
+    const archetypesTitle = isMarketingFocus ? "Target Personas" : "Archetype Trio";
+    const archetypesDesc = isMarketingFocus ? "The specific audience segments this asset is designed to convert." : "The specific roles readers of this keyword demand.";
+    const snippetLabel = isMarketingFocus ? "Sales Copy Hook" : "Story Snippet";
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 pb-20">
@@ -209,6 +222,11 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             <Link href="/glossary" className="hover:text-indigo-600 transition-colors">Directory</Link>
                             <ChevronRight size={10} className="text-slate-400" />
                             <span className="text-indigo-600">{term.term}</span>
+                            {isMarketingFocus && (
+                                <div className="ml-4 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[8px] font-black uppercase tracking-widest rounded flex items-center gap-1">
+                                    <Rocket size={10} /> Production Node
+                                </div>
+                            )}
                         </nav>
                         <div className="flex items-center gap-6">
                             <PrintButton />
@@ -261,11 +279,13 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
                                 <div className="space-y-2 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
                                     <div className="flex items-center gap-2 text-amber-400 mb-1">
-                                        <BookOpen size={16} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">The Writing Aspect</span>
+                                        <Target size={16} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{writingLabel}</span>
                                     </div>
                                     <p className="text-xs text-indigo-100 leading-relaxed font-medium">
-                                        {term.writingAspect || `In a narrative context, ${term.term} functions as a structural catalyst, driving character development and pacing through established genre tropes.`}
+                                        {term.writingAspect || (isMarketingFocus 
+                                            ? `From a conversion standpoint, ${term.term} acts as a high-intent signal, attracting users looking for specific production assets and implementation tools.`
+                                            : `In a narrative context, ${term.term} functions as a structural catalyst, driving character development and pacing through established genre tropes.`)}
                                     </p>
                                 </div>
                                 <div className="space-y-2 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
@@ -287,17 +307,26 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 {featuredPoolItem && (
                                     <Link 
                                         href={featuredPoolItem.link}
-                                        className="space-y-2 p-6 bg-white/10 rounded-3xl border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all group/featured"
+                                        className="flex items-start gap-4 p-4 bg-white/10 rounded-[2rem] border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all group/featured"
                                     >
-                                        <div className="flex items-center justify-between text-indigo-200 mb-1">
-                                            <div className="flex items-center gap-2">
-                                                <ShoppingBag size={16} />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Featured Resource</span>
-                                            </div>
-                                            <ArrowRight size={14} className="group-hover/featured:translate-x-1 transition-transform" />
+                                        <div className="shrink-0 w-16 h-20 rounded-xl overflow-hidden bg-white shadow-lg">
+                                            <img 
+                                                src={featuredPoolItem.imageUrl || '/images/placeholder-product.png'} 
+                                                alt={featuredPoolItem.title}
+                                                className="w-full h-full object-cover group-hover/featured:scale-110 transition-transform"
+                                            />
                                         </div>
-                                        <h4 className="text-xs font-black uppercase tracking-tight text-white line-clamp-1">{featuredPoolItem.title}</h4>
-                                        <p className="text-[9px] text-indigo-200 font-bold uppercase tracking-tighter">Recommended For {term.term} Strategy</p>
+                                        <div className="flex-1 min-w-0 py-1">
+                                            <div className="flex items-center justify-between text-indigo-200 mb-1">
+                                                <div className="flex items-center gap-1.5">
+                                                    <ShoppingBag size={12} />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">Featured Resource</span>
+                                                </div>
+                                                <ArrowRight size={12} className="group-hover/featured:translate-x-1 transition-transform" />
+                                            </div>
+                                            <h4 className="text-[11px] font-black uppercase tracking-tight text-white line-clamp-1 mb-1">{featuredPoolItem.title}</h4>
+                                            <p className="text-[8px] text-indigo-200 font-bold uppercase tracking-tighter opacity-80">Recommended for {term.term}</p>
+                                        </div>
                                     </Link>
                                 )}
                             </div>
@@ -377,10 +406,10 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     <Sparkles size={12} /> Phase III
                                 </div>
                                 <h2 id="masterclass" className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                                    III. Writers <span className="text-amber-400">Masterclass</span>
+                                    {isMarketingFocus ? 'III. Marketing ' : 'III. Writers '}<span className="text-amber-400">Masterclass</span>
                                 </h2>
                                 <p className="text-lg md:text-xl font-medium opacity-90 max-w-3xl leading-relaxed">
-                                    The 3-Act Profit Structure designed to manage reader engagement and maximize ROI.
+                                    {masterclassDesc}
                                 </p>
                             </div>
                         </div>
@@ -392,30 +421,30 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     <div className="space-y-4">
                                         <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
                                             <span className="text-indigo-600 text-sm font-black border-2 border-indigo-600 rounded-lg w-8 h-8 flex items-center justify-center">1</span>
-                                            3-Act Profit Structure
+                                            {structuralTitle}
                                         </h3>
-                                        <p className="text-sm text-slate-500 font-bold">Pacing metrics tailored specifically to <span className="text-indigo-600">{term.term}</span>.</p>
+                                        <p className="text-sm text-slate-500 font-bold">Optimization metrics tailored specifically to <span className="text-indigo-600">{term.term}</span>.</p>
                                     </div>
                                     <div className="space-y-6">
                                         {[
-                                            { act: "Act I: Setup & Trigger", range: "0–25%", desc: term.masterclass?.threeActStructure?.act1 || "Introduces the protagonist and the catalyst for action.", example: `Introduce the ${term.term} catalyst within the first 5k words.` },
-                                            { act: "Act II: Conflict & Friction", range: "25–75%", desc: term.masterclass?.threeActStructure?.act2 || "The core drama where stakes rise and lead takes control.", example: `Escalate the ${term.term} tension by removing the lead's safety net.` },
-                                            { act: "Act III: Payoff & Resolution", range: "75–100%", desc: term.masterclass?.threeActStructure?.act3 || "The final push toward the Climax and HEA/HFN.", example: `Resolve the ${term.term} arc with a transformative grand gesture.` }
+                                            { act: "Act I: Setup & Trigger", range: "0–25%", desc: term.masterclass?.threeActStructure?.act1 || "Introduces the protagonist and the catalyst for action.", example: `She stared at the ${term.term}, her heart hammering. It was supposed to be a secret, but secrets have a way of screaming in the silence.` },
+                                            { act: "Act II: Conflict & Friction", range: "25–75%", desc: term.masterclass?.threeActStructure?.act2 || "The core drama where stakes rise and lead takes control.", example: `"You think a simple ${term.term} changes things?" he growled, closing the distance. "In this world, it changes everything."` },
+                                            { act: "Act III: Payoff & Resolution", range: "75–100%", desc: term.masterclass?.threeActStructure?.act3 || "The final push toward the Climax and HEA/HFN.", example: `The truth of the ${term.term} was finally out, but as their eyes met, she realized the cost was worth every shattered lie.` }
                                         ].map((act, i) => (
                                             <div key={i} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between items-center">
-                                                        <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{act.act}</h5>
-                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{act.range}</span>
+                                                        <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{isMarketingFocus ? act.act.replace('Act', 'Phase') : act.act}</h5>
+                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{isMarketingFocus ? 'ROI' : act.range}</span>
                                                     </div>
                                                     <p className="text-xs text-slate-500 leading-relaxed font-medium">{act.desc}</p>
                                                 </div>
                                                 <div className="pt-3 border-t border-slate-200/50">
                                                     <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                                        <Sparkles size={10} /> Writing Example
+                                                        <Sparkles size={10} /> {snippetLabel}
                                                     </p>
                                                     <p className="text-[10px] text-slate-400 font-bold italic leading-relaxed">
-                                                        &quot;{act.example}&quot;
+                                                        &quot;{isMarketingFocus ? `Check out this ${term.term} to supercharge your blurb conversion rate instantly.` : act.example}&quot;
                                                     </p>
                                                 </div>
                                             </div>
@@ -424,7 +453,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 </div>
                                 <div className="bg-slate-900 rounded-[3rem] p-10 text-white space-y-8 shadow-2xl relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 p-6 opacity-5 rotate-12"><Activity size={100} /></div>
-                                    <h4 className="text-lg font-black uppercase tracking-tight text-indigo-400">Profit Beats (Pacing)</h4>
+                                    <h4 className="text-lg font-black uppercase tracking-tight text-indigo-400">{pacingTitle}</h4>
                                     <div className="space-y-6">
                                         {(term.masterclass?.profitBeats && term.masterclass.profitBeats.length > 0 ? term.masterclass.profitBeats : [
                                             { title: "The Hook", timing: "10%", description: "Establish protagonist empathy." },
@@ -443,9 +472,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                                     </div>
                                                     <p className="text-[11px] text-slate-400 font-medium leading-relaxed mb-2">{beat.description}</p>
                                                     <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover/beat:border-indigo-500/30 transition-all">
-                                                        <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Writing Example</p>
+                                                        <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">{snippetLabel}</p>
                                                         <p className="text-[9px] text-slate-300 font-bold italic leading-tight">
-                                                            &quot;The {beat.title} should trigger a major {term.term} pivot.&quot;
+                                                            &quot;{isMarketingFocus ? `Our ${term.term} guide reduces CPA by 40% while doubling organic reach.` : `The moment of ${term.term} was a thunderclap in the quiet room.`}&quot;
                                                         </p>
                                                     </div>
                                                 </div>
@@ -461,9 +490,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             <div className="space-y-10">
                                 <div className="space-y-4">
                                     <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                                        <Users size={24} className="text-indigo-600" /> Archetype Trio
+                                        <Users size={24} className="text-indigo-600" /> {archetypesTitle}
                                     </h3>
-                                    <p className="text-sm text-slate-500 font-bold">The specific roles readers of this keyword demand.</p>
+                                    <p className="text-sm text-slate-500 font-bold">{archetypesDesc}</p>
                                 </div>
                                 <div className="grid md:grid-cols-3 gap-8">
                                     {(term.masterclass?.characterArchetypes && term.masterclass.characterArchetypes.length > 0 ? term.masterclass.characterArchetypes : [
@@ -479,13 +508,13 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                                 <span className="text-[8px] font-black text-indigo-600/50 uppercase tracking-[0.2em]">Archetype</span>
                                             </div>
                                             <div className="space-y-2 flex-1">
-                                                <h6 className="text-sm font-black text-slate-900 uppercase tracking-tight">{char.role}</h6>
+                                                <h6 className="text-sm font-black text-slate-900 uppercase tracking-tight">{isMarketingFocus ? char.role.replace('Alpha / Specialist', 'High-LTV Buyer').replace('Relatable Proxy', 'Newsletter Sub').replace('Foil', 'Window Shopper') : char.role}</h6>
                                                 <p className="text-xs text-slate-500 font-medium leading-relaxed">{char.description}</p>
                                             </div>
                                             <div className="pt-4 border-t border-slate-200">
-                                                <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-1">Writing Example</p>
+                                                <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-1">{snippetLabel}</p>
                                                 <p className="text-[10px] text-slate-400 font-bold italic leading-relaxed">
-                                                    &quot;Use this {char.role} to challenge the {term.term} status quo.&quot;
+                                                    &quot;{isMarketingFocus ? `This ${term.term} asset is the perfect lead magnet for this segment.` : char.example}&quot;
                                                 </p>
                                             </div>
                                         </div>
@@ -534,9 +563,9 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                                 {term.masterclass?.technicalComponents?.hook || "Blurb's first line designed to convert browsers to buyers."}
                                             </p>
                                             <div className="ml-4 p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
-                                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Writing Example</p>
+                                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Story Snippet</p>
                                                 <p className="text-[9px] text-indigo-900/60 font-bold italic leading-tight">
-                                                    &quot;I thought {term.term} was just a myth... until I met him.&quot;
+                                                    &quot;In the heart of the city, a single ${term.term} could bring empires to their knees.&quot;
                                                 </p>
                                             </div>
                                         </div>
