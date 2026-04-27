@@ -29,6 +29,7 @@ export type WizardData = {
     description: string
     price: string
     category: string
+    niche: string
     format: string
     licenseType: string
     imageUrl: string
@@ -52,6 +53,7 @@ const initialData: WizardData = {
     description: "",
     price: "0",
     category: "",
+    niche: "",
     format: "",
     licenseType: "PLR",
     imageUrl: "",

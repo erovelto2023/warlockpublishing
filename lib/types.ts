@@ -5,6 +5,7 @@ export interface Product {
     price: number;
     imageUrl?: string;
     category?: string;
+    niche?: string;
     productType?: string;
     pageType?: string;
     templateId?: string;
@@ -253,6 +254,8 @@ export interface SalesPage {
     isPublished: boolean;
     showInMarketplace: boolean;
     pageType?: string;
+    category?: string;
+    niche?: string;
     price?: number;
     buyUrl?: string;
     ogImage?: string;

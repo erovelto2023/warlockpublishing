@@ -225,7 +225,19 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                                 placeholder="e.g. Productivity"
                             />
                         </div>
-                        
+                        <div className="space-y-2">
+                            <Label htmlFor="niche">Niche / Topic</Label>
+                            <Input
+                                id="niche"
+                                className="text-white bg-slate-800 border-slate-700 placeholder:text-slate-400"
+                                value={data.niche}
+                                onChange={(e) => updateData({ niche: e.target.value })}
+                                placeholder="e.g. Solo Entrepreneurship"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
                         {!isAmazon && !isExternal && (
                             <div className="space-y-2">
                                 <Label htmlFor="price">Price ($)</Label>

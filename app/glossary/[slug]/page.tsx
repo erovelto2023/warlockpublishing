@@ -10,7 +10,7 @@ import {
   ArrowRight, Copy, ChevronDown, ShoppingBag, Star, ExternalLink, 
   FileText, Users, Monitor, TrendingUp, Rocket, Compass, ShieldCheck,
   MessageSquareQuote, Youtube, Layout, Clock, Hash, Tag, Share2, 
-  ListChecks, PieChart, UserCheck, ChevronRight, BookDashed
+  ListChecks, PieChart, UserCheck, ChevronRight, BookDashed, Sparkles
 } from 'lucide-react';
 import StructuredData from '@/components/glossary/StructuredData';
 import CopyPromptButton from '@/components/glossary/CopyPromptButton';
@@ -29,11 +29,23 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     if (!term) return constructMetadata({ title: 'Not Found', description: 'The requested resource could not be found.' });
 
     return constructMetadata({
-        title: term.term,
-        description: term.shortDefinition || term.definition || `Learn about ${term.term} in the Warlock Publishing Glossary.`,
+        title: `${term.term}: Definition & Implementation Strategy`,
+        description: term.shortDefinition 
+            ? `What is ${term.term}? ${term.shortDefinition} Learn how to use ${term.term} to scale your ${term.category || 'creative'} business.`
+            : `Discover the definition and strategic usage of ${term.term}. Explore checklists, AI prompts, and implementation steps for ${term.category || 'creators'}.`,
         type: 'article',
-        keywords: [term.category, term.subCategory, ...(term.keyCharacteristics || [])].filter((k): k is string => !!k),
-        url: `https://warlockpublishing.com/glossary/${term.slug}`
+        keywords: [
+            term.term, 
+            `what is ${term.term}`, 
+            `${term.term} definition`, 
+            term.category, 
+            term.niche, 
+            term.subCategory, 
+            ...(term.keyCharacteristics || [])
+        ].filter((k): k is string => !!k),
+        url: `https://warlockpublishing.com/glossary/${term.slug}`,
+        section: term.category || 'Taxonomy',
+        tags: term.keyCharacteristics || []
     });
 }
 
@@ -49,22 +61,26 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     ]);
 
     // Normalize both products and offers into a single rotation pool
-    const normalizedProducts = products.map((p: Product) => ({
+    const normalizedProducts = products.map((p: any) => ({
         id: p._id.toString(),
         title: p.title,
         price: p.price,
         imageUrl: p.imageUrl,
+        category: p.category,
+        niche: p.niche,
         link: p.externalUrl || `/products/${p.slug || p._id}`,
         isExternal: !!p.externalUrl,
         isFeaturedInRotation: p.isFeaturedInRotation !== false,
         type: 'product'
     }));
 
-    const normalizedOffers = offers.map((o: SalesPage) => ({
+    const normalizedOffers = offers.map((o: any) => ({
         id: o._id.toString(),
         title: o.title,
         price: o.price,
         imageUrl: o.marketplaceImage || o.ogImage,
+        category: o.category,
+        niche: o.niche,
         link: o.externalUrl || `/offers/${o.slug}`,
         isExternal: !!o.externalUrl,
         isFeaturedInRotation: o.isFeaturedInRotation !== false,
@@ -72,13 +88,30 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     }));
 
     const fullPool = [...normalizedProducts, ...normalizedOffers];
-    const rotationPool = fullPool.filter(item => item.isFeaturedInRotation);
+    
+    // Intelligent Contextual Matching
+    // Prioritize items that match the term's category or niche
+    const contextualMatches = fullPool.filter(item => 
+        (item.category && (item.category === term.category || item.category === term.niche)) ||
+        (item.niche && (item.niche === term.category || item.niche === term.niche))
+    );
+
+    const rotationPool = contextualMatches.length > 0 
+        ? contextualMatches.filter(item => item.isFeaturedInRotation)
+        : fullPool.filter(item => item.isFeaturedInRotation);
 
     // Choose a random item from the pool for rotation, or the pinned one
     const seed = term.slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const randomIndex = seed % (rotationPool.length || 1);
+    
+    // The "Featured Resource" - pinned or best contextual match
     const featuredPoolItem = fullPool.find(item => item.id === term.marketplaceProduct?.productId) 
         || (rotationPool.length > 0 ? rotationPool[randomIndex] : fullPool[0]);
+
+    // Related Products Gallery (bottom of page) - Up to 4 items from the same category/niche
+    const relatedProducts = contextualMatches
+        .filter(item => item.id !== featuredPoolItem?.id)
+        .slice(0, 4);
 
     // Handle external vs internal linking (used in the UI)
     const productLink = featuredPoolItem?.link || "/products";
@@ -152,6 +185,22 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             </div>
                         </div>
                     </section>
+                    
+                    {/*  AI QUICK SUMMARY (GEO OPTIMIZATION)  */}
+                    <section className="bg-indigo-50 border border-indigo-100 rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-6 opacity-20"><Zap size={40} className="text-indigo-600" /></div>
+                        <div className="relative z-10">
+                            <h2 className="text-xs font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                                <Sparkles size={14} /> AI Quick Summary
+                            </h2>
+                            <p className="text-lg md:text-xl font-bold text-slate-900 leading-snug mb-4">
+                                {term.shortDefinition || `What is ${term.term}?`}
+                            </p>
+                            <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
+                                {term.definition?.split('.')[0]}. {term.definition?.split('.')[1] || ''}. This concept is critical for creators focusing on {term.category} and {term.niche || 'digital publishing'}.
+                            </p>
+                        </div>
+                    </section>
 
                     {/*  2. CONTEXTUAL MEANING SECTION  */}
                     <section className="space-y-8">
@@ -180,6 +229,40 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                            </p>
                         </div>
                     </section>
+                    
+                    {/*  IN-CONTENT PRODUCT CTA (HIGH CONVERSION)  */}
+                    {featuredPoolItem && (
+                        <section className="bg-white border-2 border-indigo-600 rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-5"><ShoppingBag size={100} /></div>
+                            <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                                {featuredPoolItem.imageUrl && (
+                                    <div className="w-full md:w-48 aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border border-slate-100 flex-shrink-0">
+                                        <img src={featuredPoolItem.imageUrl} alt={featuredPoolItem.title} className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+                                <div className="flex-1 text-center md:text-left">
+                                    <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4 inline-block">Recommended Resource</span>
+                                    <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-3 tracking-tight leading-tight">
+                                        Master {term.term} with this {featuredPoolItem.type}
+                                    </h3>
+                                    <p className="text-slate-600 mb-6 text-sm md:text-base leading-relaxed">
+                                        Elevate your {term.category} business with our professional-grade tools and training. {featuredPoolItem.title} is specifically designed to help creators implement these concepts faster.
+                                    </p>
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                        <Link 
+                                            href={productLink}
+                                            className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-indigo-100 flex items-center gap-2"
+                                        >
+                                            Get Instant Access <ArrowRight size={14} />
+                                        </Link>
+                                        <div className="text-lg font-black text-slate-900">
+                                            {featuredPoolItem.price ? `$${featuredPoolItem.price}` : 'Free Access'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
 
                     {/*  3. PUBLIC KNOWLEDGE BASE  */}
                     <section className="space-y-8">
@@ -564,6 +647,42 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                               ))}
                          </div>
                     </section>
+
+                    {/*  16. RELATED PRODUCTS GALLERY  */}
+                    {relatedProducts.length > 0 && (
+                        <section className="space-y-8 no-print">
+                            <div className="flex items-center justify-between px-2">
+                                <h2 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3">
+                                    <ShoppingBag className="text-indigo-600" size={24} /> Recommended Resource Library
+                                </h2>
+                                <Link href="/products" className="text-xs font-bold text-indigo-600 hover:underline uppercase tracking-widest">View All Assets</Link>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                                {relatedProducts.map((item) => (
+                                    <Link 
+                                        key={item.id}
+                                        href={item.link}
+                                        className="group bg-white rounded-3xl border border-slate-200 p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                                    >
+                                        <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-100 relative">
+                                            {item.imageUrl ? (
+                                                <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300"><BookDashed size={40} /></div>
+                                            )}
+                                        </div>
+                                        <h4 className="text-xs font-black text-slate-900 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors uppercase tracking-tight mb-2">
+                                            {item.title}
+                                        </h4>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.type}</span>
+                                            <span className="text-xs font-black text-indigo-600">${item.price || '0'}</span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                 </div>
 

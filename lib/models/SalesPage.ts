@@ -11,6 +11,8 @@ export interface ISalesPage extends Document {
     isPublished: boolean;
     showInMarketplace: boolean;
     pageType: 'sales' | 'upsell' | 'downsell' | 'thank-you';
+    category?: string;
+    niche?: string;
     price?: number;
     buyUrl?: string;
     ogImage?: string;
@@ -53,6 +55,8 @@ const SalesPageSchema: Schema = new Schema({
         enum: ['sales', 'upsell', 'downsell', 'thank-you'],
         default: 'sales'
     },
+    category: { type: String },
+    niche: { type: String },
     price: { type: Number },
     buyUrl: { type: String },
     ogImage: { type: String },

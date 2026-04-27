@@ -6,6 +6,7 @@ const ProductSchema = new Schema({
     price: { type: Number, required: true },
     imageUrl: { type: String, required: false },
     category: { type: String, required: false },
+    niche: { type: String, required: false },
     productType: { type: String, default: 'ebook' }, // ebook, software, amazon, course
     pageType: { type: String, default: 'sales' }, // sales, upsell, downsell, thankyou
     templateId: { type: String }, // ID of the selected template

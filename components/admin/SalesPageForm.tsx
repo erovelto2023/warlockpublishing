@@ -26,6 +26,8 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
         isPublished: initialData?.isPublished ?? false,
         showInMarketplace: initialData?.showInMarketplace ?? false,
         pageType: initialData?.pageType || 'sales',
+        category: initialData?.category || '',
+        niche: initialData?.niche || '',
         price: initialData?.price || '',
         buyUrl: initialData?.buyUrl || '',
         ogTitle: initialData?.ogTitle || '',
@@ -292,7 +294,7 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Internal Title</label>
                                 <input type="text" name="title" value={formData.title} onChange={handleChange} required className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold text-lg" placeholder="Ultimate Marketing Course" />
@@ -304,14 +306,25 @@ export default function SalesPageForm({ initialData, onComplete }: SalesPageForm
                                     <input type="text" name="slug" value={formData.slug} onChange={handleChange} required className="flex-1 px-5 py-4 rounded-r-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold text-blue-600" />
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div>
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">System Tag</label>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">System Tag (Page Type)</label>
                                 <select name="pageType" value={formData.pageType} onChange={handleChange} className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold bg-white appearance-none">
                                     <option value="sales">Sales Page</option>
                                     <option value="upsell">Upsell Page</option>
                                     <option value="downsell">Downsell Page</option>
                                     <option value="thank-you">Thank You Page</option>
                                 </select>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Category</label>
+                                <input type="text" name="category" value={formData.category} onChange={handleChange} className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold text-sm" placeholder="e.g. Romance, Business" />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Niche / Topic</label>
+                                <input type="text" name="niche" value={formData.niche} onChange={handleChange} className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold text-sm" placeholder="e.g. Regency, Amazon Ads" />
                             </div>
                         </div>
 

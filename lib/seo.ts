@@ -9,6 +9,8 @@ interface SeoProps {
   keywords?: string[];
   publishedTime?: string;
   authors?: string[];
+  section?: string;
+  tags?: string[];
 }
 
 export function constructMetadata({
@@ -20,6 +22,8 @@ export function constructMetadata({
   keywords = [],
   publishedTime,
   authors,
+  section,
+  tags,
 }: SeoProps): Metadata {
   const siteTitle = 'Warlock Publishing';
   const fullTitle = `${title} | ${siteTitle}`;
@@ -53,6 +57,8 @@ export function constructMetadata({
       ],
       type: type === 'product' ? 'website' : type,
       ...(publishedTime && { publishedTime }),
+      ...(section && { section }),
+      ...(tags && { tags }),
     },
     twitter: {
       card: 'summary_large_image',
