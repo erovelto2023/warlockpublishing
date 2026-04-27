@@ -173,10 +173,32 @@ export interface GlossaryTerm {
     simpleDefinition?: string;
     technicalDefinition?: string;
     checklist?: string[];
+    
+    // --- Universal Authority Framework Phases ---
+    writingAspect?: string;
+    geoTagging?: string;
+    commonMyths?: {
+        myth?: string;
+        fact?: string;
+    }[];
+    anatomy?: {
+        structuralBreakdown?: string;
+        specialistPerspective?: string;
+    };
+    directoryCategories?: {
+        name?: string;
+        description?: string;
+        productIds?: string[];
+    }[];
+    featuredSnippet?: string;
+    regionalTrends?: string;
+    buyersChecklist?: string[];
+    opportunityScore?: number;
+
     isPremium: boolean;
     isPublished: boolean;
     imageUrl?: string;
-    viewCount: number;
+    viewCount?: number;
     createdAt: string | Date;
     updatedAt: string | Date;
     marketplaceProduct?: {

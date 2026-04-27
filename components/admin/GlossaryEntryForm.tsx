@@ -24,9 +24,10 @@ import {
     SelectValue 
 } from "@/components/ui/select"
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary"
+import { GlossaryTerm as GlossaryTermType } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Plus, Trash2, Video, BookOpen, BarChart3, Palette, Megaphone, HelpCircle, Zap, FileText, ShoppingBag, Table, Play, ChevronRight, Globe, Star } from "lucide-react"
+import { Plus, Trash2, Video, BookOpen, BarChart3, Palette, Megaphone, HelpCircle, Zap, FileText, ShoppingBag, Table, Play, ChevronRight, Globe, Star, Sparkles, TrendingUp } from "lucide-react"
 
 const formSchema = z.object({
     term: z.string().optional(),
@@ -126,6 +127,33 @@ const formSchema = z.object({
     })).optional(),
     expertOpinion: z.string().optional(),
 
+    // Authority Framework - Phase 1: SEO Hook
+    writingAspect: z.string().optional(),
+    geoTagging: z.string().optional(),
+    commonMyths: z.array(z.object({
+        myth: z.string().optional(),
+        fact: z.string().optional()
+    })).optional(),
+
+    // Authority Framework - Phase 2: Educational Authority
+    anatomy: z.object({
+        structuralBreakdown: z.string().optional(),
+        specialistPerspective: z.string().optional()
+    }).optional(),
+
+    // Authority Framework - Phase 3: Sales Engine
+    directoryCategories: z.array(z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        productIds: z.array(z.string()).optional()
+    })).optional(),
+
+    // Authority Framework - Phase 4: Optimization Layer
+    featuredSnippet: z.string().optional(),
+    regionalTrends: z.string().optional(),
+    buyersChecklist: z.array(z.string()).optional(),
+    opportunityScore: z.number().min(0).max(100).optional(),
+
     // Flags
     isPublished: z.boolean(),
     isPremium: z.boolean(),
@@ -196,6 +224,26 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
             isPremium: term?.isPremium ?? false,
             brandingCues: term?.brandingCues || "",
             marketingHooks: term?.marketingHooks?.blogTitles?.join("\n") || "",
+            
+            // Phase 1
+            writingAspect: term?.writingAspect || "",
+            geoTagging: term?.geoTagging || "",
+            commonMyths: term?.commonMyths || [{ myth: "", fact: "" }],
+            
+            // Phase 2
+            anatomy: {
+                structuralBreakdown: term?.anatomy?.structuralBreakdown || "",
+                specialistPerspective: term?.anatomy?.specialistPerspective || ""
+            },
+            
+            // Phase 3
+            directoryCategories: term?.directoryCategories || [{ name: "", description: "", asins: [] }],
+            
+            // Phase 4
+            featuredSnippet: term?.featuredSnippet || "",
+            regionalTrends: term?.regionalTrends || "",
+            buyersChecklist: term?.buyersChecklist || [""],
+            opportunityScore: term?.opportunityScore || 50,
         },
     })
 
@@ -239,10 +287,20 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
         name: "checklist"
     });
 
+    const { fields: mythFields, append: appendMyth, remove: removeMyth } = useFieldArray({
+        control: form.control,
+        name: "commonMyths"
+    });
+
+    const { fields: dirCatFields, append: appendDirCat, remove: removeDirCat } = useFieldArray({
+        control: form.control,
+        name: "directoryCategories"
+    });
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setLoading(true)
         try {
-            const formData = {
+            const formData: Partial<GlossaryTermType> = {
                 ...values,
                 keyCharacteristics: values.keyCharacteristics?.split("\n").map((k: string) => k.trim()).filter(Boolean),
                 headlines: values.headlines?.split("\n").map((h: string) => h.trim()).filter(Boolean),
@@ -271,7 +329,7 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                     contentStrategyPrompt: values.contentStrategyPrompt,
                     aiImagePrompt: values.aiImagePrompt,
                 },
-                websitesRanking: values.referenceWebsites,
+                referenceWebsites: values.referenceWebsites,
                 marketingHooks: {
                     blogTitles: values.marketingHooks?.split("\n").map(h => h.trim()).filter(Boolean),
                     pinterestPinIdeas: values.pinterestIdeas?.split("\n").map(p => p.trim()).filter(Boolean),
@@ -703,6 +761,193 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                     >
                         <Plus size={14} className="mr-2" /> Inject More Affiliate Assets
                     </Button>
+                </div>
+
+                {/* AUTHORITY FRAMEWORK: PHASE 1 & 2 */}
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-8">
+                    <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                        <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><Sparkles size={18} /></div>
+                        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Phase 1 & 2: Authority & SEO Hook</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                            control={form.control}
+                            name="writingAspect"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Writing Aspect (Nuance)</FormLabel>
+                                    <FormControl><Textarea className="text-sm min-h-[80px]" placeholder="Specific technical nuances for writers..." {...field} /></FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="geoTagging"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Geo-Tagging (Regional Focus)</FormLabel>
+                                    <FormControl><Textarea className="text-sm min-h-[80px]" placeholder="Regional variations or target locations..." {...field} /></FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    <div className="space-y-4">
+                        <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Common Myths & Reality</FormLabel>
+                        <div className="space-y-3">
+                            {mythFields.map((field, index) => (
+                                <div key={field.id} className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-slate-50 rounded-xl relative group">
+                                    <button type="button" onClick={() => removeMyth(index)} className="absolute -top-2 -right-2 p-1 bg-white border border-slate-200 rounded-full text-slate-300 hover:text-red-500 shadow-sm"><Trash2 size={12}/></button>
+                                    <FormField
+                                        control={form.control}
+                                        name={`commonMyths.${index}.myth`}
+                                        render={({ field }) => (
+                                            <FormControl><Input className="h-8 text-[11px]" placeholder="The Myth..." {...field} /></FormControl>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`commonMyths.${index}.fact`}
+                                        render={({ field }) => (
+                                            <FormControl><Input className="h-8 text-[11px]" placeholder="The Reality..." {...field} /></FormControl>
+                                        )}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => appendMyth({ myth: "", fact: "" })} className="w-full text-slate-400 hover:text-indigo-600 border-dashed border h-10 rounded-xl">
+                            + Add Myth/Fact Pair
+                        </Button>
+                    </div>
+
+                    <div className="space-y-6 pt-4 border-t border-slate-50">
+                        <FormField
+                            control={form.control}
+                            name="anatomy.structuralBreakdown"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[10px] font-bold text-indigo-600 uppercase tracking-tighter flex items-center gap-2"><Table size={12}/> Anatomy: Structural Breakdown</FormLabel>
+                                    <FormControl><Textarea className="text-sm min-h-[100px]" placeholder="The structural components of this term/strategy..." {...field} /></FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="anatomy.specialistPerspective"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[10px] font-bold text-indigo-600 uppercase tracking-tighter flex items-center gap-2"><Star size={12}/> Specialist's Perspective (EEAT)</FormLabel>
+                                    <FormControl><Textarea className="text-sm min-h-[100px]" placeholder="Unique expert insight or 'Mastery Note'..." {...field} /></FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                {/* AUTHORITY FRAMEWORK: PHASE 3 & 4 */}
+                <div className="bg-white text-slate-900 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-8">
+                    <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                        <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><ShoppingBag size={18} /></div>
+                        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Phase 3 & 4: Sales Engine & Optimization</h3>
+                    </div>
+
+                    <div className="space-y-4">
+                        <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Directory Sub-Categories (Sales Engine)</FormLabel>
+                        <div className="space-y-6">
+                            {dirCatFields.map((field, index) => (
+                                <div key={field.id} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4 relative">
+                                    <button type="button" onClick={() => removeDirCat(index)} className="absolute top-4 right-4 text-slate-300 hover:text-red-500"><Trash2 size={16}/></button>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name={`directoryCategories.${index}.name`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[9px] font-bold text-slate-400 uppercase">Category Name</FormLabel>
+                                                    <FormControl><Input className="h-9 text-xs bg-white" placeholder="e.g. Narrative Essentials" {...field} /></FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name={`directoryCategories.${index}.description`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[9px] font-bold text-slate-400 uppercase">Description</FormLabel>
+                                                    <FormControl><Input className="h-9 text-xs bg-white" placeholder="Brief value prop..." {...field} /></FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name={`directoryCategories.${index}.productIds`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[9px] font-bold text-slate-400 uppercase">Product References (Comma separated ASINs or IDs)</FormLabel>
+                                                <FormControl>
+                                                    <Input 
+                                                        className="h-9 text-xs font-mono bg-white" 
+                                                        placeholder="B0XXXXXXX, product-123" 
+                                                        value={field.value?.join(", ") || ""}
+                                                        onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <Button type="button" variant="outline" size="sm" onClick={() => appendDirCat({ name: "", description: "", productIds: [] })} className="w-full border-dashed py-4 text-slate-400">
+                            + Create Sales Engine Category
+                        </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-50">
+                        <FormField
+                            control={form.control}
+                            name="featuredSnippet"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[10px] font-bold text-indigo-600 uppercase tracking-tighter flex items-center gap-2"><Globe size={12}/> Featured Snippet (SGE Hook)</FormLabel>
+                                    <FormControl><Textarea className="text-sm min-h-[80px]" placeholder="Brief, high-impact summary for search results..." {...field} /></FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="regionalTrends"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-[10px] font-bold text-indigo-600 uppercase tracking-tighter flex items-center gap-2"><TrendingUp size={12}/> Regional Trends</FormLabel>
+                                    <FormControl><Textarea className="text-sm min-h-[80px]" placeholder="Growth data or regional popularity notes..." {...field} /></FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    <div className="flex items-center justify-between gap-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                         <div className="flex-1">
+                             <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Opportunity Score (0-100)</h4>
+                             <p className="text-[9px] text-indigo-400 font-bold uppercase italic">Commercial potential of this strategic node</p>
+                         </div>
+                         <FormField
+                            control={form.control}
+                            name="opportunityScore"
+                            render={({ field }) => (
+                                <FormControl>
+                                    <Input 
+                                        type="number" 
+                                        className="w-24 h-12 text-xl font-black text-center bg-white border-indigo-200" 
+                                        {...field} 
+                                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                    />
+                                </FormControl>
+                            )}
+                        />
+                    </div>
                 </div>
 
                 {/* SECTION 6: PRODUCT IDEA PIPELINE */}

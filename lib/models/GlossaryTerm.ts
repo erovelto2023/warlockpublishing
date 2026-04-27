@@ -181,6 +181,35 @@ const GlossaryTermSchema = new Schema({
     technicalDefinition: { type: String },
     checklist: [String], // Getting Started
 
+    // --- Universal Authority Framework Phases ---
+    
+    // Phase 1: SEO Hook
+    writingAspect: { type: String },
+    geoTagging: { type: String },
+    commonMyths: [{ 
+        myth: { type: String },
+        fact: { type: String }
+    }],
+    
+    // Phase 2: Educational Authority
+    anatomy: {
+        structuralBreakdown: { type: String }, // For Books: Plot beats, archetypes. For Products: Components.
+        specialistPerspective: { type: String } // EEAT Signal
+    },
+    
+    // Phase 3: The Sales Engine (Integrated CSV Directory)
+    directoryCategories: [{
+        name: { type: String }, // Sub-Niche/Trope Name
+        description: { type: String },
+        productIds: [String] // References to Amazon ASINs or internal IDs
+    }],
+    
+    // Phase 4: Technical Layer & Optimization
+    featuredSnippet: { type: String }, // Quick summary box content
+    regionalTrends: { type: String }, // Geo-Optimization
+    buyersChecklist: [{ type: String }], // 5-point conversion list
+    opportunityScore: { type: Number, default: 0 }, // Scarcity/Social Proof metric
+
     // --- Metadata & Workflow ---
     isPremium: { type: Boolean, default: false },
     isPublished: { type: Boolean, default: true },

@@ -14,8 +14,8 @@ export default async function GlossaryPage() {
         const categories = await getGlossaryCategories();
 
         return (
-        <div className="min-h-screen bg-[#020617] pt-24">
-            <div className="max-w-[1400px] mx-auto">
+        <div className="min-h-screen bg-[#F8FAFC]">
+            <div className="max-w-[1440px] mx-auto">
                 <GlossaryClient initialTerms={terms} categories={categories} />
             </div>
         </div>

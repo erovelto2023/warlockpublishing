@@ -438,6 +438,41 @@ export async function importDetailedJson(data: any[]) {
                 }));
             }
 
+            // --- Phase-Specific Schema Defense & Normalization ---
+            if (typeof item.anatomy === 'string') item.anatomy = { structuralBreakdown: item.anatomy };
+            if (typeof item.directoryCategories === 'string') item.directoryCategories = [];
+            if (typeof item.buyersChecklist === 'string') item.buyersChecklist = [item.buyersChecklist];
+            
+            // Normalize commonMyths (force to array of objects)
+            if (Array.isArray(item.commonMyths)) {
+                item.commonMyths = item.commonMyths.map((m: any) => {
+                    if (typeof m === 'string') return { myth: m, fact: "Refer to the guide for details." };
+                    return m;
+                });
+            } else if (typeof item.commonMyths === 'string') {
+                item.commonMyths = [{ myth: item.commonMyths, fact: "Refer to the guide for details." }];
+            }
+
+            // Normalize directoryCategories and map asins -> productIds
+            if (Array.isArray(item.directoryCategories)) {
+                item.directoryCategories = item.directoryCategories.map((cat: any) => ({
+                    ...cat,
+                    productIds: cat.productIds || cat.asins || []
+                }));
+            }
+            
+            // Auto-group products into directory categories if not present
+            if (!item.directoryCategories || item.directoryCategories.length === 0) {
+                const asinList = (item.amazonProducts || []).map((p: any) => p.asin).filter(Boolean);
+                if (asinList.length > 0) {
+                    item.directoryCategories = [{
+                        name: "Top Reference Selection",
+                        description: `Curated assets for ${term}`,
+                        productIds: asinList
+                    }];
+                }
+            }
+
             return {
                 updateOne: {
                     filter: { slug },

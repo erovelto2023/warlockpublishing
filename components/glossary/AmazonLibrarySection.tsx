@@ -6,15 +6,22 @@ import Link from 'next/link';
 
 interface AmazonLibrarySectionProps {
     products: AmazonProduct[];
+    term: string;
+    category: string;
     title?: string;
     subtitle?: string;
 }
 
 export default function AmazonLibrarySection({ 
     products, 
-    title = "Prime Reference Library", 
-    subtitle = "Vetted Industry Assets" 
+    term,
+    category,
+    title, 
+    subtitle 
 }: AmazonLibrarySectionProps) {
+    const displayTitle = title || `Prime Reference: ${term}`;
+    const displaySubtitle = subtitle || `Curated Industry Assets for ${category}`;
+
     if (!products || products.length === 0) return null;
 
     return (
@@ -22,10 +29,10 @@ export default function AmazonLibrarySection({
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-2">
                 <div className="space-y-2">
                     <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
-                        {title}
+                        {displayTitle}
                     </h2>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
-                        <ShieldCheck size={14} className="text-emerald-500" /> {subtitle}
+                        <ShieldCheck size={14} className="text-emerald-500" /> {displaySubtitle}
                     </p>
                 </div>
                 <div className="hidden md:block h-px flex-1 bg-slate-200 mx-8 mb-4 opacity-50"></div>

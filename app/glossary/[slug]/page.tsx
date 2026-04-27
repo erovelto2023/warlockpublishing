@@ -211,7 +211,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         <nav className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
                             <Link href="/" className="hover:text-indigo-600 transition-colors">Hub</Link>
                             <ChevronRight size={10} className="text-slate-400" />
-                            <Link href="/glossary" className="hover:text-indigo-600 transition-colors">Glossary</Link>
+                            <Link href="/glossary" className="hover:text-indigo-600 transition-colors">Directory</Link>
                             <ChevronRight size={10} className="text-slate-400" />
                             <span className="text-indigo-600">{term.term}</span>
                         </nav>
@@ -233,319 +233,374 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                 </aside>
                 
                 {/*  MAIN CONTENT AREA  */}
-                <div className="flex-1 max-w-4xl space-y-24 pb-32">
+                <div className="flex-1 max-w-4xl space-y-20 pb-32">
                     
-                    {/*  1. IDENTITY & TAXONOMY SECTION  */}
-                    <section className="bg-white rounded-[2.5rem] p-8 md:p-14 border border-slate-200 shadow-sm relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-50/50 rounded-full blur-3xl -mr-24 -mt-24 opacity-60"></div>
-                        <div className="relative z-10">
-                            <div className="flex flex-wrap gap-3 mb-8">
-                                <span className="px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider rounded-md">{term.category || 'Taxonomy'}</span>
+                    {/*  PHASE 4.1: THE FEATURED SNIPPET BLOCK (SEO/SGE HOOK)  */}
+                    <section className="bg-indigo-600 text-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"><Zap size={120} /></div>
+                        <div className="relative z-10 space-y-6">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                <Sparkles size={14} className="text-amber-400" /> AI Quick Guide
                             </div>
-                            <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight mb-6 leading-[1.1]">
-                                {term.term}
-                            </h1>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-slate-100">
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Primary Niche</span>
-                                    <span className="text-sm font-bold text-slate-700 flex items-center gap-2"><Tag size={14} className="text-indigo-500" /> {term.category || 'General'}</span>
-                                </div>
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Market Status</span>
-                                    <span className="text-sm font-bold text-emerald-600 flex items-center gap-2"><TrendingUp size={14} /> Evergreen</span>
-                                </div>
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Entry Difficulty</span>
-                                    <span className="text-sm font-bold text-amber-500 flex items-center gap-2"><ShieldCheck size={14} /> {term.skillRequired || 'Intermediate'}</span>
-                                </div>
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Profit Potential</span>
-                                    <span className="text-sm font-bold text-slate-700 flex items-center gap-2"><DollarSign size={14} className="text-emerald-500" /> High Margin</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/*  ENTITY VITAL SIGNS (DYNAMIC ANALYTICS)  */}
-                    <section className="grid grid-cols-1 md:grid-cols-3 gap-6" id="vitals">
-                         {[
-                             { label: "Search Velocity", value: "88/100", trend: "+12%", color: "text-indigo-600", bg: "bg-indigo-50", icon: <TrendingUp size={20}/> },
-                             { label: "Affiliate Strength", value: "Tier 1", trend: "Stable", color: "text-emerald-600", bg: "bg-emerald-50", icon: <DollarSign size={20}/> },
-                             { label: "Content Longevity", value: "Evergreen", trend: "Infinite", color: "text-amber-600", bg: "bg-amber-50", icon: <Clock size={20}/> }
-                         ].map((stat, i) => (
-                             <div key={i} className={`${stat.bg} p-8 rounded-[2rem] border border-white/50 shadow-sm flex flex-col justify-between h-40 group hover:shadow-xl transition-all`}>
-                                 <div className="flex items-center justify-between">
-                                     <div className={`${stat.color} p-3 bg-white rounded-2xl shadow-sm`}>{stat.icon}</div>
-                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</span>
-                                 </div>
-                                 <div className="flex items-end justify-between">
-                                     <span className={`text-3xl font-black ${stat.color} tracking-tighter italic`}>{stat.value}</span>
-                                     <span className="text-[10px] font-bold bg-white/50 px-2 py-1 rounded-md text-slate-500">{stat.trend}</span>
-                                 </div>
-                             </div>
-                         ))}
-                    </section>
-                    
-                    {/*  AI QUICK SUMMARY (GEO OPTIMIZATION)  */}
-                    <section className="bg-indigo-50 border border-indigo-100 rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-6 opacity-20"><Zap size={40} className="text-indigo-600" /></div>
-                        <div className="relative z-10">
-                            <h2 className="text-xs font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
-                                <Sparkles size={14} /> AI Quick Summary
+                            <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-tight uppercase italic">
+                                Everything you need to know about <span className="text-amber-400">{term.term}</span> in 30 seconds
                             </h2>
-                            <p className="text-lg md:text-xl font-bold text-slate-900 leading-snug mb-4">
-                                {term.shortDefinition || `What is ${term.term}?`}
-                            </p>
-                            <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
-                                {term.definition?.split('.')[0]}. {term.definition?.split('.')[1] || ''}. This concept is critical for creators focusing on {term.category} and {term.niche || 'digital publishing'}.
+                            <p className="text-lg md:text-xl font-medium leading-relaxed opacity-90 max-w-3xl border-l-4 border-white/30 pl-6">
+                                {term.featuredSnippet || term.shortDefinition || `Mastering ${term.term} is the key to unlocking consistent narrative engagement and commercial authority in the ${term.category} niche.`}
                             </p>
                         </div>
                     </section>
 
-                    {/*  2. CONTEXTUAL MEANING SECTION  */}
-                    <section className="space-y-10" id="context">
-                        <h2 id="context" className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
-                            <HistoryIcon className="text-indigo-600" size={24} /> Semantic Connectivity
-                        </h2>
-                        
-                        <TermTabs 
-                            origin={term.origin} 
-                            modernUsage={term.modernUsage} 
-                            expandedExplanation={term.expandedExplanation} 
-                        />
-
-                        <ConnectivityHub 
-                            synonyms={term.synonyms} 
-                            antonyms={term.antonyms} 
-                        />
-                    </section>
-                    
-                    {/*  IN-CONTENT SOLUTION CTA (CONVERSION FOCUSED)  */}
-                    {featuredPoolItem && (
-                        <section className="bg-white border-2 border-indigo-600 rounded-[2.5rem] p-8 md:p-14 shadow-2xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><ShoppingBag size={120} /></div>
-                            
-                            {/* Problem/Solution Bridge */}
-                            <div className="mb-10 text-center md:text-left">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
-                                </div>
-                                <h3 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                                    Struggling with {term.targetAudience?.painPoints?.[0] || term.term + " implementation"}?
-                                </h3>
-                                <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
-                                    Understanding the definition is only the first step. To truly dominate this niche, you need the right tools to bridge the gap between concept and profit.
+                    {/*  PHASE 1: THE TOP-OF-FUNNEL GLOSSARY (SEO HOOK)  */}
+                    <section className="bg-white rounded-[2.5rem] p-8 md:p-14 border border-slate-200 shadow-sm relative overflow-hidden" id="definition">
+                        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-50/50 rounded-full blur-3xl -mr-24 -mt-24 opacity-60"></div>
+                        <div className="relative z-10 space-y-12">
+                            <div className="space-y-4">
+                                <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-indigo-100">{term.category || 'Taxonomy'}</span>
+                                <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
+                                    {term.term}
+                                </h1>
+                                <p className="text-xl text-slate-600 leading-relaxed max-w-3xl font-medium">
+                                    {term.definition}
                                 </p>
                             </div>
 
-                            <div className="flex flex-col md:flex-row items-stretch gap-10 relative z-10 bg-slate-50 p-8 rounded-[2rem] border border-slate-200">
-                                {featuredPoolItem.imageUrl && (
-                                    <div className="w-full md:w-60 aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white flex-shrink-0 relative">
-                                        <img src={featuredPoolItem.imageUrl} alt={featuredPoolItem.title} className="w-full h-full object-cover" />
-                                        <div className="absolute bottom-4 left-4 right-4 py-2 bg-indigo-600/90 backdrop-blur text-white text-center rounded-xl text-[9px] font-black uppercase tracking-widest">
-                                            Recommended Solution
-                                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 border-t border-slate-100 pt-10">
+                                {/* Writing Aspect */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 text-indigo-600">
+                                        <BookOpen size={20} />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">Writing Aspect</h3>
                                     </div>
-                                )}
-                                <div className="flex-1 flex flex-col justify-center">
-                                    <h4 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">
-                                        {featuredPoolItem.title}
-                                    </h4>
-                                    
-                                    {/* Benefit List */}
-                                    <div className="space-y-4 mb-8">
-                                        {(term.targetAudience?.desiredOutcomes?.slice(0, 3) || ["Scale your creative output", "Increase commercial authority", "Automate implementation"]).map((outcome: string, i: number) => (
-                                            <div key={i} className="flex items-start gap-3">
-                                                <div className="mt-1 p-0.5 bg-emerald-100 text-emerald-600 rounded-full"><CheckCircle2 size={14} /></div>
-                                                <span className="text-sm font-bold text-slate-700">{outcome}</span>
+                                    <p className="text-sm text-slate-600 leading-relaxed">
+                                        {term.writingAspect || `In a narrative context, ${term.term} functions as a structural catalyst, driving character development and pacing through established genre tropes.`}
+                                    </p>
+                                </div>
+                                {/* Geo-Tagging */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 text-emerald-600">
+                                        <Globe size={20} />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">Geo-Tagging & Trends</h3>
+                                    </div>
+                                    <p className="text-sm text-slate-600 leading-relaxed">
+                                        {term.geoTagging || `${term.term} is currently trending in North American and UK-based digital markets, particularly within the ${term.niche || 'publishing'} sector.`}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Common Myths */}
+                            <div className="bg-rose-50 border border-rose-100 rounded-3xl p-8 space-y-6">
+                                <div className="flex items-center gap-3 text-rose-600">
+                                    <AlertTriangle size={20} />
+                                    <h3 className="text-xs font-black uppercase tracking-widest">Common Myths & Misconceptions</h3>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-8">
+                                    {(term.commonMyths && term.commonMyths.length > 0 ? term.commonMyths : [
+                                        { myth: "It is too expensive for beginners.", fact: "You can start with $0 using organic reach." },
+                                        { myth: "Only large publishers succeed.", fact: "Niche authority allows small creators to dominate." }
+                                    ]).map((myth: any, i: number) => (
+                                        <div key={i} className="space-y-3 p-4 bg-white rounded-2xl border border-rose-100 shadow-sm group hover:shadow-md transition-all">
+                                            <div className="flex gap-4 items-start">
+                                                <div className="mt-1 shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-[10px]">✕</div>
+                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-tight line-through opacity-60">Myth: {myth.myth}</p>
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="flex flex-wrap items-center gap-6 mt-auto">
-                                        <Link 
-                                            href={productLink}
-                                            className="px-10 py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-indigo-100 flex items-center gap-3 group/btn"
-                                        >
-                                            Solve My {term.term} Challenges <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                                        </Link>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Today&apos;s Price</span>
-                                            <span className="text-2xl font-black text-slate-900">
-                                                {featuredPoolItem.price ? `$${featuredPoolItem.price}` : 'Free Access'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    )}
-
-                    {/*  3. PUBLIC KNOWLEDGE BASE  */}
-                    <section className="space-y-8">
-                        <h2 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
-                            <BookOpen className="text-indigo-600" size={24} /> Public Knowledge Base
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="p-8 bg-indigo-50/50 border border-indigo-100 rounded-3xl space-y-3">
-                                <h4 className="text-[11px] font-bold text-indigo-700 uppercase tracking-widest">Simple Definition</h4>
-                                <p className="text-sm text-slate-600 italic leading-relaxed font-medium">&quot;{term.shortDefinition || "A foundational summary of the concept intended for broad understanding."}&quot;</p>
-                            </div>
-                            <div className="p-8 bg-white border border-slate-200 rounded-3xl space-y-3 shadow-sm">
-                                <h4 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest">Technical Definition</h4>
-                                <p className="text-sm text-slate-600 leading-relaxed">{term.definition || "Formalized implementation details and structural constraints within the publishing ecosystem."}</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/*  4. GETTING STARTED CHECKLIST  */}
-                    <section className="p-10 md:p-14 bg-white border border-slate-200 shadow-sm rounded-[3rem] relative overflow-hidden flex flex-col justify-center" id="checklist">
-                        <h2 id="checklist" className="sr-only">Checklist</h2>
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-bl-full -z-10 opacity-40"></div>
-                        <div className="flex items-center justify-between mb-10">
-                            <h2 className="text-3xl font-bold text-slate-900 uppercase tracking-tighter leading-none">Getting Started Checklist</h2>
-                            <div className="p-3 bg-indigo-100 text-indigo-600 rounded-2xl shadow-inner"><ListChecks size={24} /></div>
-                        </div>
-                        <div className="space-y-3">
-                            {(term.checklist && term.checklist.length > 0 ? term.checklist : [
-                                "Define Core Objective for implementation.", 
-                                "Analyze Competitor Gaps in the landscape.", 
-                                "Synthesize Content Blueprint.", 
-                                "Execute Deployment Protocol."
-                            ]).map((step: string, i: number) => (
-                                <div key={i} className="flex items-center gap-6 p-5 bg-slate-50 border border-slate-100 rounded-2xl group cursor-pointer hover:bg-white hover:border-indigo-200 transition-all">
-                                    <div className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400 group-hover:bg-indigo-600 group-hover:border-indigo-600 group-hover:text-white transition-all bg-white font-mono shrink-0">{i+1}</div>
-                                    <span className="text-md font-semibold text-slate-700 group-hover:text-slate-900 leading-snug">{step}</span>
-                                    <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"><ArrowRight size={18} className="text-indigo-500" /></div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/*  5. FAQ ACCORDION BUILDER  */}
-                    <section className="space-y-8" id="faq">
-                        <div className="flex items-center justify-between px-2">
-                            <h2 id="faq" className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Strategic FAQ</h2>
-                            {/* <button className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100 hover:bg-indigo-100 transition-all">+ Add FAQ Entry</button> */}
-                        </div>
-                        <div className="space-y-4">
-                            {(term.faqs && term.faqs.length > 0 ? term.faqs : [
-                                { question: "How does this drive commercial authority?", answer: "By establishing terminology dominance, you position your brand as the primary reference point in the niche." },
-                                { question: "Is this scalable for small creators?", answer: "Exceedingly so. Small creators can leverage this clarity to out-maneuver larger, slower competitors." }
-                            ]).map((faq, i) => (
-                                <details key={i} className="group bg-white border border-slate-200 rounded-3xl overflow-hidden hover:border-indigo-300 hover:shadow-md transition-all">
-                                    <summary className="flex items-center justify-between p-10 cursor-pointer list-none hover:bg-slate-50 transition-all font-black text-slate-800 uppercase text-sm tracking-wide">
-                                        {faq.question}
-                                        <div className="p-2 bg-slate-100 rounded-lg group-open:rotate-180 transition-transform"><ChevronDown size={14}/></div>
-                                    </summary>
-                                    <div className="p-10 pt-0 text-slate-600 text-sm leading-relaxed border-t border-slate-100 mt-4 bg-white">
-                                        {faq.answer}
-                                    </div>
-                                </details>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/*  6. PROFIT & CREATION BLUEPRINT + TARGET AUDIENCE  */}
-                    <section className="space-y-8" id="monetization">
-                         <h2 id="monetization" className="text-2xl font-bold uppercase tracking-tight flex items-center gap-3 px-2">
-                            <PieChart className="text-indigo-600" size={24} /> Profit & Creation Blueprint
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-6 shadow-sm">
-                                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b pb-4">Revenue & Pricing</h4>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center"><span className="text-xs font-semibold text-slate-500">Revenue Streams</span><span className="text-xs font-bold text-slate-900 uppercase">POD, Ebooks, Consulting</span></div>
-                                    <div className="flex justify-between items-center"><span className="text-xs font-semibold text-slate-500">Scale Potential</span><span className="text-xs font-bold text-emerald-600">High Margin</span></div>
-                                    <div className="flex justify-between items-center"><span className="text-xs font-semibold text-slate-500">Startup Cost</span><span className="text-xs font-bold text-slate-900">{term.startupCost || '$0'}</span></div>
-                                </div>
-                            </div>
-                            <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-6 shadow-sm">
-                                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b pb-4">Complexity Metrics</h4>
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center"><span className="text-xs font-semibold text-slate-500">Skill Level</span><span className="text-xs font-bold text-amber-500 uppercase tracking-wide">{term.skillRequired || 'Intermediate'}</span></div>
-                                    <div className="flex justify-between items-center"><span className="text-xs font-semibold text-slate-500">Time Estimate</span><span className="text-xs font-bold text-slate-900">{term.timeToCreate || '1-3 Days'}</span></div>
-                                    <div className="flex justify-between items-center"><span className="text-xs font-semibold text-slate-500">Market Trend</span><span className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-50 px-2 py-0.5 rounded">High Growth</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/*  Target Audience Expansion  */}
-                        <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-200 space-y-8 shadow-sm">
-                             <div className="flex items-center gap-3 border-b border-slate-100 pb-6">
-                                 <UserCheck className="text-indigo-600" size={24} />
-                                 <div>
-                                     <h3 className="text-xl font-bold uppercase tracking-tight">Primary Target Audience</h3>
-                                     <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Whom this keyword serves</p>
-                                 </div>
-                             </div>
-                             <div className="grid md:grid-cols-3 gap-6">
-                                     {(Array.isArray(term.targetAudience) && term.targetAudience.length > 0 ? term.targetAudience : [
-                                        { title: "Educators", benefit: "Curriculum tools and classroom modeling." },
-                                        { title: "Publishers", benefit: "Data on high-demand tropes for new acquisitions." },
-                                        { title: "Authors", benefit: "Strategic cues for writing character interactions." }
-                                    ]).map((aud: { title: string; benefit?: string; description?: string }, i: number) => (
-                                        <div key={i} className="space-y-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                             <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-tight">{aud.title}</h4>
-                                             <p className="text-[11px] text-slate-500 leading-relaxed">{aud.benefit || aud.description}</p>
+                                            <div className="flex gap-4 items-start pl-9">
+                                                <div className="mt-0.5 shrink-0 w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                                <p className="text-xs font-black text-slate-900">{myth.fact}</p>
+                                            </div>
                                         </div>
                                     ))}
-                             </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
-                    {/*  7. TOP 3 COMPETITOR/REFERENCE TITLES  */}
-                    <section className="space-y-8">
+                    {/*  PHASE 2: MIDDLE-OF-FUNNEL FRAMEWORK (EDUCATIONAL AUTHORITY)  */}
+                    <section className="space-y-10" id="anatomy">
                         <div className="flex items-center justify-between px-2">
-                             <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight italic">Top 3 Reference Titles</h2>
+                             <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
+                                The Anatomy of <span className="text-indigo-600">{term.term}</span>
+                             </h2>
+                             <div className="hidden md:block h-px flex-1 bg-slate-200 mx-8 opacity-50"></div>
+                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Structural Breakdown</span>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {(term.competitorReferences && term.competitorReferences.length > 0 ? term.competitorReferences : [
-                                { name: "Reference Asset A", type: "Amazon Book", url: "#" },
-                                { name: "Reference Asset B", type: "Affiliate Product", url: "#" },
-                                { name: "Reference Asset C", type: "Digital Guide", url: "#" }
-                            ]).map((ref: any, i: number) => (
-                                <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-200 flex flex-col gap-4 group hover:border-indigo-300 transition-all shadow-sm">
-                                     <div className="flex justify-between items-start">
-                                         <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">{ref.type || "Resource"}</span>
-                                         <ExternalLink size={14} className="text-slate-300 group-hover:text-indigo-500" />
-                                     </div>
-                                      <h4 className="text-lg font-extrabold text-slate-900 italic leading-tight">&quot;{ref.title || ref.name}&quot;</h4>
-                                     <a href={ref.url || '#'} className="mt-auto text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1">
-                                        View Reference <ArrowRight size={10} />
-                                     </a>
+
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div className="bg-white p-10 rounded-[3rem] border border-slate-200 shadow-sm space-y-6 relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600 opacity-20"></div>
+                                <div className="flex items-center gap-4 text-indigo-600 mb-2">
+                                    <Layout size={24} />
+                                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Structural Breakdown</h4>
                                 </div>
-                            ))}
+                                <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                                    {term.anatomy?.structuralBreakdown || `Every ${term.term} implementation relies on three core components: structural integrity, audience alignment, and commercial scalability. For books, this manifests as plot beats and character archetypes.`}
+                                </p>
+                            </div>
+                            <div className="bg-slate-900 p-10 rounded-[3rem] border border-slate-800 shadow-2xl space-y-6 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-6 opacity-10 rotate-12 group-hover:scale-110 transition-transform text-white"><Star size={60} /></div>
+                                <div className="flex items-center gap-4 text-indigo-400 mb-2">
+                                    <Users size={24} />
+                                    <h4 className="text-xs font-black uppercase tracking-widest text-indigo-200">The Specialist&apos;s Perspective</h4>
+                                </div>
+                                <p className="text-sm text-indigo-100/70 leading-relaxed font-medium">
+                                    {term.anatomy?.specialistPerspective || `From an expert lens, ${term.term} is not just a definition—it is an EEAT signal. Authors who master this nuance can command higher royalty rates and increased reader loyalty through authenticity.`}
+                                </p>
+                            </div>
                         </div>
                     </section>
 
-                    {/*  8. 10 PRODUCT IDEAS PIPELINE  */}
-                    <section className="space-y-8" id="ideas">
-                        <h2 id="ideas" className="text-2xl font-bold text-slate-900 uppercase tracking-tight border-b border-slate-200 pb-6 italic">10 Product Ideas Pipeline</h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {(term.productIdeas && term.productIdeas.length > 0 ? term.productIdeas : [
-                                { title: "Blueprint Masterclass", type: "Course", pricePoint: "$147.00", description: "A comprehensive guide on deploying these strategies." },
-                                { title: "Niche Authority Kit", type: "Template", pricePoint: "$29.00", description: "Printable frameworks to prompt discussion." }
-                            ]).map((item: any, i: number) => (
-                                <div key={i} className="p-8 bg-white border border-slate-200 rounded-[2rem] space-y-4 group hover:border-indigo-300 hover:shadow-lg transition-all shadow-sm">
-                                    <div className="flex justify-between items-start">
-                                        <div className="p-3 bg-slate-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"><Rocket size={20} /></div>
-                                        <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded-md">{item.pricePoint || item.price || "$19.00"}</span>
+                    {/*  PHASE 3: BOTTOM-OF-FUNNEL DIRECTORY (THE SALES ENGINE)  */}
+                    <section className="space-y-12" id="directory">
+                        <div className="bg-white rounded-[3rem] p-10 md:p-14 border border-slate-200 shadow-sm space-y-12">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-10">
+                                <div className="space-y-3">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-md border border-emerald-100">
+                                        <ShoppingBag size={14} /> The Sales Engine
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <h4 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">{item.title}</h4>
-                                        <p className="text-[11px] text-slate-500 uppercase font-bold tracking-widest border-l-2 border-slate-200 pl-3">{item.type}</p>
-                                        <p className="text-xs text-slate-400 mt-2 leading-relaxed">{item.description || item.desc}</p>
-                                    </div>
+                                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+                                        Curated <span className="text-indigo-600">Solutions</span> & Directory
+                                    </h2>
                                 </div>
-                            ))}
+                                <div className="flex items-center gap-4">
+                                     <div className="text-right">
+                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Opportunity Score</p>
+                                         <p className="text-2xl font-black text-emerald-600">{term.opportunityScore || '92'}/100</p>
+                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Integrated Category Results */}
+                            <div className="space-y-20">
+                                {(term.directoryCategories && term.directoryCategories.length > 0 ? term.directoryCategories : [
+                                    { name: "Top Recommended Assets", description: "Vetted books and digital products for this niche." }
+                                ]).map((cat: any, idx: number) => {
+                                    // Match internal products to this sub-category
+                                    const internalCatMatches = fullPool.filter(item => 
+                                        item.category?.toLowerCase() === cat.name?.toLowerCase() ||
+                                        item.title?.toLowerCase().includes(term.term.toLowerCase())
+                                    );
+
+                                    // Match CSV products (by ASIN if provided, otherwise relevance)
+                                    const csvMatches = cat.productIds?.length > 0 
+                                        ? csvProducts.filter(p => cat.productIds.includes(p.asin))
+                                        : (idx === 0 ? csvProducts.slice(0, 6) : []);
+
+                                    // Interleave: Internal first, then CSV
+                                    const combinedCategoryPool = [...internalCatMatches, ...csvMatches.map(p => ({
+                                        id: p.asin,
+                                        title: p.title,
+                                        price: p.price || '9.99',
+                                        imageUrl: p.imageUrl,
+                                        link: formatAmazonLink(p.fullUrl || `https://www.amazon.com/dp/${p.asin}`),
+                                        isExternal: true,
+                                        type: 'amazon',
+                                        rating: p.rating || '4.8'
+                                    }))];
+
+                                    if (combinedCategoryPool.length === 0) return null;
+
+                                    return (
+                                        <div key={idx} className="space-y-10">
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-1 bg-indigo-600 rounded-full"></div>
+                                                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
+                                                        {cat.name}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-slate-500 font-bold ml-16 max-w-2xl">{cat.description}</p>
+                                            </div>
+
+                                            {/* Dynamic Grid */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                                {combinedCategoryPool.slice(0, 6).map((item: any, pIdx: number) => (
+                                                    <Link 
+                                                        key={pIdx}
+                                                        href={item.link}
+                                                        target={item.isExternal ? "_blank" : "_self"}
+                                                        className="group bg-slate-50 border border-slate-200 rounded-[2.5rem] p-8 hover:bg-white hover:shadow-2xl hover:border-indigo-200 transition-all flex flex-col h-full relative"
+                                                    >
+                                                        {item.type !== 'amazon' && (
+                                                            <div className="absolute -top-3 -right-3 bg-indigo-600 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg z-10 border-2 border-white">
+                                                                Internal Asset
+                                                            </div>
+                                                        )}
+                                                        <div className="aspect-[3/4] rounded-3xl overflow-hidden mb-8 shadow-xl relative bg-white">
+                                                            <img 
+                                                                src={item.imageUrl || '/images/placeholder-product.png'} 
+                                                                alt={item.title} 
+                                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                                            />
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                        </div>
+                                                        <h4 className="text-base font-black text-slate-900 mb-4 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors">
+                                                            {item.title}
+                                                        </h4>
+                                                        <div className="mt-auto pt-6 flex items-center justify-between border-t border-slate-100">
+                                                            <span className="text-xl font-black text-slate-900">${item.price}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                {item.rating && (
+                                                                    <div className="flex items-center gap-1 text-amber-400 mr-2">
+                                                                        <Star size={12} className="fill-current" />
+                                                                        <span className="text-[11px] font-black text-slate-900">{item.rating}</span>
+                                                                    </div>
+                                                                )}
+                                                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                                                    Access
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+
+                                            {/* Comparison/List View for this Category */}
+                                            <div className="overflow-hidden rounded-[2rem] border border-slate-200 shadow-sm bg-white">
+                                                <table className="w-full text-left border-collapse">
+                                                    <thead>
+                                                        <tr className="bg-slate-50 border-b border-slate-200">
+                                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Asset Title</th>
+                                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:table-cell">Type</th>
+                                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {combinedCategoryPool.slice(0, 8).map((item: any, pIdx: number) => (
+                                                            <tr key={pIdx} className="border-b border-slate-100 hover:bg-indigo-50/30 transition-colors group/row">
+                                                                <td className="px-8 py-5 font-bold text-slate-900 text-sm">{item.title.split(':')[0]}</td>
+                                                                <td className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:table-cell">
+                                                                    {item.type === 'amazon' ? 'Amazon Reference' : 'Direct Access'}
+                                                                </td>
+                                                                <td className="px-8 py-5">
+                                                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${item.type === 'amazon' ? 'bg-amber-50 text-amber-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                                                                        {item.type === 'amazon' ? 'Affiliate' : 'Warlock Verified'}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-8 py-5">
+                                                                    <Link 
+                                                                        href={item.link}
+                                                                        target={item.isExternal ? "_blank" : "_self"}
+                                                                        className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline flex items-center gap-2 group-hover/row:translate-x-1 transition-transform"
+                                                                    >
+                                                                        Explore <ArrowRight size={12} />
+                                                                    </Link>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/*  PHASE 4: AI & SEARCH OPTIMIZATION (THE TECHNICAL LAYER)  */}
+                    <div className="grid md:grid-cols-2 gap-8">
+                        {/* Regional Trends */}
+                        <section className="bg-white p-10 rounded-[3rem] border border-slate-200 shadow-sm space-y-6">
+                            <div className="flex items-center gap-3 text-indigo-600">
+                                <TrendingUp size={24} />
+                                <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Regional Trends</h3>
+                            </div>
+                            <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                                {term.regionalTrends || `Demand for ${term.term} is currently peaking in North America (High Interest) and the UK (Emerging Growth). European markets are showing significant interest in localized translations and adaptations.`}
+                            </p>
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Status</span>
+                                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase rounded-md border border-emerald-100">Expanding</span>
+                            </div>
+                        </section>
+
+                        {/* Buyer's Checklist */}
+                        <section className="bg-slate-900 text-white p-10 rounded-[3rem] shadow-2xl space-y-6">
+                            <div className="flex items-center gap-3 text-indigo-400">
+                                <CheckCircle2 size={24} />
+                                <h3 className="text-xl font-black uppercase tracking-tight text-white">The Buyer&apos;s Checklist</h3>
+                            </div>
+                            <div className="space-y-3">
+                                {(term.buyersChecklist && term.buyersChecklist.length > 0 ? term.buyersChecklist : [
+                                    "Verify author credentials or product materials.",
+                                    "Check for compatibility with current tech stacks.",
+                                    "Evaluate long-term scalability potential.",
+                                    "Review community feedback and rating trends.",
+                                    "Confirm affiliate eligibility for bonuses."
+                                ]).map((item, i) => (
+                                    <div key={i} className="flex gap-4 items-center">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                                        <span className="text-sm font-medium text-slate-300">{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </div>
+
+                    {/*  AI COMMAND CENTER (INTEGRATED PHASE 4.3)  */}
+                    <section className="p-10 md:p-14 bg-white border-4 border-slate-900 rounded-[3.5rem] shadow-2xl relative overflow-hidden group" id="ai">
+                         <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Monitor size={140} /></div>
+                         <div className="relative z-10 space-y-10">
+                            <div className="flex items-center gap-4">
+                                <div className="p-4 bg-slate-900 text-white rounded-3xl shadow-xl"><Zap size={24} className="text-amber-400" /></div>
+                                <div>
+                                    <h2 id="ai" className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">AI Command Center</h2>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Direct Implementation Prompts</p>
+                                </div>
+                            </div>
+                            <div className="grid gap-8">
+                                {[
+                                    { label: "Product Synthesis Protocol", prompt: term.aiPromptCommandCenter?.productIdeaPrompt || term.productPrompt },
+                                    { label: "Content Authority Prompt", prompt: term.aiPromptCommandCenter?.contentStrategyPrompt || term.socialPrompt },
+                                    { label: "Visual Asset Prompt", prompt: term.aiPromptCommandCenter?.aiImagePrompt || term.imagePrompt }
+                                ].filter(p => p.prompt).map((p, i) => (
+                                    <div key={i} className="space-y-4">
+                                        <h4 className="text-[11px] font-black uppercase tracking-widest text-indigo-600 border-l-4 border-indigo-600 pl-4">{p.label}</h4>
+                                        <div className="bg-slate-50 border border-slate-200 p-8 rounded-[2.5rem] text-sm font-mono text-slate-600 relative group/prompt hover:border-indigo-300 transition-all">
+                                            <code className="block leading-relaxed pr-10">{p.prompt}</code>
+                                            <div className="absolute top-6 right-6 opacity-0 group-hover/prompt:opacity-100 transition-opacity">
+                                                <CopyPromptButton prompt={p.prompt as string} className="!p-3 !rounded-2xl !bg-slate-900 !text-white hover:!bg-indigo-600 shadow-xl" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                         </div>
+                    </section>
+
+                    {/*  THE SOLUTION ROADMAP (FINAL CTA)  */}
+                    <section className="bg-indigo-600 text-white rounded-[4rem] p-12 md:p-24 relative overflow-hidden shadow-2xl" id="roadmap">
+                        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
+                        <div className="relative z-10 text-center space-y-12">
+                            <h2 className="text-5xl md:text-8xl font-black tracking-tighter italic uppercase leading-none">
+                                Turn knowledge into <span className="text-amber-400">Empire</span>
+                            </h2>
+                            <p className="text-xl md:text-2xl font-medium opacity-90 max-w-2xl mx-auto italic">
+                                Our vetted implementation tools are the difference between a &quot;hobbyist&quot; and a dominant market authority. Claim your mastery resource today.
+                            </p>
+                            <div className="flex flex-col md:flex-row items-center justify-center gap-8 pt-8">
+                                <Link 
+                                    href={productLink}
+                                    className="w-full md:w-auto px-12 py-8 bg-white text-slate-900 rounded-[2.5rem] font-black uppercase tracking-widest text-xs hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-4 group"
+                                >
+                                    Claim Mastery Resource <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                                </Link>
+                                <Link 
+                                    href="/glossary"
+                                    className="w-full md:w-auto px-12 py-8 bg-indigo-500 text-white border border-indigo-400/30 rounded-[2.5rem] font-black uppercase tracking-widest text-xs hover:bg-indigo-400 transition-all flex items-center justify-center gap-4 shadow-xl"
+                                >
+                                    Return to Vault <ShoppingBag size={20} />
+                                </Link>
+                            </div>
                         </div>
                     </section>
 
                     {/*  EXTRA SECTIONS: Amazon Prime Reference Library (Dynamic CSV Integration)  */}
                     <AmazonLibrarySection 
-                        products={csvProducts} 
-                        title={`Prime Reference: ${term.term}`}
-                        subtitle="Curated Industry Assets & Reference Titles"
+                        term={term.term} 
+                        category={term.category || 'General'} 
+                        products={csvProducts}
                     />
 
                     {/*  9. COMMON PITFALLS  */}

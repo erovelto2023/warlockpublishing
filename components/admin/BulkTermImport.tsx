@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { X, Upload, CheckCircle2, AlertCircle, Loader2, Copy, Zap, FileJson, Database } from 'lucide-react';
+import { X, Upload, CheckCircle2, AlertCircle, Loader2, Copy, Zap, FileJson, Database, Sparkles } from 'lucide-react';
 import { bulkImportTerms, importDetailedJson } from '@/lib/actions/glossary';
 import { useRouter } from 'next/navigation';
 
@@ -223,7 +223,22 @@ SCHEMA STRUCTURE:
   "blogArticle": { "title": "...", "content": "..." },
   "faqs": [ { "question": "...", "answer": "..." } ],
   "amazonProducts": [ { "name": "...", "url": "..." } ],
-  "checklist": ["Step 1", "Step 2"]
+  "checklist": ["Step 1", "Step 2"],
+  
+  // Authority Framework Extensions
+  "writingAspect": "Specific technical nuance for authors...",
+  "geoTagging": "Regional popularity or cultural variations...",
+  "commonMyths": [ { "myth": "...", "fact": "..." } ],
+  "anatomy": { 
+    "structuralBreakdown": "...", 
+    "specialistPerspective": "Expert mastery note (EEAT)..." 
+  },
+  "directoryCategories": [
+    { "name": "...", "description": "...", "productIds": ["B0XXXXXX", "B0YYYYYY"] }
+  ],
+  "featuredSnippet": "Brief high-impact summary for SGE...",
+  "regionalTrends": "Growth data for specific regions...",
+  "opportunityScore": 85
 }
 
 KEYWORDS TO RESEARCH:
@@ -332,16 +347,16 @@ KEYWORDS TO RESEARCH:
                                 <div className="w-20 h-20 bg-indigo-600/10 rounded-full flex items-center justify-center mb-6">
                                     <Copy className="text-indigo-600" size={32} />
                                 </div>
-                                <h3 className="text-lg font-black text-indigo-950 mb-3 uppercase tracking-tight">Monetization Blueprint Prompt</h3>
+                                <h3 className="text-lg font-black text-indigo-950 mb-3 uppercase tracking-tight">Authority Silo Architect</h3>
                                 <p className="text-slate-600 text-sm mb-8 leading-relaxed font-medium">
-                                    Copies the perfect high-fidelity research template to your clipboard. Paste this into ChatGPT with your seeded keywords to generate deep market analysis, 50+ hooks, and long-form articles.
+                                    Copies the **Universal Authority Template** research prompt to your clipboard. Use this with Claude or ChatGPT to generate the 4-Phase content structure (SEO Hook, Educational Authority, Sales Engine, and Optimization) for any niche.
                                 </p>
                                 <button 
                                     onClick={copyPrompt}
                                     className="px-10 py-4 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-100 transition-all flex items-center gap-3"
                                 >
-                                    <Copy size={16} />
-                                    Copy 360-Research Prompt
+                                    <Sparkles size={16} />
+                                    Copy Universal Authority Prompt
                                 </button>
                             </div>
                         </div>
