@@ -7,7 +7,7 @@ import { getPublishedSalesPages } from '@/lib/actions/sales-page.actions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Sparkles, Zap, TrendingUp, BookOpen, AlertTriangle, Star, Layout, Users, Activity, Palette, Rocket, ListChecks, CheckCircle2, ShoppingBag, ArrowRight, Target, FileText, Megaphone, Copy, ShieldCheck, Globe, DollarSign, ExternalLink, MessageSquareQuote, Youtube, Clock, Hash, Tag, Share2, PieChart, UserCheck, ChevronRight, BookDashed } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import AIPromptCard from '@/components/glossary/AIPromptCard';
 import StructuredData from '@/components/glossary/StructuredData';
 import CopyPromptButton from '@/components/glossary/CopyPromptButton';
 import PrintButton from '@/components/glossary/PrintButton';
@@ -604,53 +604,24 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         </div>
 
                         <div className="grid md:grid-cols-3 gap-6">
-                            {[
-                                { 
-                                    title: "Scene Generator", 
-                                    icon: <Activity className="text-indigo-600" />, 
-                                    desc: "Generate high-tension scenes.",
-                                    prompt: term.aiPromptCommandCenter?.productIdeaPrompt || `Draft a scene where [Alpha] first sees [Proxy]'s secret involving ${term.term}.`
-                                },
-                                { 
-                                    title: "Blurb/Marketing", 
-                                    icon: <Megaphone className="text-amber-500" />, 
-                                    desc: "High-CTR hooks & hooks.",
-                                    prompt: term.aiPromptCommandCenter?.contentStrategyPrompt || `Create 5 high-converting TikTok hooks for a ${term.term} reveal.`
-                                },
-                                { 
-                                    title: "Visual Asset", 
-                                    icon: <Palette className="text-emerald-500" />, 
-                                    desc: "Thematic cover/Pinterest art.",
-                                    prompt: term.aiPromptCommandCenter?.aiImagePrompt || `Cinematic book cover art representing ${term.term} with high emotional contrast.`
-                                }
-                            ].map((item, i) => (
-                                <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6 flex flex-col h-full group hover:border-indigo-200 transition-all">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-3 bg-slate-50 rounded-2xl group-hover:scale-110 transition-transform">{item.icon}</div>
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{item.title}</h4>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase">{item.desc}</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-950 p-6 rounded-2xl relative overflow-hidden flex-1 min-h-[120px]">
-                                        <p className="text-[10px] text-slate-400 font-mono leading-relaxed line-clamp-4">
-                                            {item.prompt}
-                                        </p>
-                                        <button 
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(item.prompt);
-                                                toast({
-                                                    title: `${item.title} Prompt Copied`,
-                                                    description: "The prompt is now in your clipboard.",
-                                                });
-                                            }}
-                                            className="absolute bottom-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-all opacity-0 group-hover:opacity-100"
-                                        >
-                                            <Copy size={12} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                            <AIPromptCard 
+                                title="Scene Generator" 
+                                icon={<Activity className="text-indigo-600" />} 
+                                desc="Generate high-tension scenes."
+                                prompt={term.aiPromptCommandCenter?.productIdeaPrompt || `Draft a scene where [Alpha] first sees [Proxy]'s secret involving ${term.term}.`}
+                            />
+                            <AIPromptCard 
+                                title="Blurb/Marketing" 
+                                icon={<Megaphone className="text-amber-500" />} 
+                                desc="High-CTR hooks & hooks."
+                                prompt={term.aiPromptCommandCenter?.contentStrategyPrompt || `Create 5 high-converting TikTok hooks for a ${term.term} reveal.`}
+                            />
+                            <AIPromptCard 
+                                title="Visual Asset" 
+                                icon={<Palette className="text-emerald-500" />} 
+                                desc="Thematic cover/Pinterest art."
+                                prompt={term.aiPromptCommandCenter?.aiImagePrompt || `Cinematic book cover art representing ${term.term} with high emotional contrast.`}
+                            />
                         </div>
                     </section>
 
