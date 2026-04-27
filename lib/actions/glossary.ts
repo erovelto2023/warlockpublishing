@@ -5,6 +5,26 @@ import GlossaryTerm from '@/lib/models/GlossaryTerm';
 import { revalidatePath } from 'next/cache';
 import { GlossaryTerm as GlossaryTermType } from '@/lib/types';
 import { AMAZON_AFFILIATE_ID, formatAmazonLink } from '@/lib/utils';
+import { parseAmazonCsv, AmazonProduct } from '@/lib/csv-parser';
+
+export async function getAmazonProductsFromCsv(query: string, limit: number = 4): Promise<AmazonProduct[]> {
+    const allProducts = await parseAmazonCsv();
+    if (!allProducts || allProducts.length === 0) return [];
+    
+    const queryLower = query.toLowerCase();
+    
+    // Match by keyword or title
+    const matches = allProducts.filter(p => 
+        p.keyword.toLowerCase().includes(queryLower) || 
+        p.title.toLowerCase().includes(queryLower) ||
+        queryLower.includes(p.keyword.toLowerCase())
+    );
+
+    // If no direct matches, return some default top picks from the CSV
+    if (matches.length === 0) return allProducts.slice(0, limit);
+    
+    return matches.slice(0, limit);
+}
 
 // Slugify helper
 function slugify(text: string) {
