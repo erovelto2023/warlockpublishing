@@ -408,6 +408,59 @@ export async function importDetailedJson(data: any[]) {
                 if (!Array.isArray(item.masterclass.characterArchetypes)) item.masterclass.characterArchetypes = [];
                 if (!Array.isArray(item.masterclass.profitabilityChecklist)) item.masterclass.profitabilityChecklist = [];
             }
+            
+            // --- STREAMLINED SCHEMA MAPPING (Choice A/B) ---
+            if (item.marketIntel) {
+                item.opportunityScore = item.marketIntel.opportunityScore ?? item.opportunityScore;
+                item.geoTagging = item.marketIntel.geoTrends || item.geoTagging;
+                item.modernUsage = item.marketIntel.modernUsage || item.modernUsage;
+            }
+            if (item.genreAnatomy) {
+                item.writingAspect = item.genreAnatomy.writingAspect || item.writingAspect;
+                item.anatomy = {
+                    ...item.anatomy,
+                    specialistPerspective: item.genreAnatomy.specialistPerspective || item.anatomy?.specialistPerspective
+                };
+                if (item.genreAnatomy.pitfalls && Array.isArray(item.genreAnatomy.pitfalls)) {
+                    item.commonPitfalls = item.genreAnatomy.pitfalls.map((p: any) => ({
+                        pitfall: p.challenge,
+                        whyItHappens: "",
+                        howToAvoid: p.solution
+                    }));
+                }
+            }
+            if (item.masterclass && typeof item.masterclass === 'object') {
+                if (item.masterclass.structure) {
+                    item.masterclass.threeActStructure = item.masterclass.structure;
+                }
+                if (item.masterclass.archetypes && typeof item.masterclass.archetypes === 'object') {
+                    item.masterclass.characterArchetypes = [
+                        { role: "The Alpha / Specialist", description: item.masterclass.archetypes.alpha || "" },
+                        { role: "The Relatable Proxy", description: item.masterclass.archetypes.proxy || "" },
+                        { role: "The Foil", description: item.masterclass.archetypes.foil || "" }
+                    ];
+                }
+            }
+            if (item.publishingTech) {
+                item.masterclass = {
+                    ...(item.masterclass || {}),
+                    technicalComponents: {
+                        powerTitle: item.publishingTech.powerTitle,
+                        tropes: item.publishingTech.essentialTropes,
+                        hook: item.publishingTech.blurbHook
+                    }
+                };
+            }
+            if (item.aiCommandCenter) {
+                item.aiPromptCommandCenter = {
+                    ...(item.aiPromptCommandCenter || {}),
+                    productIdeaPrompt: item.aiCommandCenter.scenePrompt,
+                    contentStrategyPrompt: item.aiCommandCenter.marketingPrompt,
+                    aiImagePrompt: item.aiCommandCenter.visualPrompt
+                };
+            }
+            // ----------------------------------------------
+
             if (typeof item.aiPromptCommandCenter === 'string') item.aiPromptCommandCenter = { contentStrategyPrompt: item.aiPromptCommandCenter };
 
             // Defend Array-to-String Cast Errors (for fields defined as String but sometimes output as Array by GPT)
