@@ -7,6 +7,7 @@ import {
     ChevronRight, Info, Trash2, Edit, X, ChevronLeft
 } from 'lucide-react';
 import { getAmazonCsvContent, updateAmazonCsvContent } from '@/lib/actions/marketplace';
+import { formatAmazonLink } from '@/lib/utils';
 
 const PAGE_SIZE = 20;
 
@@ -81,11 +82,15 @@ export default function MarketplaceManager() {
         const lines = content.split('\n').filter(l => l.trim());
         return lines.map((line, idx) => {
             const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
+            const sUrl = (parts[2] || '').trim();
+            const fUrl = (parts[3] || '').trim();
+            const preferredUrl = (fUrl.includes('javascript:void') && sUrl.startsWith('http')) ? sUrl : (fUrl || sUrl);
+
             return {
                 id: idx,
                 rawParts: parts,
                 keyword: parts[1] || '',
-                url: parts[3] || '',
+                url: preferredUrl,
                 title: parts[9] || 'Untitled',
                 price: parts[26] || '0.00'
             };
@@ -252,7 +257,7 @@ export default function MarketplaceManager() {
                                             </td>
                                             <td className="px-8 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <a href={item.url} target="_blank" className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"><ExternalLink size={14} /></a>
+                                                    <a href={formatAmazonLink(item.url)} target="_blank" className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"><ExternalLink size={14} /></a>
                                                     <button onClick={() => openEditModal(item)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-white rounded-lg transition-all"><Edit size={14} /></button>
                                                     <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-white rounded-lg transition-all"><Trash2 size={14} /></button>
                                                 </div>
