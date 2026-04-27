@@ -593,7 +593,11 @@ async function searchYouTubeForTerm(term: string, category: string = ""): Promis
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
         const html = await searchRes.text();
-        const match = html.match(/ytInitialData\s*=\s*({.+?});/);
+        
+        // More robust regex for YouTube's initial data
+        const match = html.match(/ytInitialData\s*=\s*({.+?})(?:;|<\/script)/) || 
+                      html.match(/window\["ytInitialData"\]\s*=\s*({.+?});/);
+        
         if (!match) return null;
 
         const data = JSON.parse(match[1]);

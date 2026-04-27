@@ -165,7 +165,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                 </aside>
                 
                 {/*  MAIN CONTENT AREA  */}
-                <div className="lg:col-span-8 xl:col-span-7 space-y-20">
+                <div className="lg:col-span-8 xl:col-span-7 space-y-24 pb-32">
                     
                     {/*  1. IDENTITY & TAXONOMY SECTION  */}
                     <section className="bg-white rounded-[2.5rem] p-8 md:p-14 border border-slate-200 shadow-sm relative overflow-hidden">
@@ -890,10 +890,10 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
                 </aside>
 
+                <div className="lg:hidden h-20" /> {/* Mobile Spacer */}
             </div>
 
-
-
+            <div className="h-32" /> {/* Bottom Page Buffer */}
         </div>
     );
 }
