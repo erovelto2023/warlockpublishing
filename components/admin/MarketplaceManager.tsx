@@ -52,6 +52,12 @@ export default function MarketplaceManager() {
         setSaving(false);
     };
 
+    const cleanseText = (text: string) => {
+        return text
+            .replace(/javascript:void\(0\)/g, '')
+            .replace(/amazon\.com(?!\/)/g, 'amazon.com/');
+    };
+
     const repairRow = (parts: string[]) => {
         const sUrl = (parts[2] || '').trim();
         const fUrl = (parts[3] || '').trim();
