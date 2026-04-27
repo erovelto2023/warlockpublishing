@@ -30,16 +30,21 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     const { slug } = await props.params;
     try {
         const term = await getGlossaryTermBySlug(slug) as GlossaryTerm | null;
-        if (!term) return constructMetadata({ title: 'Term Not Found' });
+        if (!term) return constructMetadata({ 
+            title: 'Term Not Found', 
+            description: 'The requested glossary term could not be located in our strategy database.' 
+        });
 
         return constructMetadata({
             title: `${term.term} | Premium Strategy & Definition`,
-            description: term.blogArticle?.metaDescription || term.shortDefinition || `Deep dive into ${term.term} for publishers and creators.`,
-            canonical: `/glossary/${slug}`
+            description: term.blogArticle?.metaDescription || term.shortDefinition || `Deep dive into ${term.term} for publishers and creators.`
         });
     } catch (err) {
         console.error("Metadata generation failed:", err);
-        return constructMetadata({ title: 'Glossary Term' });
+        return constructMetadata({ 
+            title: 'Glossary Strategy Node', 
+            description: 'Explore premium publishing strategies and industry definitions.' 
+        });
     }
 }
 
