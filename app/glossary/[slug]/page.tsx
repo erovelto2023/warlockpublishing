@@ -185,18 +185,76 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
     const productLink = featuredPoolItem?.link || "/products";
     
-    // Marketing/Production keyword detection logic
+    // --- CATEGORY INTELLIGENCE ENGINE ---
+    const isFiction = [
+        'Romance', 'Literature & Fiction', 'Mystery, Thriller & Suspense', 
+        'Science Fiction & Fantasy', 'Teen & Young Adult', 'Comics & Graphic Novels', 'Trope', 'Genre'
+    ].includes(term.category);
+
+    const isNonFiction = [
+        'Biographies & Memoirs', 'Business & Money', 'Health, Fitness & Dieting', 
+        'History', 'Politics & Social Sciences', 'Religion & Spirituality', 
+        'Science & Math', 'Self-Help', 'Education & Teaching', 'Engineering & Transportation', 
+        'Law', 'Medical Books', 'Parenting & Relationships', 'Reference', 'Sports & Outdoors', 'Writing', 'Publishing', 'Marketing'
+    ].includes(term.category);
+
+    const isPractical = [
+        'Cookbooks, Food & Wine', 'Crafts, Hobbies & Home', 'Travel', 'Humor & Entertainment', 'Children\'s Books'
+    ].includes(term.category);
+
+    // Marketing/Production keyword detection logic (Fallback)
     const marketingKeywords = ['cover', 'video', 'checklist', 'marketing', 'sales', 'blurb', 'design', 'art', 'promo', 'ad', 'social', 'email', 'funnel'];
-    const isMarketingFocus = marketingKeywords.some(k => term.term.toLowerCase().includes(k) || term.slug.includes(k));
+    const isMarketingFocus = marketingKeywords.some(k => term.term.toLowerCase().includes(k) || term.slug.includes(k)) || term.category === 'Marketing';
     
-    const writingLabel = isMarketingFocus ? "The Marketing Angle" : "The Writing Aspect";
-    const masterclassTitle = isMarketingFocus ? "Marketing Mastery" : "Writers Masterclass";
-    const masterclassDesc = isMarketingFocus ? "The technical sales framework designed to maximize visibility and conversion." : "The 3-Act Profit Structure designed to manage reader engagement and maximize ROI.";
-    const structuralTitle = isMarketingFocus ? "Campaign Structure" : "3-Act Profit Structure";
-    const pacingTitle = isMarketingFocus ? "Conversion Beats" : "Profit Beats (Pacing)";
-    const archetypesTitle = isMarketingFocus ? "Target Personas" : "Archetype Trio";
-    const archetypesDesc = isMarketingFocus ? "The specific audience segments this asset is designed to convert." : "The specific roles readers of this keyword demand.";
-    const snippetLabel = isMarketingFocus ? "Sales Copy Hook" : "Story Snippet";
+    // Dynamic Labels based on Meta-Category
+    let writingLabel = "The Strategic Aspect";
+    let masterclassTitle = "Authority Masterclass";
+    let masterclassDesc = "The universal strategy designed to manage engagement and maximize ROI.";
+    let structuralTitle = "Strategic Structure";
+    let pacingTitle = "Strategic Beats";
+    let archetypesTitle = "Character Archetypes";
+    let archetypesDesc = "The specific roles readers of this keyword demand.";
+    let snippetLabel = "Strategy Snippet";
+
+    if (isFiction) {
+        writingLabel = "The Writing Aspect";
+        masterclassTitle = "Writers Masterclass";
+        masterclassDesc = "The 3-Act Profit Structure designed to manage reader engagement and maximize ROI.";
+        structuralTitle = "3-Act Profit Structure";
+        pacingTitle = "Profit Beats (Pacing)";
+        archetypesTitle = "Archetype Trio";
+        archetypesDesc = "The specific roles readers of this keyword demand.";
+        snippetLabel = "Story Snippet";
+    } else if (isNonFiction) {
+        writingLabel = "The Authority Angle";
+        masterclassTitle = "Authority Masterclass";
+        masterclassDesc = "The educational framework designed to establish EEAT and drive student transformation.";
+        structuralTitle = "Authority Framework";
+        pacingTitle = "Transformation Milestones";
+        archetypesTitle = "Personas & Avatars";
+        archetypesDesc = "The specific student or reader personas this content serves.";
+        snippetLabel = "Authority Hook";
+    } else if (isPractical) {
+        writingLabel = "The Execution Logic";
+        masterclassTitle = "Practical Masterclass";
+        masterclassDesc = "The step-by-step implementation path designed for clarity and lifestyle results.";
+        structuralTitle = "The Execution Path";
+        pacingTitle = "Implementation Steps";
+        archetypesTitle = "User Profiles";
+        archetypesDesc = "The specific hobbyist or practitioner profiles this asset is for.";
+        snippetLabel = "Execution Tip";
+    }
+
+    if (isMarketingFocus) {
+        writingLabel = "The Marketing Angle";
+        masterclassTitle = "Marketing Mastery";
+        masterclassDesc = "The technical sales framework designed to maximize visibility and conversion.";
+        structuralTitle = "Campaign Structure";
+        pacingTitle = "Conversion Beats";
+        archetypesTitle = "Target Personas";
+        archetypesDesc = "The specific audience segments this asset is designed to convert.";
+        snippetLabel = "Sales Copy Hook";
+    }
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-900 pb-20">
@@ -434,8 +492,12 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                             <div key={i} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between items-center">
-                                                        <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{isMarketingFocus ? act.act.replace('Act', 'Phase') : act.act}</h5>
-                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{isMarketingFocus ? 'ROI' : act.range}</span>
+                                                        <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">
+                                                            {isFiction ? act.act : (isNonFiction ? act.act.replace('Act', 'Phase') : act.act.replace('Act', 'Step'))}
+                                                        </h5>
+                                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">
+                                                            {isFiction ? act.range : (isNonFiction ? 'Goal' : 'Action')}
+                                                        </span>
                                                     </div>
                                                     <p className="text-xs text-slate-500 leading-relaxed font-medium">{act.desc}</p>
                                                 </div>

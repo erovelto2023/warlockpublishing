@@ -182,7 +182,43 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
     };
 
     const copyPrompt = () => {
+        const isFiction = [
+            'Romance', 'Literature & Fiction', 'Mystery, Thriller & Suspense', 
+            'Science Fiction & Fantasy', 'Teen & Young Adult', 'Comics & Graphic Novels', 'Trope', 'Genre'
+        ].includes(category);
+
+        const isNonFiction = [
+            'Biographies & Memoirs', 'Business & Money', 'Health, Fitness & Dieting', 
+            'History', 'Politics & Social Sciences', 'Religion & Spirituality', 
+            'Science & Math', 'Self-Help', 'Education & Teaching', 'Engineering & Transportation', 
+            'Law', 'Medical Books', 'Parenting & Relationships', 'Reference', 'Sports & Outdoors', 'Writing', 'Publishing', 'Marketing'
+        ].includes(category);
+
+        const isPractical = [
+            'Cookbooks, Food & Wine', 'Crafts, Hobbies & Home', 'Travel', 'Humor & Entertainment', 'Children\'s Books'
+        ].includes(category);
+
+        let categorySpecificInstructions = "";
+        if (isFiction) {
+            categorySpecificInstructions = `
+- Focus on narrative architecture, character archetypes, and plot-driven profit beats.
+- For "threeActStructure", use Act 1 (Hook), Act 2 (Rising Stakes), Act 3 (Resolution).
+- For "characterArchetypes", focus on roles like "The Alpha", "The Proxy", and "The Foil".`;
+        } else if (isNonFiction) {
+            categorySpecificInstructions = `
+- Focus on authority signals, evidence-based frameworks, and transformation milestones.
+- For "threeActStructure", replace with "The Authority Framework": Act 1 (The Problem), Act 2 (The System/Solution), Act 3 (The Transformation).
+- For "characterArchetypes", focus on "The Expert/Guide", "The Struggler/Student", and "The Success Story".`;
+        } else if (isPractical) {
+            categorySpecificInstructions = `
+- Focus on instructional flow, visual requirements, and lifestyle integration.
+- For "threeActStructure", replace with "The Execution Path": Act 1 (Preparation/Tools), Act 2 (Implementation/Steps), Act 3 (The Final Result).
+- For "characterArchetypes", focus on "The Beginner", "The Hobbyist", and "The Master Crafter".`;
+        }
+
         const prompt = `CRITICAL: Generate a STRICT JSON array of research objects for the keywords provided below. 
+CATEGORY CONTEXT: ${category}
+${categorySpecificInstructions}
 
 OUTPUT REQUIREMENTS:
 1. Valid JSON Array only. No conversational text.
@@ -339,11 +375,45 @@ KEYWORDS TO RESEARCH:
                                     onChange={(e) => setCategory(e.target.value)}
                                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-bold text-slate-700 appearance-none"
                                 >
-                                    <option>Writing</option>
-                                    <option>Publishing</option>
-                                    <option>Marketing</option>
-                                    <option>Trope</option>
-                                    <option>Genre</option>
+                                    <optgroup label="Core Strategic">
+                                        <option>Writing</option>
+                                        <option>Publishing</option>
+                                        <option>Marketing</option>
+                                        <option>Trope</option>
+                                        <option>Genre</option>
+                                    </optgroup>
+                                    <optgroup label="Fiction Categories">
+                                        <option>Romance</option>
+                                        <option>Literature & Fiction</option>
+                                        <option>Mystery, Thriller & Suspense</option>
+                                        <option>Science Fiction & Fantasy</option>
+                                        <option>Teen & Young Adult</option>
+                                        <option>Comics & Graphic Novels</option>
+                                    </optgroup>
+                                    <optgroup label="Non-Fiction Categories">
+                                        <option>Biographies & Memoirs</option>
+                                        <option>Business & Money</option>
+                                        <option>Health, Fitness & Dieting</option>
+                                        <option>History</option>
+                                        <option>Politics & Social Sciences</option>
+                                        <option>Religion & Spirituality</option>
+                                        <option>Science & Math</option>
+                                        <option>Self-Help</option>
+                                        <option>Education & Teaching</option>
+                                        <option>Engineering & Transportation</option>
+                                        <option>Law</option>
+                                        <option>Medical Books</option>
+                                        <option>Parenting & Relationships</option>
+                                        <option>Reference</option>
+                                        <option>Sports & Outdoors</option>
+                                    </optgroup>
+                                    <optgroup label="Practical & Lifestyle">
+                                        <option>Cookbooks, Food & Wine</option>
+                                        <option>Crafts, Hobbies & Home</option>
+                                        <option>Travel</option>
+                                        <option>Humor & Entertainment</option>
+                                        <option>Children's Books</option>
+                                    </optgroup>
                                 </select>
                             </div>
 
