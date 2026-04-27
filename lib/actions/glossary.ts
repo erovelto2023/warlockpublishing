@@ -398,6 +398,16 @@ export async function importDetailedJson(data: any[]) {
             if (typeof item.marketingHooks === 'string') item.marketingHooks = { blogTitles: [item.marketingHooks] };
             if (typeof item.blogArticle === 'string') item.blogArticle = { content: item.blogArticle };
             if (typeof item.youtubeVideo === 'string') item.youtubeVideo = { url: item.youtubeVideo };
+            
+            // Masterclass Defense
+            if (item.masterclass && typeof item.masterclass === 'object') {
+                if (typeof item.masterclass.threeActStructure === 'string') {
+                    item.masterclass.threeActStructure = { act1: item.masterclass.threeActStructure };
+                }
+                if (!Array.isArray(item.masterclass.profitBeats)) item.masterclass.profitBeats = [];
+                if (!Array.isArray(item.masterclass.characterArchetypes)) item.masterclass.characterArchetypes = [];
+                if (!Array.isArray(item.masterclass.profitabilityChecklist)) item.masterclass.profitabilityChecklist = [];
+            }
             if (typeof item.aiPromptCommandCenter === 'string') item.aiPromptCommandCenter = { contentStrategyPrompt: item.aiPromptCommandCenter };
 
             // Defend Array-to-String Cast Errors (for fields defined as String but sometimes output as Array by GPT)

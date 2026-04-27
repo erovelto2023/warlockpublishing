@@ -193,6 +193,28 @@ export interface GlossaryTerm {
     featuredSnippet?: string;
     regionalTrends?: string;
     buyersChecklist?: string[];
+    masterclass?: {
+        threeActStructure?: {
+            act1?: string;
+            act2?: string;
+            act3?: string;
+        };
+        profitBeats?: {
+            title?: string;
+            description?: string;
+            timing?: string;
+        }[];
+        characterArchetypes?: {
+            role?: string;
+            description?: string;
+        }[];
+        technicalComponents?: {
+            powerTitle?: string;
+            tropes?: string[];
+            hook?: string;
+        };
+        profitabilityChecklist?: string[];
+    };
     opportunityScore?: number;
 
     isPremium: boolean;

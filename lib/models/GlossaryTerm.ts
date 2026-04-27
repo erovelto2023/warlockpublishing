@@ -209,6 +209,30 @@ const GlossaryTermSchema = new Schema({
     regionalTrends: { type: String }, // Geo-Optimization
     buyersChecklist: [{ type: String }], // 5-point conversion list
     opportunityScore: { type: Number, default: 0 }, // Scarcity/Social Proof metric
+    
+    // Writers Masterclass
+    masterclass: {
+        threeActStructure: {
+            act1: { type: String },
+            act2: { type: String },
+            act3: { type: String }
+        },
+        profitBeats: [{
+            title: { type: String },
+            description: { type: String },
+            timing: { type: String }
+        }],
+        characterArchetypes: [{
+            role: { type: String },
+            description: { type: String }
+        }],
+        technicalComponents: {
+            powerTitle: { type: String },
+            tropes: [{ type: String }],
+            hook: { type: String }
+        },
+        profitabilityChecklist: [{ type: String }]
+    },
 
     // --- Metadata & Workflow ---
     isPremium: { type: Boolean, default: false },

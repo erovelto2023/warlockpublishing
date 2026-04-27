@@ -154,6 +154,30 @@ const formSchema = z.object({
     buyersChecklist: z.array(z.string()).optional(),
     opportunityScore: z.number().min(0).max(100).optional(),
 
+    // Writers Masterclass
+    masterclass: z.object({
+        threeActStructure: z.object({
+            act1: z.string().optional(),
+            act2: z.string().optional(),
+            act3: z.string().optional()
+        }).optional(),
+        profitBeats: z.array(z.object({
+            title: z.string().optional(),
+            description: z.string().optional(),
+            timing: z.string().optional()
+        })).optional(),
+        characterArchetypes: z.array(z.object({
+            role: z.string().optional(),
+            description: z.string().optional()
+        })).optional(),
+        technicalComponents: z.object({
+            powerTitle: z.string().optional(),
+            tropes: z.array(z.string()).optional(),
+            hook: z.string().optional()
+        }).optional(),
+        profitabilityChecklist: z.array(z.string()).optional()
+    }).optional(),
+
     // Flags
     isPublished: z.boolean(),
     isPremium: z.boolean(),
@@ -244,8 +268,44 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
             regionalTrends: term?.regionalTrends || "",
             buyersChecklist: term?.buyersChecklist || [""],
             opportunityScore: term?.opportunityScore || 50,
+
+            // Masterclass
+            masterclass: {
+                threeActStructure: {
+                    act1: term?.masterclass?.threeActStructure?.act1 || "",
+                    act2: term?.masterclass?.threeActStructure?.act2 || "",
+                    act3: term?.masterclass?.threeActStructure?.act3 || ""
+                },
+                profitBeats: term?.masterclass?.profitBeats || [
+                    { title: "Save the Cat", timing: "Early Stage", description: "" },
+                    { title: "Pinch Points", timing: "35% & 60%", description: "" },
+                    { title: "All is Lost", timing: "75%", description: "" },
+                    { title: "Grand Gesture", timing: "Climax", description: "" }
+                ],
+                characterArchetypes: term?.masterclass?.characterArchetypes || [
+                    { role: "The Alpha / Specialist", description: "" },
+                    { role: "The Relatable Proxy", description: "" },
+                    { role: "The Foil", description: "" }
+                ],
+                technicalComponents: {
+                    powerTitle: term?.masterclass?.technicalComponents?.powerTitle || "",
+                    tropes: term?.masterclass?.technicalComponents?.tropes || [""],
+                    hook: term?.masterclass?.technicalComponents?.hook || ""
+                },
+                profitabilityChecklist: term?.masterclass?.profitabilityChecklist || ["", "", "", ""]
+            }
         },
     })
+
+    const { fields: beatFields } = useFieldArray({
+        control: form.control,
+        name: "masterclass.profitBeats"
+    });
+
+    const { fields: archetypeFields } = useFieldArray({
+        control: form.control,
+        name: "masterclass.characterArchetypes"
+    });
 
     const { fields: faqFields, append: appendFaq, remove: removeFaq } = useFieldArray({
         control: form.control,
@@ -1430,6 +1490,150 @@ export default function GlossaryEntryForm({ term }: GlossaryEntryFormProps) {
                             </FormItem>
                         )}
                     />
+                </div>
+
+                {/* SECTION: WRITERS MASTERCLASS */}
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-8">
+                    <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-2">
+                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Sparkles size={20} /></div>
+                        <div>
+                            <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Writers Masterclass Architect</h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Plot structures, profit beats, and archetypes</p>
+                        </div>
+                    </div>
+
+                    {/* Three Act Structure */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4 px-1">Three-Act Foundation</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="masterclass.threeActStructure.act1"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Act I: Hook (0-25%)</FormLabel>
+                                        <FormControl><Textarea className="text-xs min-h-[100px]" placeholder="Setup & Inciting Incident..." {...field} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="masterclass.threeActStructure.act2"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Act II: Confrontation (25-75%)</FormLabel>
+                                        <FormControl><Textarea className="text-xs min-h-[100px]" placeholder="Midpoint & Rising Action..." {...field} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="masterclass.threeActStructure.act3"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Act III: Resolution (75-100%)</FormLabel>
+                                        <FormControl><Textarea className="text-xs min-h-[100px]" placeholder="Climax & HEA/HFN..." {...field} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Profit Beats */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4 px-1">The Profit Beats</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {beatFields.map((field, index) => (
+                                <div key={field.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <FormField
+                                            control={form.control}
+                                            name={`masterclass.profitBeats.${index}.title`}
+                                            render={({ field }) => (
+                                                <FormItem className="flex-1">
+                                                    <FormControl><Input className="h-8 text-xs font-black uppercase border-none bg-transparent p-0" {...field} /></FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name={`masterclass.profitBeats.${index}.timing`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl><Input className="h-6 text-[9px] font-black uppercase border-none bg-indigo-100 text-indigo-600 px-2 rounded" {...field} /></FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name={`masterclass.profitBeats.${index}.description`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl><Textarea className="text-[11px] min-h-[60px] bg-white border-slate-200" placeholder="Beat details..." {...field} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Character Archetypes */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4 px-1">Character Archetypes</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {archetypeFields.map((field, index) => (
+                                <div key={field.id} className="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
+                                    <FormField
+                                        control={form.control}
+                                        name={`masterclass.characterArchetypes.${index}.role`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl><Input className="h-7 text-[11px] font-black uppercase border-none bg-slate-100 rounded px-2" {...field} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`masterclass.characterArchetypes.${index}.description`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl><Textarea className="text-[11px] min-h-[80px]" placeholder="Role details..." {...field} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Technical Components */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4 px-1">Technical Architecture</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="masterclass.technicalComponents.powerTitle"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">The &quot;Power&quot; Title</FormLabel>
+                                        <FormControl><Input className="h-9 text-xs" {...field} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="masterclass.technicalComponents.hook"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">The Hook (Blurb First Line)</FormLabel>
+                                        <FormControl><Input className="h-9 text-xs" {...field} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">

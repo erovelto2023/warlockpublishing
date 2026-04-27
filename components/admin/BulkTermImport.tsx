@@ -238,8 +238,34 @@ SCHEMA STRUCTURE:
   ],
   "featuredSnippet": "Brief high-impact summary for SGE...",
   "regionalTrends": "Growth data for specific regions...",
-  "opportunityScore": 85
+  "opportunityScore": 85,
+  "masterclass": {
+    "threeActStructure": {
+      "act1": "Hook & Setup (0-25%)...",
+      "act2": "Confrontation (25-75%)...",
+      "act3": "Resolution (75-100%)..."
+    },
+    "profitBeats": [
+      { "title": "Save the Cat", "description": "...", "timing": "Early Stage" },
+      { "title": "Pinch Points", "description": "...", "timing": "35% & 60%" },
+      { "title": "All is Lost", "description": "...", "timing": "75%" },
+      { "title": "Grand Gesture", "description": "...", "timing": "Climax" }
+    ],
+    "characterArchetypes": [
+      { "role": "The Alpha / Specialist", "description": "..." },
+      { "role": "The Relatable Proxy", "description": "..." },
+      { "role": "The Foil", "description": "..." }
+    ],
+    "technicalComponents": {
+      "powerTitle": "Keyword-optimized title idea...",
+      "tropes": ["Trope 1", "Trope 2"],
+      "hook": "The blurb's first high-impact line..."
+    },
+    "profitabilityChecklist": ["Hook check...", "Pacing check...", "Market Alignment check...", "Resolution check..."]
+  }
 }
+
+CRITICAL: For the "masterclass" section, provide specific, high-value advice tailored to the keyword. If it's a fiction trope, focus on plot architecture. If it's a technical term, focus on project structure.
 
 KEYWORDS TO RESEARCH:
 [PASTE KEYWORDS HERE]`;
