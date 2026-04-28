@@ -95,9 +95,14 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         offers = (results[2] || []) as SalesPage[];
         csvProducts = results[3] || [];
         
+        // DE-DUPLICATION: Remove the featured resource from the secondary list
+        if (featuredPoolItem) {
+            csvProducts = csvProducts.filter(p => p.asin !== (featuredPoolItem as any).asin);
+        }
+
         // Ensure rotation on every load by shuffling candidates
         if (csvProducts.length > 0) {
-            csvProducts = [...csvProducts].sort(() => Math.random() - 0.5).slice(0, 8);
+            csvProducts = [...csvProducts].sort(() => Math.random() - 0.5).slice(0, 4);
         }
     } catch (err) {
         console.error("Secondary data fetch failed:", err);
