@@ -91,68 +91,90 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
 - For "visualAsset", create prompts for thematic cover art or Pinterest-style coloring page previews.`;
         }
 
-        const prompt = `Act as an Expert UX/UI Data Architect, Literary Analyst, and E-Commerce SEO Strategist. Your task is to design the "Ultimate JSON Data" for these keywords.
+        const prompt = `Act as an Expert UX/UI Data Architect, Literary Analyst, and E-Commerce SEO Strategist. Your task is to design the "Ultimate JSON Data" for these keywords. 
 
-For EACH keyword, you must generate a structured JSON object that follows this EXACT schema. This is for the "Ultimate Authority Pipeline" - so ensure the data is high-ranking, high-converting, and reader-focused.
+You are a master architect designing the "Ultimate Authority Pipeline" for ${category}. 
+
+${categorySpecificInstructions}
+
+For EACH keyword provided below, you must generate a high-ranking, high-converting JSON object that follows this EXACT schema. This data acts as the structural engine for a premium glossary system.
 
 ### MANDATORY RULES:
-1. Valid JSON Array only. No conversational text.
+1. Valid JSON Array only. No conversational text or markdown explanation outside the array.
 2. Use DOUBLE QUOTES (") for all keys and string values.
-3. CRITICAL: Tropes are "cognitive shortcuts". Explain the psychology behind them.
+3. CRITICAL: Tropes are "cognitive shortcuts". Explain the reader psychology in depth.
+4. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
+5. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
 
-SCHEMA:
+SCHEMA FOR EACH OBJECT:
 {
   "term": "Main Term",
-  "slug": "main-term",
-  "shortDefinition": "1-sentence punchy summary.",
-  "definition": "Clear, authoritative definition for SGE. Explain plot movement or rhetorical purpose.",
+  "slug": "main-term-slug",
+  "shortDefinition": "1-sentence punchy summary for SEO snippets.",
+  "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
   "category": "${category}",
   "marketDemand": { 
-    "demandScore": "X/10", 
-    "passionScore": "X/10", 
-    "saturationScore": "X/10",
+    "demandScore": "X.X/10", 
+    "passionScore": "X.X/10", 
+    "saturationScore": "X.X/10",
     "trendStatus": "Rising/Stable/Oversaturated"
   },
   "readerPsychology": {
-    "whyWeCraveIt": "Explain why the human brain craves this trope.",
-    "cognitiveShortcut": "How this trope acts as a mental shortcut for the reader.",
-    "emotionalPayoff": "The specific emotional reward.",
-    "catharticRelease": "Exploration of taboo/catharsis."
+    "whyWeCraveIt": "Deep analysis of the human hardwiring for this specific pattern.",
+    "cognitiveShortcut": "How this trope acts as a mental shortcut for immediate immersion.",
+    "emotionalPayoff": "The specific emotional reward for the reader/user.",
+    "catharticRelease": "Exploration of the psychological release or wish fulfillment provided."
   },
   "masterclass": {
-    "threeActStructure": { "act1": "Phase I: Setup", "act2": "Phase II: Friction", "act3": "Phase III: Payoff" },
-    "profitBeats": [ { "title": "...", "description": "...", "timing": "..." } ],
-    "technicalComponents": { "powerTitle": "...", "tropes": [], "hook": "..." },
-    "profitabilityChecklist": ["Verify X", "Verify Y"]
+    "masterclassDesc": "A high-level summary of how to master this concept for commercial success.",
+    "threeActStructure": { 
+        "act1": "Phase I instructions...", 
+        "act2": "Phase II instructions...", 
+        "act3": "Phase III instructions..." 
+    },
+    "profitBeats": [ 
+        { "title": "Beat Title", "description": "Strategic implementation detail", "timing": "e.g. 25% or Step 2" } 
+    ],
+    "characterArchetypes": [
+        { "role": "The Alpha/Specialist", "description": "Role in this trope/concept." }
+    ],
+    "technicalComponents": { 
+        "powerTitle": "Strategic Title Idea", 
+        "tropes": ["Related Trope 1", "Related Trope 2"], 
+        "hook": "The high-converting blurb hook." 
+    },
+    "profitabilityChecklist": ["Specific Checklist Item 1", "Specific Checklist Item 2"]
   },
   "subGenreVariations": [
-    { "genre": "Sci-Fi", "variation": "How it works here" }
+    { "genre": "Sub-Genre A", "variation": "How the concept shifts in this sub-genre." }
   ],
   "vibeCuration": [
     {
       "vibe": "Yellow",
-      "vibeDescription": "For the reader seeking emotional catharsis and passion.",
+      "vibeDescription": "For readers seeking passion and catharsis.",
       "books": [
-        { "title": "Book 1", "author": "Author A", "salesHook": "1-sentence hook", "buyUrl": "#" }
+        { "title": "Example Book 1", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "#" }
       ]
     },
     {
       "vibe": "Blue",
-      "vibeDescription": "For the reader seeking introspective depth.",
+      "vibeDescription": "For readers seeking depth and atmosphere.",
       "books": [
-        { "title": "Book 2", "author": "Author B", "salesHook": "1-sentence hook", "buyUrl": "#" }
+        { "title": "Example Book 2", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "#" }
       ]
     }
   ],
-  "commonPitfalls": [ { "pitfall": "Writing Sin/Design Error", "howToAvoid": "Expert Solution" } ],
+  "commonPitfalls": [ 
+    { "pitfall": "The common mistake", "howToAvoid": "The expert solution." } 
+  ],
   "aiPromptCommandCenter": {
-    "sceneGeneratorPrompt": "Prompt for high-tension scene...",
-    "marketingHookPrompt": "Prompt for TikTok/Pinterest hooks...",
-    "aiImagePrompt": "Visual Asset Prompt..."
+    "sceneGeneratorPrompt": "Full AI prompt to generate a high-tension scene or concept draft involving [term].",
+    "marketingHookPrompt": "Full AI prompt to generate 5 viral TikTok/social hooks for [term].",
+    "aiImagePrompt": "Cinematic AI image generation prompt for covers or aesthetic assets."
   }
 }
 
-KEYWORDS TO RESEARCH:
+KEYWORDS TO RESEARCH AND CONVERT TO JSON:
 ${rawList || "Please paste keywords in the first column"}`;
 
         navigator.clipboard.writeText(prompt);

@@ -350,7 +350,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 </div>
                             </div>
 
-                    <div className="space-y-4 border-l-4 border-amber-400 pl-6">
+                            <div className="space-y-4 border-l-4 border-amber-400 pl-6">
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">Phase I: SGE Authority Hook</span>
                                 <p className="text-lg md:text-xl font-medium leading-relaxed opacity-95 max-w-3xl">
                                     {term.definition || `Mastering ${term.term} is the key to unlocking consistent narrative engagement and commercial authority in the ${term.category} niche.`}
@@ -485,17 +485,17 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                             <div className="mt-1 shrink-0 w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-[10px]">✕</div>
                                             <div className="space-y-1">
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{pitfallLabel}</p>
-                                                 <p className="text-xs font-black text-slate-900">{item.pitfall || item.challenge}</p>
-                                             </div>
-                                         </div>
-                                         <div className="flex gap-4 items-start pl-10 border-l-2 border-emerald-100 ml-3">
-                                             <div className="space-y-1">
-                                                 <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{solutionLabel}</p>
-                                                 <p className="text-xs font-medium text-slate-600 leading-relaxed">{item.howToAvoid || item.solution}</p>
-                                             </div>
-                                         </div>
-                                     </div>
-                                 ))}
+                                                <p className="text-xs font-black text-slate-900">{item.pitfall || item.challenge}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-4 items-start pl-10 border-l-2 border-emerald-100 ml-3">
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{solutionLabel}</p>
+                                                <p className="text-xs font-medium text-slate-600 leading-relaxed">{item.howToAvoid || item.solution}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
@@ -577,7 +577,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             </div>
                         </section>
                     )}
-                    </section>
 
                     {/*  PHASE III: THE WRITERS MASTERCLASS (THE BLUEPRINT)  */}
                     <section className="bg-white border border-slate-200 rounded-[3.5rem] shadow-sm overflow-hidden" id="masterclass">
