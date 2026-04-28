@@ -22,6 +22,7 @@ import { getAmazonProductsFromCsv } from '@/lib/actions/glossary';
 import { AmazonProduct } from '@/lib/csv-parser';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await props.params;
@@ -93,6 +94,11 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         products = (results[1] || []) as Product[];
         offers = (results[2] || []) as SalesPage[];
         csvProducts = results[3] || [];
+        
+        // Ensure rotation on every load by shuffling candidates
+        if (csvProducts.length > 0) {
+            csvProducts = [...csvProducts].sort(() => Math.random() - 0.5).slice(0, 8);
+        }
     } catch (err) {
         console.error("Secondary data fetch failed:", err);
     };
@@ -417,25 +423,31 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 {featuredPoolItem && (
                                     <Link 
                                         href={featuredPoolItem.link}
-                                        className="flex items-start gap-4 p-4 bg-white/10 rounded-[2rem] border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all group/featured"
+                                        className="flex items-center gap-6 p-6 bg-white/10 rounded-[2.5rem] border border-white/20 backdrop-blur-md hover:bg-white/20 transition-all group/featured lg:col-span-1 shadow-2xl relative overflow-hidden"
                                     >
-                                        <div className="shrink-0 w-16 h-20 rounded-xl overflow-hidden bg-white shadow-lg">
+                                        <div className="absolute top-0 right-0 p-4 opacity-10 -rotate-12 group-hover/featured:rotate-0 transition-transform">
+                                            <Zap size={40} className="text-white" />
+                                        </div>
+                                        <div className="shrink-0 w-24 h-32 rounded-2xl overflow-hidden bg-white shadow-2xl border-2 border-white/20">
                                             <img 
                                                 src={featuredPoolItem.imageUrl || '/images/placeholder-product.png'} 
                                                 alt={featuredPoolItem.title}
-                                                className="w-full h-full object-cover group-hover/featured:scale-110 transition-transform"
+                                                className="w-full h-full object-cover group-hover/featured:scale-110 transition-transform duration-500"
                                             />
                                         </div>
-                                        <div className="flex-1 min-w-0 py-1">
-                                            <div className="flex items-center justify-between text-indigo-200 mb-1">
-                                                <div className="flex items-center gap-1.5">
-                                                    <ShoppingBag size={12} />
-                                                    <span className="text-[9px] font-black uppercase tracking-widest">Featured Resource</span>
+                                        <div className="flex-1 min-w-0 space-y-3">
+                                            <div className="flex items-center justify-between text-amber-400">
+                                                <div className="flex items-center gap-2">
+                                                    <Sparkles size={16} />
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Featured Resource</span>
                                                 </div>
-                                                <ArrowRight size={12} className="group-hover/featured:translate-x-1 transition-transform" />
+                                                <ArrowRight size={16} className="group-hover/featured:translate-x-2 transition-transform text-white" />
                                             </div>
-                                            <h4 className="text-[11px] font-black uppercase tracking-tight text-white line-clamp-1 mb-1">{featuredPoolItem.title}</h4>
-                                            <p className="text-[8px] text-indigo-200 font-bold uppercase tracking-tighter opacity-80">Recommended for {term.term}</p>
+                                            <h4 className="text-sm md:text-base font-black uppercase tracking-tight text-white leading-tight line-clamp-2">{featuredPoolItem.title}</h4>
+                                            <div className="flex items-center gap-3">
+                                                <span className="px-3 py-1 bg-amber-400 text-amber-950 text-[9px] font-black uppercase tracking-widest rounded-full">Recommended</span>
+                                                <p className="text-[10px] text-indigo-100 font-bold uppercase tracking-widest opacity-60">High ROI Asset</p>
+                                            </div>
                                         </div>
                                     </Link>
                                 )}
