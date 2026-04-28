@@ -160,26 +160,32 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const randomIndex = seed % (rotationPool.length || 1);
     
     // The "Featured Resource" - pinned or best contextual match
+    // 1. PHASE ONE FEATURED RESOURCE
     const featuredPoolItem = fullPool.find(item => item.id === term.marketplaceProduct?.productId) 
-        || (rotationPool.length > 0 ? rotationPool[randomIndex] : fullPool[0]);
+        || (rotationPool.length > 0 ? rotationPool[Math.floor(Math.random() * rotationPool.length)] : fullPool[0]);
 
-    // Related Products Gallery (bottom of page) - Up to 4 items from the same category/niche
-    const relatedProducts = contextualMatches
+    // 2. INTERNAL SITE PRODUCTS (For Directory & Insights)
+    // Filter out the featured item and shuffle
+    const siteAssetsPool = contextualMatches
         .filter(item => item.id !== featuredPoolItem?.id)
-        .slice(0, 4);
+        .sort(() => Math.random() - 0.5);
 
-    // DE-DUPLICATION & ROTATION: Marketplace CSV Library
-    let marketplacePool = [...csvProducts];
-    if (featuredPoolItem && marketplacePool.length > 0) {
-        marketplacePool = marketplacePool.filter(p => p.asin !== (featuredPoolItem as any).asin);
+    const internalDirectoryAssets = siteAssetsPool.slice(0, 4);
+    const marketplaceInsightAssets = siteAssetsPool.slice(4, 8);
+
+    // 3. AMAZON MARKETPLACE ASSETS
+    let amazonPool = [...csvProducts];
+    // Remove featured item if it's an amazon ASIN
+    if (featuredPoolItem && amazonPool.length > 0) {
+        amazonPool = amazonPool.filter(p => p.asin !== (featuredPoolItem as any).asin);
     }
     
-    // Final Shuffle for the entire page pool
-    marketplacePool = marketplacePool.sort(() => Math.random() - 0.5);
+    // Final Shuffle for marketplace
+    amazonPool = amazonPool.sort(() => Math.random() - 0.5);
 
-    // Split the pool for different sections to ensure variety
-    const directoryProducts = marketplacePool.slice(0, 4);
-    const exploreProducts = marketplacePool.slice(4, 8);
+    // Split for different sections
+    const amazonDirectoryAssets = amazonPool.slice(0, 4);
+    const bottomExploreAssets = amazonPool.slice(4, 8);
 
     // YouTube Data fetch if missing
     let youtubeVideo = term.youtubeVideo;
@@ -835,29 +841,30 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 {(term.directoryCategories && term.directoryCategories.length > 0 ? term.directoryCategories : [
                                     { name: "Mastery Examples", description: "Curated books that exemplify this keyword." }
                                 ]).map((cat: any, idx: number) => {
-                                    const internalCatMatches = fullPool.filter(item => 
-                                        item.category?.toLowerCase() === cat.name?.toLowerCase() ||
-                                        item.title?.toLowerCase().includes(term.term.toLowerCase())
-                                    );
-                                    const csvMatches = idx === 0 ? directoryProducts : [];
-
-                                    const combinedCategoryPool = [...internalCatMatches, ...csvMatches.map(p => ({
-                                        id: p.asin,
-                                        title: p.title,
-                                        price: p.price || '9.99',
-                                        imageUrl: p.imageUrl,
-                                        link: formatAmazonLink(p.fullUrl || `https://www.amazon.com/dp/${p.asin}`),
-                                        isExternal: true,
-                                        type: 'amazon',
-                                        rating: p.rating || '4.8'
-                                    }))];
+                                    const internalCatMatches = idx === 0 ? internalDirectoryAssets : [];
+                                    const csvMatches = idx === 0 ? amazonDirectoryAssets : [];
+                                    
+                                    const combinedCategoryPool = [
+                                        ...internalCatMatches, 
+                                        ...csvMatches.map(p => ({
+                                            id: p.asin,
+                                            title: p.title,
+                                            price: p.price || '9.99',
+                                            imageUrl: p.imageUrl,
+                                            link: formatAmazonLink(p.fullUrl || `https://www.amazon.com/dp/${p.asin}`),
+                                            isExternal: true,
+                                            type: 'amazon',
+                                            rating: p.rating || '4.8'
+                                        }))
+                                    ];
+ }))];
 
                                     if (combinedCategoryPool.length === 0) return null;
 
                                     return (
                                         <div key={idx} className="space-y-10">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                                {combinedCategoryPool.slice(0, 6).map((item: any, pIdx: number) => (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                                                {combinedCategoryPool.slice(0, 8).map((item: any, pIdx: number) => (
                                                     <Link 
                                                         key={pIdx}
                                                         href={item.link}
@@ -959,7 +966,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Marketplace Insights</h3>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {relatedProducts.map((item: any, i: number) => (
+                                {marketplaceInsightAssets.map((item: any, i: number) => (
                                     <Link 
                                         key={i}
                                         href={item.link}
@@ -1065,7 +1072,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         subtitle={`Live Marketplace Assets for ${term.category || 'Publishing'}`}
                         term={term.term} 
                         category={term.category || 'General'} 
-                        products={exploreProducts}
+                        products={bottomExploreAssets}
                     />
                 </div>
 

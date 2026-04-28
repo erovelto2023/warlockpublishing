@@ -15,99 +15,82 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
         const queryLower = (query || "").toLowerCase();
         const categoryLower = (preferredCategory || "").toLowerCase();
 
-        // 1. Primary Fetch: Match title, keyword, or ASIN with a random skip for variety
-        const totalCandidates = await MarketplaceProduct.countDocuments({
+        // NICHE DETECTION (Proactive Querying)
+        const isColoringTerm = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('coloring') || queryLower.includes('aesthetic');
+        const isRomanceTerm = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance') || queryLower.includes('depravity') || queryLower.includes('mafia');
+
+        const nicheQuery = isColoringTerm ? 'coloring' : (isRomanceTerm ? 'romance' : '');
+
+        // 1. Primary Fetch: Strictly filter by niche first to prevent contamination
+        let dbQuery: any = {
             $or: [
                 { title: { $regex: queryClean, $options: 'i' } },
-                { keyword: { $regex: queryClean, $options: 'i' } },
-                { asin: { $in: targetAsins } }
+                { keyword: { $regex: queryClean, $options: 'i' } }
             ]
-        });
+        };
 
-        const skip = totalCandidates > 20 ? Math.floor(Math.random() * Math.min(totalCandidates - 20, 50)) : 0;
+        if (nicheQuery) {
+            dbQuery = {
+                $and: [
+                    dbQuery,
+                    { 
+                        $or: [
+                            { category: { $regex: nicheQuery, $options: 'i' } },
+                            { keyword: { $regex: nicheQuery, $options: 'i' } },
+                            { title: { $regex: nicheQuery, $options: 'i' } }
+                        ]
+                    }
+                ]
+            };
+        }
 
-        let products = await MarketplaceProduct.find({
-            $or: [
-                { title: { $regex: queryClean, $options: 'i' } },
-                { keyword: { $regex: queryClean, $options: 'i' } },
-                { asin: { $in: targetAsins } }
-            ]
-        })
-        .skip(skip)
-        .limit(100);
+        const totalCandidates = await MarketplaceProduct.countDocuments(dbQuery);
+        const skip = totalCandidates > 20 ? Math.floor(Math.random() * Math.min(totalCandidates - 20, 100)) : 0;
 
-        // 2. Fallback: If no matches, try matching by category
-        if (products.length === 0 && categoryLower && categoryLower !== "general") {
-            const catClean = categoryLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        let products = await MarketplaceProduct.find(dbQuery)
+            .skip(skip)
+            .limit(100);
+
+        // 2. Fallback: If no direct matches, pull by niche alone
+        if (products.length === 0 && nicheQuery) {
             products = await MarketplaceProduct.find({
-                category: { $regex: catClean, $options: 'i' }
-            }).limit(100);
+                $or: [
+                    { category: { $regex: nicheQuery, $options: 'i' } },
+                    { keyword: { $regex: nicheQuery, $options: 'i' } }
+                ]
+            })
+            .skip(Math.floor(Math.random() * 20))
+            .limit(100);
         }
 
-        // 3. Final Fallback: If still nothing, return the most recent synced items with a random offset
+        // 3. Final Fallback: Recent items
         if (products.length === 0) {
-            console.log("No specific matches. Pulling recent global assets.");
-            const totalProducts = await MarketplaceProduct.countDocuments();
-            const globalSkip = totalProducts > limit ? Math.floor(Math.random() * Math.min(totalProducts - limit, 100)) : 0;
-            products = await MarketplaceProduct.find().sort({ lastSynced: -1 }).skip(globalSkip).limit(limit);
+            products = await MarketplaceProduct.find().sort({ lastSynced: -1 }).limit(limit);
         }
 
-        if (products.length === 0) {
-            return [];
-        }
+        if (products.length === 0) return [];
 
         const scoredMatches = products.map(p => {
             const product = p.toObject();
             let score = 0;
             const titleLower = product.title.toLowerCase();
             const keywordLower = (product.keyword || "").toLowerCase();
-            const categoryLowerField = (product.category || "").toLowerCase();
-            const combinedLower = `${titleLower} ${keywordLower} ${categoryLowerField}`;
-            const asin = product.asin;
 
-            // NICHE DETECTION (Strict Isolation)
-            const isColoringTerm = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('coloring') || queryLower.includes('aesthetic');
-            const isRomanceTerm = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance') || queryLower.includes('depravity') || queryLower.includes('mafia');
-
-            // High-Risk Romance Keywords (Aggressive Detection)
-            const romanceKeywords = ['romance', 'billionaire', 'mafia', 'depravity', 'steamy', 'contemporary', 'enemie', 'dark romance', 'alpha', 'protective'];
-            // High-Risk Coloring Keywords
-            const coloringKeywords = ['coloring', 'illustrator', 'printable', 'pattern', 'craft', 'art book'];
-
-            const isColoringProduct = coloringKeywords.some(k => combinedLower.includes(k));
-            const isRomanceProduct = romanceKeywords.some(k => combinedLower.includes(k));
-
-            // 0. Manual Override
-            if (targetAsins.includes(asin)) score += 1000;
-            score += 50; // Base score
-
-            // 1. Cross-Niche Disqualification (The core fix)
-            // If it's a coloring term, and it looks like a romance product, and NOT a coloring product -> KILL IT
-            if (isColoringTerm && isRomanceProduct && !isColoringProduct) score -= 5000;
-            // If it's a romance term, and it looks like a coloring product, and NOT a romance product -> KILL IT
-            if (isRomanceTerm && isColoringProduct && !isRomanceProduct) score -= 5000;
+            if (targetAsins.includes(product.asin)) score += 1000;
+            score += 50;
 
             if (keywordLower === queryLower) score += 300;
             else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
             if (titleLower.includes(queryLower)) score += 100;
             
-            // Category Synergy
-            if (categoryLower && (categoryLowerField.includes(categoryLower) || categoryLower.includes(categoryLowerField))) {
-                score += 80;
-            }
-
             return { ...product, score };
         });
 
-        // Shuffle and return top results to provide variety on every load
-        const finalResults = scoredMatches
-            .filter(item => item.score > 20) // Kill disqualified items (score would be around -4950)
+        return scoredMatches
             .sort((a, b) => b.score - a.score)
-            .slice(0, 40); // Take top 40 relevant candidates
+            .sort(() => Math.random() - 0.5) // Shuffle for variety
+            .slice(0, 100);
 
-        return finalResults
-            .sort(() => Math.random() - 0.5) // Randomize the selection
-            .slice(0, limit);
     } catch (err) {
         console.error("Marketplace DB query failed:", err);
         return [];
