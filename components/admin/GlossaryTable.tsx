@@ -169,15 +169,13 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                 >
                     <Upload size={12} /> Bulk Import
                 </button>
-                {selectedIds.length > 0 && (
-                    <button 
-                        onClick={handleBulkDelete}
-                        disabled={isBulkDeleting}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-tight flex items-center gap-2 shadow-lg shadow-red-100 animate-in zoom-in-95 duration-200 disabled:opacity-50"
-                    >
-                        <Trash2 size={12} /> {isBulkDeleting ? 'Deleting...' : `Delete ${selectedIds.length} Selected`}
-                    </button>
-                )}
+                <button 
+                    onClick={handleBulkDelete}
+                    disabled={isBulkDeleting || selectedIds.length === 0}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-tight flex items-center gap-2 shadow-lg shadow-red-100 transition-all disabled:opacity-30 disabled:bg-slate-300 disabled:shadow-none"
+                >
+                    <Trash2 size={12} /> {isBulkDeleting ? 'Deleting...' : selectedIds.length > 0 ? `Delete ${selectedIds.length} Selected` : 'Bulk Delete'}
+                </button>
             </div>
 
             {/* SEARCH & FILTERS */}
