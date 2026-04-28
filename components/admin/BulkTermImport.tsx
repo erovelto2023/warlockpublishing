@@ -79,16 +79,22 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
 
         let categorySpecificInstructions = "";
         if (isFiction) {
-            categorySpecificInstructions = `Focus on narrative architecture, character archetypes, and plot-driven profit beats.`;
+            categorySpecificInstructions = `Focus on narrative architecture, character archetypes, and plot-driven profit beats.
+- For "masterclass", include a "profitabilityChecklist" with items like: "Does Chapter 1 end with an urgent question?", "Does every chapter drive toward the goal?", "Are the 'Top 3 Tropes' fully satisfied?".
+- For "aiPromptCommandCenter", focus on Scene Generators (high-tension scenes) and TikTok hooks for trope reveals.`;
         } else if (isNonFiction) {
             categorySpecificInstructions = `Focus on authority signals, evidence-based frameworks, and transformation milestones.`;
-        } else if (isPractical) {
-            categorySpecificInstructions = `Focus on instructional flow, visual requirements, and lifestyle integration.`;
+        } else if (isPractical || category.includes('Coloring')) {
+            categorySpecificInstructions = `Focus on design aesthetics, user engagement (coloring/crafting flow), and market-compliant production.
+- For "masterclass", include a "profitabilityChecklist" with items like: "Does the line art have sufficient contrast?", "Is the pattern complexity appropriate for adults?", "Is the resolution market-compliant (300DPI+)?", "Is the bleed management correct?".
+- For "aiPromptCommandCenter", focus on Pattern Generators (thematic page ideas) and TikTok hooks for ASMR coloring or "Relax with [Term]".
+- For "visualAsset", create prompts for thematic cover art or Pinterest-style coloring page previews.`;
         }
 
         const prompt = `CRITICAL: Generate a STRICT JSON array of research objects for the keywords provided below. 
 CATEGORY CONTEXT: ${category}
 INSTRUCTIONS: ${categorySpecificInstructions}
+- For "commonPitfalls", frame the "pitfall" as a "Writing Sin" (for fiction) or "Design Error" (for coloring books) and the "howToAvoid" as the "Expert Solution".
 
 OUTPUT REQUIREMENTS:
 1. Valid JSON Array only. No conversational text.
@@ -108,10 +114,18 @@ SCHEMA:
   "youtubeVideo": { "title": "...", "url": "..." },
   "blogArticle": { "title": "...", "content": "..." },
   "faqs": [ { "question": "...", "answer": "..." } ],
+  "commonMyths": [ { "myth": "...", "fact": "..." } ],
+  "commonPitfalls": [ { "pitfall": "Writing Sin/Design Error", "howToAvoid": "Expert Solution" } ],
+  "aiPromptCommandCenter": {
+    "productIdeaPrompt": "Scene/Pattern Generator...",
+    "contentStrategyPrompt": "Marketing/TikTok Hooks...",
+    "aiImagePrompt": "Visual Asset Prompt..."
+  },
   "masterclass": {
     "threeActStructure": { "act1": "...", "act2": "...", "act3": "..." },
     "profitBeats": [ { "title": "...", "description": "...", "timing": "..." } ],
-    "technicalComponents": { "powerTitle": "...", "tropes": [] }
+    "technicalComponents": { "powerTitle": "...", "tropes": [] },
+    "profitabilityChecklist": []
   }
 }
 
