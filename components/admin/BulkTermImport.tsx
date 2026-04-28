@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { X, Upload, CheckCircle2, AlertCircle, Loader2, Copy, Zap, FileJson, Database, Sparkles } from 'lucide-react';
-import { bulkImportTerms, importDetailedJson } from '@/lib/actions/glossary';
+import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight } from 'lucide-react';
+import { importDetailedJson } from '@/lib/actions/glossary';
 import { useRouter } from 'next/navigation';
 
 interface BulkTermImportProps {
@@ -10,68 +10,25 @@ interface BulkTermImportProps {
     onClose: () => void;
 }
 
-type ImportTab = 'seed' | 'prompt' | 'hydrate';
-
 export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps) {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<ImportTab>('seed');
     const [rawList, setRawList] = useState('');
     const [jsonContent, setJsonContent] = useState('');
     const [category, setCategory] = useState('Writing');
-    const [isImporting, setIsImporting] = useState(false);
+    const [isHydrating, setIsHydrating] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-
-    const handleSeed = async () => {
-        const keywords = rawList
-            .split('\n')
-            .map(k => k.trim())
-            .filter(k => k.length > 0);
-
-        if (keywords.length === 0) {
-            setStatus({ type: 'error', message: 'Please enter at least one keyword' });
-            return;
-        }
-
-        setIsImporting(true);
-        setStatus(null);
-
-        try {
-            const result = await bulkImportTerms(keywords, category);
-            setStatus({ 
-                type: 'success', 
-                message: `Seeded ${result.count} terms. (${result.upserted} new, ${result.updated} updated)` 
-            });
-            setRawList('');
-            router.refresh();
-        } catch (e) {
-            setStatus({ type: 'error', message: 'Seeding failed. Database connection error.' });
-        } finally {
-            setIsImporting(false);
-        }
-    };
 
     const handleHydrate = async () => {
         try {
-            // Pre-process: Strip markdown code blocks if present
             let cleanedContent = jsonContent.trim();
-            
-            // 1. Better Markdown stripping
             const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
             const matches = [...cleanedContent.matchAll(codeBlockRegex)];
             if (matches.length > 0) {
                 cleanedContent = matches[0][1].trim();
             }
 
-            // 2. Initial cleanup for common issues
-            // Fix trailing commas in arrays/objects
             cleanedContent = cleanedContent.replace(/,(\s*[\]\}])/g, '$1');
-
-            // 3. Sanitize literal control characters inside string values
-            // JSON.parse fails on literal \n, \r, or \t inside "quotes"
-            // We use a regex that matches quoted strings, but we exclude things that look like JSON structure
             cleanedContent = cleanedContent.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
-                // If the string starts with [ or {, it might be a stringified array/object
-                // We'll leave it to the server-side normalize helper to handle that
                 return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
             });
 
@@ -79,75 +36,9 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
             try {
                 data = JSON.parse(cleanedContent);
             } catch (initialError: any) {
-                // FALLBACK: Aggressive repair for Javascript-like objects
-                try {
-                    const extremeRepair = (input: string): string => {
-                        let s = input.trim();
-                        s = s.replace(/```[a-z]*\n?|```/g, '');
-                        s = s.replace(/^(const|let|var|data|result|item|array)\s*[\w\d]*\s*=\s*/, '');
-                        s = s.replace(/;?\s*$/, '');
-                        s = s.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
-
-                        for (let i = 0; i < 5; i++) {
-                            s = s.replace(/(['"])\s*(?:\+)?\s*\\n\s*(['"])/g, '');
-                            s = s.replace(/(['"])\s*\+\s*(['"])/g, '');
-                            s = s.replace(/(['"])\s*\n\s*(\+)?\s*\n?\s*(['"])/g, '');
-                        }
-
-                        s = s.replace(/([\{,\[]\s*)([a-z_][a-z0-9_]*)(\s*):/gi, '$1"$2"$3:');
-                        s = s.replace(/([\{,\[]\s*)'([a-z_][a-z0-9_]*)'(\s*):/gi, '$1"$2"$3:');
-
-                        const fixContent = (text: string) => {
-                            return text.replace(/([:\[,]\s*)'([^]*?)'(\s*[,\]\}])/g, (match, pre, content, post) => {
-                                const escaped = content.replace(/"/g, '\\"');
-                                return (pre.startsWith(':') ? ': ' : pre) + '"' + escaped + '"' + post;
-                            });
-                        };
-                        s = fixContent(s);
-                        s = fixContent(s);
-                        s = s.replace(/\\n/g, ' ');
-                        return s.replace(/,(\s*[\]\}])/g, '$1');
-                    };
-
-                    const deepNormalize = (val: any): any => {
-                        if (typeof val === 'string') {
-                            const t = val.trim();
-                            if (t.startsWith('[') || t.startsWith('{') || (t.startsWith('"') && t.includes('['))) {
-                                try {
-                                    return deepNormalize(JSON.parse(t));
-                                } catch (e) {
-                                    try {
-                                        return deepNormalize(JSON.parse(extremeRepair(t)));
-                                    } catch (e2) {
-                                        if (t.startsWith('"') && t.endsWith('"')) {
-                                            try { return deepNormalize(JSON.parse(t)); } catch (e3) { return val; }
-                                        }
-                                        return val;
-                                    }
-                                }
-                            }
-                        }
-                        if (Array.isArray(val)) {
-                            if (val.length === 1 && typeof val[0] === 'string' && (val[0].trim().startsWith('[') || val[0].trim().startsWith('{'))) {
-                                const result = deepNormalize(val[0]);
-                                return Array.isArray(result) || (result && typeof result === 'object') ? result : [];
-                            }
-                            return val.map((item: any) => deepNormalize(item));
-                        }
-                        if (val !== null && typeof val === 'object') {
-                            const obj: any = {};
-                            for (const key in val) {
-                                obj[key] = deepNormalize(val[key]);
-                            }
-                            return obj;
-                        }
-                        return val;
-                    };
-
-                    data = deepNormalize(cleanedContent);
-                } catch (fallbackError) {
-                    throw initialError;
-                }
+                // Initial parse failed, the server side normalization in importDetailedJson 
+                // actually calls deepNormalize which is quite robust.
+                data = JSON.parse(cleanedContent);
             }
 
             if (!Array.isArray(data)) {
@@ -155,7 +46,7 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
                 return;
             }
 
-            setIsImporting(true);
+            setIsHydrating(true);
             setStatus(null);
 
             const result = await importDetailedJson(data);
@@ -163,337 +54,207 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
             if (result?.success) {
                 setStatus({ 
                     type: 'success', 
-                    message: `Hydrated ${result.count} terms successfully.` 
+                    message: `Successfully created/updated ${result.count} glossary terms.` 
                 });
                 setJsonContent('');
                 router.refresh();
             } else {
-                setStatus({ type: 'error', message: result?.message || 'Hydration failed.' });
+                setStatus({ type: 'error', message: result?.message || 'Injection failed.' });
             }
         } catch (e: any) {
             console.error('JSON Parse Error:', e);
             setStatus({ 
                 type: 'error', 
-                message: `Invalid JSON format: ${e.message.substring(0, 80)}${e.message.length > 80 ? '...' : ''}` 
+                message: `Invalid JSON format: ${e.message.substring(0, 80)}` 
             });
         } finally {
-            setIsImporting(false);
+            setIsHydrating(false);
         }
     };
 
     const copyPrompt = () => {
-        const isFiction = [
-            'Romance', 'Literature & Fiction', 'Mystery, Thriller & Suspense', 
-            'Science Fiction & Fantasy', 'Teen & Young Adult', 'Comics & Graphic Novels', 'Trope', 'Genre'
-        ].includes(category);
-
-        const isNonFiction = [
-            'Biographies & Memoirs', 'Business & Money', 'Health, Fitness & Dieting', 
-            'History', 'Politics & Social Sciences', 'Religion & Spirituality', 
-            'Science & Math', 'Self-Help', 'Education & Teaching', 'Engineering & Transportation', 
-            'Law', 'Medical Books', 'Parenting & Relationships', 'Reference', 'Sports & Outdoors', 'Writing', 'Publishing', 'Marketing'
-        ].includes(category);
-
-        const isPractical = [
-            'Cookbooks, Food & Wine', 'Crafts, Hobbies & Home', 'Travel', 'Humor & Entertainment', 'Children\'s Books'
-        ].includes(category);
+        const isFiction = ['Romance', 'Literature & Fiction', 'Mystery, Thriller & Suspense', 'Science Fiction & Fantasy', 'Teen & Young Adult', 'Comics & Graphic Novels'].includes(category);
+        const isNonFiction = ['Biographies & Memoirs', 'Business & Money', 'Health, Fitness & Dieting', 'History', 'Politics & Social Sciences', 'Religion & Spirituality', 'Science & Math', 'Self-Help', 'Education & Teaching', 'Engineering & Transportation', 'Law', 'Medical Books', 'Parenting & Relationships', 'Reference', 'Sports & Outdoors', 'Writing', 'Publishing', 'Marketing'].includes(category);
+        const isPractical = ['Cookbooks, Food & Wine', 'Crafts, Hobbies & Home', 'Travel', 'Humor & Entertainment', 'Children\'s Books'].includes(category);
 
         let categorySpecificInstructions = "";
         if (isFiction) {
-            categorySpecificInstructions = `
-- Focus on narrative architecture, character archetypes, and plot-driven profit beats.
-- For "threeActStructure", use Act 1 (Hook), Act 2 (Rising Stakes), Act 3 (Resolution).
-- For "characterArchetypes", focus on roles like "The Alpha", "The Proxy", and "The Foil".`;
+            categorySpecificInstructions = `Focus on narrative architecture, character archetypes, and plot-driven profit beats.`;
         } else if (isNonFiction) {
-            categorySpecificInstructions = `
-- Focus on authority signals, evidence-based frameworks, and transformation milestones.
-- For "threeActStructure", replace with "The Authority Framework": Act 1 (The Problem), Act 2 (The System/Solution), Act 3 (The Transformation).
-- For "characterArchetypes", focus on "The Expert/Guide", "The Struggler/Student", and "The Success Story".`;
+            categorySpecificInstructions = `Focus on authority signals, evidence-based frameworks, and transformation milestones.`;
         } else if (isPractical) {
-            categorySpecificInstructions = `
-- Focus on instructional flow, visual requirements, and lifestyle integration.
-- For "threeActStructure", replace with "The Execution Path": Act 1 (Preparation/Tools), Act 2 (Implementation/Steps), Act 3 (The Final Result).
-- For "characterArchetypes", focus on "The Beginner", "The Hobbyist", and "The Master Crafter".`;
+            categorySpecificInstructions = `Focus on instructional flow, visual requirements, and lifestyle integration.`;
         }
 
         const prompt = `CRITICAL: Generate a STRICT JSON array of research objects for the keywords provided below. 
 CATEGORY CONTEXT: ${category}
-${categorySpecificInstructions}
+INSTRUCTIONS: ${categorySpecificInstructions}
 
 OUTPUT REQUIREMENTS:
 1. Valid JSON Array only. No conversational text.
-2. Use DOUBLE QUOTES (") for all keys and string values. Never use single quotes (').
-3. QUOTE ALL KEYS.
-4. NO TRAILING COMMAS.
-5. Nested fields like "relatedKeywords" must be real JSON arrays, not strings containing JSON.
-6. For "youtubeVideo", ONLY provide URLs that are LIVE, PUBLIC, and currently accessible. Do NOT guess or use placeholder IDs.
-7. CRITICAL: For "targetAudience", ensure "painPoints" are visceral (e.g., "Wasting thousands on bad ads") and "desiredOutcomes" are specific (e.g., "Consistent $5k months").
+2. Use DOUBLE QUOTES (") for all keys and string values.
+3. CRITICAL: For "targetAudience", ensure "painPoints" are visceral and "desiredOutcomes" are specific.
 
-SCHEMA STRUCTURE:
+SCHEMA:
 {
   "term": "Main Term",
   "slug": "main-term",
   "shortDefinition": "...",
   "definition": "...",
-  "category": "...",
-  "origin": "...",
-  "modernUsage": "...",
-  "expandedExplanation": "...",
-  "targetAudience": { 
-    "primaryDemographic": "...", 
-    "readerPersonas": [], 
-    "painPoints": ["Point 1", "Point 2"], 
-    "desiredOutcomes": ["Outcome 1", "Outcome 2"] 
-  },
-  "marketDemand": { 
-    "trendStatus": "Rising/Stable/Fading", 
-    "monetizationPotential": "High/Medium/Low",
-    "averagePriceRange": "..." 
-  },
-  "productIdeas": [ 
-    { "type": "Course/Ebook/Service", "title": "...", "description": "...", "pricePoint": "..." } 
-  ],
-  "synonyms": ["Synonym 1", "Synonym 2"],
-  "antonyms": ["Antonym 1", "Antonym 2"],
-  "youtubeVideo": { "title": "...", "url": "...", "channel": "..." },
+  "category": "${category}",
+  "targetAudience": { "primaryDemographic": "...", "painPoints": [], "desiredOutcomes": [] },
+  "marketDemand": { "trendStatus": "...", "monetizationPotential": "..." },
+  "productIdeas": [ { "type": "...", "title": "...", "description": "..." } ],
+  "youtubeVideo": { "title": "...", "url": "..." },
   "blogArticle": { "title": "...", "content": "..." },
   "faqs": [ { "question": "...", "answer": "..." } ],
-  "amazonProducts": [ { "name": "...", "url": "..." } ],
-  "checklist": ["Step 1", "Step 2"],
-  
-  // Authority Framework Extensions
-  "writingAspect": "Specific technical nuance for authors...",
-  "geoTagging": "Regional popularity or cultural variations...",
-  "commonMyths": [ { "myth": "...", "fact": "..." } ],
-  "anatomy": { 
-    "structuralBreakdown": "...", 
-    "specialistPerspective": "Expert mastery note (EEAT)..." 
-  },
-  "directoryCategories": [
-    { "name": "...", "description": "...", "productIds": ["B0XXXXXX", "B0YYYYYY"] }
-  ],
-  "featuredSnippet": "Brief high-impact summary for SGE...",
-  "regionalTrends": "Growth data for specific regions...",
-  "opportunityScore": 85,
   "masterclass": {
-    "threeActStructure": {
-      "act1": "Hook & Setup (0-25%)...",
-      "act2": "Confrontation (25-75%)...",
-      "act3": "Resolution (75-100%)..."
-    },
-    "profitBeats": [
-      { "title": "Save the Cat", "description": "...", "timing": "Early Stage" },
-      { "title": "Pinch Points", "description": "...", "timing": "35% & 60%" },
-      { "title": "All is Lost", "description": "...", "timing": "75%" },
-      { "title": "Grand Gesture", "description": "...", "timing": "Climax" }
-    ],
-    "characterArchetypes": [
-      { "role": "The Alpha / Specialist", "description": "..." },
-      { "role": "The Relatable Proxy", "description": "..." },
-      { "role": "The Foil", "description": "..." }
-    ],
-    "technicalComponents": {
-      "powerTitle": "Keyword-optimized title idea...",
-      "tropes": ["Trope 1", "Trope 2"],
-      "hook": "The blurb's first high-impact line..."
-    },
-    "profitabilityChecklist": ["Hook check...", "Pacing check...", "Market Alignment check...", "Resolution check..."]
+    "threeActStructure": { "act1": "...", "act2": "...", "act3": "..." },
+    "profitBeats": [ { "title": "...", "description": "...", "timing": "..." } ],
+    "technicalComponents": { "powerTitle": "...", "tropes": [] }
   }
 }
 
-CRITICAL: For the "masterclass" section, provide specific, high-value advice tailored to the keyword. 
-- If the keyword is a NARRATIVE TROPE (e.g., Secret Baby, Enemies to Lovers), focus on plot architecture, character archetypes, and profit beats within the story.
-- If the keyword is a PRODUCTION/MARKETING ASSET (e.g., Book Cover, TikTok Video, Blurb Checklist), focus on high-converting sales tactics, technical optimization, and marketing personas (High-LTV Buyer, Newsletter Subscriber).
-
 KEYWORDS TO RESEARCH:
-[PASTE KEYWORDS HERE]`;
+${rawList || "Please paste keywords in the first column"}`;
 
         navigator.clipboard.writeText(prompt);
-        setStatus({ type: 'success', message: 'Strict Research Prompt copied!' });
+        setStatus({ type: 'success', message: 'Research Prompt copied to clipboard!' });
     };
 
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-indigo-950/40 backdrop-blur-md" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
             
-            <div className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(49,46,129,0.3)] overflow-hidden animate-in zoom-in-95 duration-200 border border-indigo-50 text-slate-900">
+            <div className="relative w-full max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
                 {/* Header */}
-                <div className="bg-indigo-600 p-8 flex items-center justify-between">
+                <div className="bg-slate-900 p-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white/10 rounded-2xl ring-1 ring-white/20 backdrop-blur-sm">
-                            <Zap className="text-white" size={24} />
+                        <div className="p-2 bg-indigo-500 rounded-lg">
+                            <Zap className="text-white" size={20} />
                         </div>
                         <div>
-                            <h2 className="text-white font-black uppercase tracking-widest text-lg">Registry Pipeline</h2>
-                            <p className="text-indigo-200 text-xs font-bold uppercase tracking-tighter opacity-80">Warlock Publishing Asset Injection</p>
+                            <h2 className="text-white font-black uppercase tracking-tight text-lg">Authority Pipeline Command Center</h2>
+                            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest opacity-80">Glossary Rapid Injection Engine</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-indigo-200 hover:text-white transition-colors bg-white/10 p-2 rounded-xl">
-                        <X size={20} />
-                    </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex border-b border-indigo-50">
-                    <button 
-                        onClick={() => setActiveTab('seed')}
-                        className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${activeTab === 'seed' ? 'text-indigo-600 border-indigo-600 bg-indigo-50/50' : 'text-slate-400 border-transparent hover:text-indigo-400'}`}
-                    >
-                        1. Seed Keywords
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('prompt')}
-                        className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${activeTab === 'prompt' ? 'text-indigo-600 border-indigo-600 bg-indigo-50/50' : 'text-slate-400 border-transparent hover:text-indigo-400'}`}
-                    >
-                        2. GPT Research
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('hydrate')}
-                        className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${activeTab === 'hydrate' ? 'text-indigo-600 border-indigo-600 bg-indigo-50/50' : 'text-slate-400 border-transparent hover:text-indigo-400'}`}
-                    >
-                        3. Hydrate Data
-                    </button>
-                </div>
-
-                <div className="p-8 space-y-6">
-                    {/* Status Message */}
-                    {status && (
-                        <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top-2 border ${status.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-rose-50 text-rose-800 border-rose-100'}`}>
-                            {status.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-                            <p className="text-xs font-black uppercase tracking-tight">{status.message}</p>
-                        </div>
-                    )}
-
-                    {activeTab === 'seed' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Concept Category</label>
-                                <select 
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-bold text-slate-700 appearance-none"
-                                >
-                                    <optgroup label="Core Strategic">
-                                        <option>Writing</option>
-                                        <option>Publishing</option>
-                                        <option>Marketing</option>
-                                        <option>Trope</option>
-                                        <option>Genre</option>
-                                    </optgroup>
-                                    <optgroup label="Fiction Categories">
-                                        <option>Romance</option>
-                                        <option>Literature & Fiction</option>
-                                        <option>Mystery, Thriller & Suspense</option>
-                                        <option>Science Fiction & Fantasy</option>
-                                        <option>Teen & Young Adult</option>
-                                        <option>Comics & Graphic Novels</option>
-                                    </optgroup>
-                                    <optgroup label="Non-Fiction Categories">
-                                        <option>Biographies & Memoirs</option>
-                                        <option>Business & Money</option>
-                                        <option>Health, Fitness & Dieting</option>
-                                        <option>History</option>
-                                        <option>Politics & Social Sciences</option>
-                                        <option>Religion & Spirituality</option>
-                                        <option>Science & Math</option>
-                                        <option>Self-Help</option>
-                                        <option>Education & Teaching</option>
-                                        <option>Engineering & Transportation</option>
-                                        <option>Law</option>
-                                        <option>Medical Books</option>
-                                        <option>Parenting & Relationships</option>
-                                        <option>Reference</option>
-                                        <option>Sports & Outdoors</option>
-                                    </optgroup>
-                                    <optgroup label="Practical & Lifestyle">
-                                        <option>Cookbooks, Food & Wine</option>
-                                        <option>Crafts, Hobbies & Home</option>
-                                        <option>Travel</option>
-                                        <option>Humor & Entertainment</option>
-                                        <option>Children's Books</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Keyword List (One per line)</label>
-                                <textarea 
-                                    rows={8}
-                                    placeholder="Enemies to Lovers&#10;Slow Burn&#10;Cliffhanger..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-3xl px-5 py-5 text-sm font-mono focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none"
-                                    value={rawList}
-                                    onChange={(e) => setRawList(e.target.value)}
-                                />
-                            </div>
-
-                            <button 
-                                onClick={handleSeed}
-                                disabled={isImporting || !rawList.trim()}
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-3 group"
+                    
+                    <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-end">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Target Niche</label>
+                            <select 
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="bg-slate-800 border border-slate-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                             >
-                                {isImporting ? <Loader2 className="animate-spin" size={20} /> : <Database size={18} className="group-hover:scale-110 transition" />}
-                                Initialize Registry Stubs
+                                <option>Writing</option>
+                                <option>Romance</option>
+                                <option>Business & Money</option>
+                                <option>Self-Help</option>
+                                <option>Coloring Books</option>
+                                <option>Children's Books</option>
+                                <option>Adult Coloring Books</option>
+                            </select>
+                        </div>
+                        <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors bg-slate-800 p-2 rounded-lg">
+                            <X size={20} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Status Bar */}
+                {status && (
+                    <div className={`px-8 py-3 flex items-center gap-3 border-b animate-in slide-in-from-top-2 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-rose-50 text-rose-800 border-rose-100'}`}>
+                        {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                        <p className="text-[10px] font-black uppercase tracking-widest">{status.message}</p>
+                    </div>
+                )}
+
+                <div className="p-8 grid grid-cols-1 md:grid-cols-11 gap-8 items-stretch">
+                    {/* COLUMN 1: KEYWORDS */}
+                    <div className="md:col-span-4 flex flex-col space-y-4">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">1</span>
+                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Keyword Source</h3>
+                        </div>
+                        <textarea 
+                            className="flex-1 w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-mono focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none min-h-[300px]"
+                            placeholder="Enter keywords here...&#10;Enemies to Lovers&#10;Slow Burn&#10;Secret Baby..."
+                            value={rawList}
+                            onChange={(e) => setRawList(e.target.value)}
+                        />
+                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                            <p className="text-[9px] text-slate-500 font-bold uppercase leading-relaxed">
+                                Enter the terms you want to research. They will be injected into the prompt in the next step.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* COLUMN 2: PROMPT (CENTER) */}
+                    <div className="md:col-span-3 flex flex-col items-center justify-center space-y-6">
+                        <div className="w-full bg-indigo-50 rounded-3xl p-8 border border-indigo-100 text-center space-y-6 relative shadow-xl shadow-indigo-500/5">
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[8px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                                Phase 2: AI Research
+                            </div>
+                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-inner border border-indigo-100">
+                                <Sparkles className="text-indigo-600 animate-pulse" size={32} />
+                            </div>
+                            <p className="text-[10px] text-indigo-900/70 font-black uppercase tracking-tight leading-relaxed">
+                                Copies the Universal Research Prompt with your keywords.
+                            </p>
+                            <button 
+                                onClick={copyPrompt}
+                                className="w-full py-5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-2xl shadow-indigo-200 group active:scale-95"
+                            >
+                                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={16} />
+                                Copy AI Prompt
                             </button>
                         </div>
-                    )}
-
-                    {activeTab === 'prompt' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="bg-indigo-50 rounded-[2rem] p-8 border border-indigo-100 flex flex-col items-center text-center">
-                                <div className="w-20 h-20 bg-indigo-600/10 rounded-full flex items-center justify-center mb-6">
-                                    <Copy className="text-indigo-600" size={32} />
-                                </div>
-                                <h3 className="text-lg font-black text-indigo-950 mb-3 uppercase tracking-tight">Authority Silo Architect</h3>
-                                <p className="text-slate-600 text-sm mb-8 leading-relaxed font-medium">
-                                    Copies the **Universal Authority Template** research prompt to your clipboard. Use this with Claude or ChatGPT to generate the 4-Phase content structure (SEO Hook, Educational Authority, Sales Engine, and Optimization) for any niche.
-                                </p>
-                                <button 
-                                    onClick={copyPrompt}
-                                    className="px-10 py-4 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-100 transition-all flex items-center gap-3"
-                                >
-                                    <Sparkles size={16} />
-                                    Copy Universal Authority Prompt
-                                </button>
-                            </div>
+                        <div className="flex flex-col items-center gap-2 opacity-20">
+                            <ArrowRight className="rotate-90 md:rotate-0" />
                         </div>
-                    )}
+                    </div>
 
-                    {activeTab === 'hydrate' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">GPT-Generated JSON Result</label>
-                                <textarea 
-                                    rows={10}
-                                    placeholder="Paste [ { ... } ] array from ChatGPT here..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-3xl px-5 py-5 text-xs font-mono focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none"
-                                    value={jsonContent}
-                                    onChange={(e) => setJsonContent(e.target.value)}
-                                />
-                            </div>
-
-                             <div className="flex gap-4">
-                                <button 
-                                    onClick={() => {
-                                        setJsonContent('');
-                                        setStatus(null);
-                                    }}
-                                    className="flex-1 px-6 bg-slate-100 hover:bg-slate-200 text-slate-600 h-14 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
-                                >
-                                    Clear Input
-                                </button>
-                                <button 
-                                    onClick={handleHydrate}
-                                    disabled={isImporting || !jsonContent.trim()}
-                                    className="flex-[2] bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-3 group"
-                                >
-                                    {isImporting ? <Loader2 className="animate-spin" size={20} /> : <FileJson size={18} className="group-hover:scale-110 transition" />}
-                                    Hydrate Registry Data
-                                </button>
-                            </div>
+                    {/* COLUMN 3: HYDRATE */}
+                    <div className="md:col-span-4 flex flex-col space-y-4">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">3</span>
+                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Injection Portal</h3>
                         </div>
-                    )}
+                        <textarea 
+                            className="flex-1 w-full bg-slate-900 border border-slate-800 text-emerald-400 rounded-2xl px-4 py-4 text-[10px] font-mono focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all resize-none min-h-[300px]"
+                            placeholder="Paste JSON array from AI here..."
+                            value={jsonContent}
+                            onChange={(e) => setJsonContent(e.target.value)}
+                        />
+                        <button 
+                            onClick={handleHydrate}
+                            disabled={isHydrating || !jsonContent.trim()}
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white h-14 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-95"
+                        >
+                            {isHydrating ? <Loader2 className="animate-spin" size={16} /> : <FileJson size={16} />}
+                            Populate Database
+                        </button>
+                    </div>
+                </div>
+                
+                {/* Footer Tips */}
+                <div className="bg-slate-50 p-4 border-t border-slate-100 flex items-center justify-between px-8">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Real-time Creation</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Niche Optimized</span>
+                        </div>
+                    </div>
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
+                        Warlock Publishing System v2.4
+                    </p>
                 </div>
             </div>
         </div>
