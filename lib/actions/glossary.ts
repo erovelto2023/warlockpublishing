@@ -11,35 +11,35 @@ import MarketplaceProduct from '@/lib/models/MarketplaceProduct';
 export async function getAmazonProductsFromCsv(query: string, limit: number = 20, preferredCategory: string = "", targetAsins: string[] = []): Promise<AmazonProduct[]> {
     try {
         await connectToDatabase();
+        const queryClean = (query || "").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex
         const queryLower = (query || "").toLowerCase();
         const categoryLower = (preferredCategory || "").toLowerCase();
 
-        // 1. Fetch matching candidates from MongoDB
-        const products = await MarketplaceProduct.find({
+        // 1. Primary Fetch: Match title, keyword, or ASIN
+        let products = await MarketplaceProduct.find({
             $or: [
-                { title: { $regex: queryLower, $options: 'i' } },
-                { keyword: { $regex: queryLower, $options: 'i' } },
+                { title: { $regex: queryClean, $options: 'i' } },
+                { keyword: { $regex: queryClean, $options: 'i' } },
                 { asin: { $in: targetAsins } }
             ]
         }).limit(100);
 
+        // 2. Fallback: If no matches, try matching by category
+        if (products.length === 0 && categoryLower && categoryLower !== "general") {
+            const catClean = categoryLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            products = await MarketplaceProduct.find({
+                category: { $regex: catClean, $options: 'i' }
+            }).limit(100);
+        }
+
+        // 3. Final Fallback: If still nothing, return the most recent synced items
         if (products.length === 0) {
-            console.log("No MongoDB marketplace results, falling back to raw CSV parse...");
-            const allProducts = await parseAmazonCsv();
-            if (!allProducts || allProducts.length === 0) return [];
-            
-            // Scoring engine for high-relevance matching (CSV Fallback)
-            const scoredMatches = allProducts.map(p => {
-                const titleLower = p.title.toLowerCase();
-                const keywordLower = (p.keyword || "").toLowerCase();
-                let score = 0;
-                if (targetAsins.includes(p.asin)) score += 1000;
-                if (keywordLower === queryLower) score += 300;
-                else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
-                if (titleLower.includes(queryLower)) score += 100;
-                return { ...p, score };
-            });
-            return scoredMatches.sort((a, b) => b.score - a.score).filter(item => item.score > 0).slice(0, limit);
+            console.log("No specific matches. Pulling recent global assets.");
+            products = await MarketplaceProduct.find().sort({ lastSynced: -1 }).limit(limit);
+        }
+
+        if (products.length === 0) {
+            return [];
         }
 
         const scoredMatches = products.map(p => {
@@ -55,14 +55,18 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
             if (keywordLower === queryLower) score += 300;
             else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
             if (titleLower.includes(queryLower)) score += 100;
-            if (categoryLower && (product.category?.toLowerCase().includes(categoryLower) || categoryLower.includes(product.category?.toLowerCase() || ""))) score += 80;
+            
+            // Category Synergy
+            if (categoryLower && (product.category?.toLowerCase().includes(categoryLower) || categoryLower.includes(product.category?.toLowerCase() || ""))) {
+                score += 80;
+            }
 
             return { ...product, score };
         });
 
         return scoredMatches
             .sort((a, b) => b.score - a.score)
-            .filter(item => item.score > 60)
+            .filter(item => item.score > 40) // Slightly lower threshold for better visibility
             .slice(0, limit);
     } catch (err) {
         console.error("Marketplace DB query failed:", err);

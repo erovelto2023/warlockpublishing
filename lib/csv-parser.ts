@@ -64,7 +64,7 @@ export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
                     imageUrl: parts[4] || '',
                     rank: parts[5] || '',
                     store: parts[6] || '',
-                    category: parts[7] || '',
+                    category: (parts[6] && parts[7]) ? `${parts[6]} ${parts[7]}` : (parts[7] || parts[6] || ''),
                     asin: parts[8] || '',
                     title: parts[9] || '',
                     rating: parts[15] || '',
