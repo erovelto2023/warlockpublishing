@@ -62,22 +62,30 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
             const titleLower = product.title.toLowerCase();
             const keywordLower = (product.keyword || "").toLowerCase();
             const categoryLowerField = (product.category || "").toLowerCase();
+            const combinedLower = `${titleLower} ${keywordLower} ${categoryLowerField}`;
             const asin = product.asin;
 
             // NICHE DETECTION (Strict Isolation)
-            const isColoringTerm = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('coloring');
-            const isRomanceTerm = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance');
+            const isColoringTerm = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('coloring') || queryLower.includes('aesthetic');
+            const isRomanceTerm = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance') || queryLower.includes('depravity') || queryLower.includes('mafia');
 
-            const isColoringProduct = titleLower.includes('coloring') || categoryLowerField.includes('coloring') || keywordLower.includes('coloring');
-            const isRomanceProduct = titleLower.includes('romance') || titleLower.includes('billionaire') || categoryLowerField.includes('romance');
+            // High-Risk Romance Keywords (Aggressive Detection)
+            const romanceKeywords = ['romance', 'billionaire', 'mafia', 'depravity', 'steamy', 'contemporary', 'enemie', 'dark romance', 'alpha', 'protective'];
+            // High-Risk Coloring Keywords
+            const coloringKeywords = ['coloring', 'illustrator', 'printable', 'pattern', 'craft', 'art book'];
+
+            const isColoringProduct = coloringKeywords.some(k => combinedLower.includes(k));
+            const isRomanceProduct = romanceKeywords.some(k => combinedLower.includes(k));
 
             // 0. Manual Override
             if (targetAsins.includes(asin)) score += 1000;
             score += 50; // Base score
 
             // 1. Cross-Niche Disqualification (The core fix)
-            if (isColoringTerm && isRomanceProduct && !isColoringProduct) score -= 1000;
-            if (isRomanceTerm && isColoringProduct && !isRomanceProduct) score -= 1000;
+            // If it's a coloring term, and it looks like a romance product, and NOT a coloring product -> KILL IT
+            if (isColoringTerm && isRomanceProduct && !isColoringProduct) score -= 5000;
+            // If it's a romance term, and it looks like a coloring product, and NOT a romance product -> KILL IT
+            if (isRomanceTerm && isColoringProduct && !isRomanceProduct) score -= 5000;
 
             if (keywordLower === queryLower) score += 300;
             else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
@@ -93,8 +101,8 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
 
         // Shuffle and return top results to provide variety on every load
         const finalResults = scoredMatches
+            .filter(item => item.score > 20) // Kill disqualified items (score would be around -4950)
             .sort((a, b) => b.score - a.score)
-            .filter(item => item.score > 20) // Much lower threshold for variety
             .slice(0, 40); // Take top 40 relevant candidates
 
         return finalResults

@@ -127,12 +127,29 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
     const fullPool = [...normalizedProducts, ...normalizedOffers];
     
-    // Intelligent Contextual Matching
-    // Prioritize items that match the term's category or niche
-    const contextualMatches = fullPool.filter(item => 
-        (item.category && (item.category === term.category || item.category === term.niche)) ||
-        (item.niche && (item.niche === term.category || item.niche === term.niche))
-    );
+    // Intelligent Contextual Matching with STRICT Niche Isolation
+    const contextualMatches = fullPool.filter(item => {
+        const itemCat = (item.category || '').toLowerCase();
+        const itemNiche = (item.niche || '').toLowerCase();
+        const termCat = (term.category || '').toLowerCase();
+        const termNiche = (term.niche || '').toLowerCase();
+        const termTitle = term.term.toLowerCase();
+
+        // Niche Identifiers
+        const isColoringTerm = termTitle.includes('coloring') || termCat.includes('coloring') || termCat.includes('crafts');
+        const isRomanceTerm = termTitle.includes('romance') || termCat.includes('romance') || termTitle.includes('billionaire');
+
+        const isColoringProduct = itemCat.includes('coloring') || itemNiche.includes('coloring') || item.title.toLowerCase().includes('coloring');
+        const isRomanceProduct = itemCat.includes('romance') || itemNiche.includes('romance') || item.title.toLowerCase().includes('romance');
+
+        // Isolation Logic
+        if (isColoringTerm && isRomanceProduct && !isColoringProduct) return false;
+        if (isRomanceTerm && isColoringProduct && !isRomanceProduct) return false;
+
+        return (item.category && (item.category === term.category || item.category === term.niche)) ||
+               (item.niche && (item.niche === term.category || item.niche === term.niche)) ||
+               (item.title.toLowerCase().includes(term.term.toLowerCase()));
+    });
 
     const rotationPool = contextualMatches.length > 0 
         ? contextualMatches.filter(item => item.isFeaturedInRotation)
