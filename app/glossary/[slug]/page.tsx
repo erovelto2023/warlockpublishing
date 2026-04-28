@@ -1026,7 +1026,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
                     {/*  EXTRA SECTIONS: Amazon Prime Reference Library (Dynamic CSV Integration)  */}
                     <AmazonLibrarySection 
-                        title={`Marketplace: ${term.term}`}
+                        title="Other books to explore"
                         subtitle={`Live Marketplace Assets for ${term.category || 'Publishing'}`}
                         term={term.term} 
                         category={term.category || 'General'} 

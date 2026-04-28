@@ -77,9 +77,14 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
             return { ...product, score };
         });
 
-        return scoredMatches
+        // Shuffle and return top results to provide variety on every load
+        const finalResults = scoredMatches
             .sort((a, b) => b.score - a.score)
-            .filter(item => item.score > 40) // Quality threshold
+            .filter(item => item.score > 40)
+            .slice(0, 40); // Take top 40 relevant candidates
+
+        return finalResults
+            .sort(() => Math.random() - 0.5) // Randomize the selection
             .slice(0, limit);
     } catch (err) {
         console.error("Marketplace DB query failed:", err);
@@ -595,10 +600,10 @@ export async function importDetailedJson(data: any[]) {
             
             // Auto-group products into directory categories if not present
             if (!item.directoryCategories || item.directoryCategories.length === 0) {
-                const asinList = (item.amazonProducts || []).map((p: any) => p.asin).filter(Boolean);
+                const asinList = (item.amazonProducts || []).map((p: any) => p.asin).filter(Boolean).sort(() => Math.random() - 0.5);
                 if (asinList.length > 0) {
                     item.directoryCategories = [{
-                        name: "Top Reference Selection",
+                        name: "Recommended Resources",
                         description: `Curated assets for ${term}`,
                         productIds: asinList
                     }];
