@@ -6,99 +6,68 @@ import { revalidatePath } from 'next/cache';
 import { GlossaryTerm as GlossaryTermType } from '@/lib/types';
 import { AMAZON_AFFILIATE_ID, formatAmazonLink } from '@/lib/utils';
 import { parseAmazonCsv, AmazonProduct } from '@/lib/csv-parser';
+import MarketplaceProduct from '@/lib/models/MarketplaceProduct';
 
 export async function getAmazonProductsFromCsv(query: string, limit: number = 20, preferredCategory: string = "", targetAsins: string[] = []): Promise<AmazonProduct[]> {
-    const allProducts = await parseAmazonCsv();
-    if (!allProducts || allProducts.length === 0) return [];
-    
-    const queryLower = query.toLowerCase();
-    const queryWords = queryLower.split(' ').filter(w => w.length > 2);
-    const categoryLower = (preferredCategory || "").toLowerCase();
-    
-    // Niche Detection Flags
-    const isColoringNiche = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('hobbies') || categoryLower.includes('coloring');
-    const isRomanceNiche = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance');
+    try {
+        await connectToDatabase();
+        const queryLower = (query || "").toLowerCase();
+        const categoryLower = (preferredCategory || "").toLowerCase();
 
-    // Scoring engine for high-relevance matching
-    const scoredMatches = allProducts.map(p => {
-        const titleLower = p.title.toLowerCase();
-        const keywordLower = (p.keyword || "").toLowerCase();
-        const csvCategoryLower = (p.category || "").toLowerCase();
-        const asin = p.asin;
+        // 1. Fetch matching candidates from MongoDB
+        const products = await MarketplaceProduct.find({
+            $or: [
+                { title: { $regex: queryLower, $options: 'i' } },
+                { keyword: { $regex: queryLower, $options: 'i' } },
+                { asin: { $in: targetAsins } }
+            ]
+        }).limit(100);
 
-        // CRITICAL ISOLATION: Immediate disqualification
-        const hasRomanceClues = titleLower.includes('romance') || titleLower.includes('billionaire') || titleLower.includes('mafia') || titleLower.includes('steamy') || keywordLower.includes('romance') || keywordLower.includes('billionaire');
-        const hasColoringClues = titleLower.includes('coloring') || titleLower.includes('illustrations') || titleLower.includes('pages') || titleLower.includes('drawing') || keywordLower.includes('coloring');
-
-        if (isColoringNiche && hasRomanceClues) return { product: p, score: -10000 };
-        if (isRomanceNiche && hasColoringClues) return { product: p, score: -10000 };
-
-        let score = 0;
-
-        // 0. Manual Override (High Priority)
-        if (targetAsins.includes(asin)) score += 1000;
-
-        // BASE SCORE for being in the Marketplace pool
-        score += 50;
-
-        // 1. Exact Keyword Match
-        if (keywordLower === queryLower) score += 300;
-        else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
-        
-        // 2. Title Match
-        if (titleLower.includes(queryLower)) score += 100;
-        
-        // 3. Niche Alignment
-        if (isRomanceNiche && hasRomanceClues) score += 100;
-        if (isColoringNiche && hasColoringClues) score += 100;
-        
-        // 4. Category Match
-        if (categoryLower && (p.category?.toLowerCase().includes(categoryLower) || categoryLower.includes(p.category?.toLowerCase() || ""))) {
-            score += 80;
-        }
-
-        // Penalty for mismatching niche when niche is detected
-        if (isColoringNiche && !hasColoringClues && !csvCategoryLower.includes('crafts') && !csvCategoryLower.includes('coloring')) score -= 200;
-
-        return { product: p, score };
-    })
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score);
-
-    if (scoredMatches.length === 0) {
-        // SAFE FALLBACK: Only return items from the same category, never leak across niches
-        if (categoryLower && categoryLower !== "general") {
-            const catMatches = allProducts.filter(p => {
+        if (products.length === 0) {
+            console.log("No MongoDB marketplace results, falling back to raw CSV parse...");
+            const allProducts = await parseAmazonCsv();
+            if (!allProducts || allProducts.length === 0) return [];
+            
+            // Scoring engine for high-relevance matching (CSV Fallback)
+            const scoredMatches = allProducts.map(p => {
                 const titleLower = p.title.toLowerCase();
-                const csvCat = (p.category || "").toLowerCase();
-                const hasRomanceClues = titleLower.includes('romance') || titleLower.includes('billionaire');
-                
-                if (isColoringNiche && hasRomanceClues) return false;
-                return csvCat.includes(categoryLower) || titleLower.includes(categoryLower);
+                const keywordLower = (p.keyword || "").toLowerCase();
+                let score = 0;
+                if (targetAsins.includes(p.asin)) score += 1000;
+                if (keywordLower === queryLower) score += 300;
+                else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
+                if (titleLower.includes(queryLower)) score += 100;
+                return { ...p, score };
             });
-            if (catMatches.length > 0) return catMatches.slice(0, limit);
-        }
-        
-        // If it's a coloring term and we have NO matches, return NOTHING rather than romance
-        if (isColoringNiche) {
-            return allProducts.filter(p => {
-                const titleLower = p.title.toLowerCase();
-                return titleLower.includes('coloring') || titleLower.includes('illustration');
-            }).slice(0, limit);
+            return scoredMatches.sort((a, b) => b.score - a.score).filter(item => item.score > 0).slice(0, limit);
         }
 
-        // Final sanity check: never return romance for non-romance terms
-        if (!isRomanceNiche) {
-            return allProducts.filter(p => {
-                const titleLower = p.title.toLowerCase();
-                return !titleLower.includes('romance') && !titleLower.includes('billionaire');
-            }).slice(0, limit);
-        }
+        const scoredMatches = products.map(p => {
+            const product = p.toObject();
+            let score = 0;
+            const titleLower = product.title.toLowerCase();
+            const keywordLower = (product.keyword || "").toLowerCase();
+            const asin = product.asin;
 
-        return allProducts.slice(0, limit);
+            if (targetAsins.includes(asin)) score += 1000;
+            score += 50; // Base score
+
+            if (keywordLower === queryLower) score += 300;
+            else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
+            if (titleLower.includes(queryLower)) score += 100;
+            if (categoryLower && (product.category?.toLowerCase().includes(categoryLower) || categoryLower.includes(product.category?.toLowerCase() || ""))) score += 80;
+
+            return { ...product, score };
+        });
+
+        return scoredMatches
+            .sort((a, b) => b.score - a.score)
+            .filter(item => item.score > 60)
+            .slice(0, limit);
+    } catch (err) {
+        console.error("Marketplace DB query failed:", err);
+        return [];
     }
-    
-    return scoredMatches.map(m => m.product).slice(0, limit);
 }
 
 // Slugify helper
@@ -1051,4 +1020,52 @@ export async function runGlossaryAudit(type: 'video' | 'affiliate' | 'article') 
     }
     const results = await GlossaryTerm.find(query, { _id: 1 }).lean();
     return results.map((r: any) => ({ ...r, _id: r._id.toString() }));
+}
+
+/**
+ * PERSISTENT MARKETPLACE SYNC
+ * Call this to hydrate MongoDB from the CSV files
+ */
+export async function syncMarketplaceData() {
+    try {
+        await connectToDatabase();
+        console.log("Starting Marketplace Sync...");
+        const csvProducts = await parseAmazonCsv();
+        
+        if (csvProducts.length === 0) {
+            console.warn("No products found in CSVs to sync.");
+            return { success: false, count: 0 };
+        }
+
+        let syncedCount = 0;
+        for (const p of csvProducts) {
+            if (!p.asin) continue;
+            
+            await MarketplaceProduct.findOneAndUpdate(
+                { asin: p.asin },
+                {
+                    title: p.title,
+                    keyword: p.keyword,
+                    shortUrl: p.shortUrl,
+                    fullUrl: p.fullUrl,
+                    imageUrl: p.imageUrl,
+                    rank: p.rank,
+                    store: p.store,
+                    category: p.category,
+                    rating: p.rating,
+                    reviewCount: p.reviewCount,
+                    price: p.price,
+                    lastSynced: new Date()
+                },
+                { upsert: true, new: true }
+            );
+            syncedCount++;
+        }
+
+        console.log(`Successfully synced ${syncedCount} marketplace products.`);
+        return { success: true, count: syncedCount };
+    } catch (err) {
+        console.error("Marketplace sync failed:", err);
+        return { success: false, error: String(err) };
+    }
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight } from 'lucide-react';
-import { importDetailedJson } from '@/lib/actions/glossary';
+import { importDetailedJson, syncMarketplaceData } from '@/lib/actions/glossary';
 import { useRouter } from 'next/navigation';
 
 interface BulkTermImportProps {
@@ -15,7 +15,8 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
     const [rawList, setRawList] = useState('');
     const [jsonContent, setJsonContent] = useState('');
     const [category, setCategory] = useState('Writing');
-    const [isHydrating, setIsHydrating] = useState(false);
+     const [isHydrating, setIsHydrating] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
     const handleHydrate = async () => {
@@ -69,6 +70,23 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
             });
         } finally {
             setIsHydrating(false);
+        }
+    };
+
+    const handleSyncMarketplace = async () => {
+        try {
+            setIsSyncing(true);
+            setStatus(null);
+            const result = await syncMarketplaceData();
+            if (result.success) {
+                setStatus({ type: 'success', message: `Successfully synced ${result.count} marketplace products.` });
+            } else {
+                setStatus({ type: 'error', message: `Sync failed: ${result.error}` });
+            }
+        } catch (err: any) {
+            setStatus({ type: 'error', message: err.message });
+        } finally {
+            setIsSyncing(false);
         }
     };
 
@@ -310,6 +328,14 @@ ${rawList || "Please paste keywords in the first column"}`;
                             <div className="w-2 h-2 rounded-full bg-indigo-500" />
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Niche Optimized</span>
                         </div>
+                        <button
+                            onClick={handleSyncMarketplace}
+                            disabled={isSyncing || isHydrating}
+                            className="ml-6 px-4 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg font-black text-[9px] uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm"
+                        >
+                            {isSyncing ? <Loader2 className="animate-spin" size={12} /> : <Zap size={12} />}
+                            Sync Marketplace
+                        </button>
                     </div>
                     <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
                         Warlock Publishing System v2.4
