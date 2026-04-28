@@ -150,6 +150,26 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         .filter(item => item.id !== featuredPoolItem?.id)
         .slice(0, 4);
 
+    // YouTube Data fetch if missing
+    let youtubeVideo = term.youtubeVideo;
+    if (!youtubeVideo?.url && !term.videoUrl) {
+        try {
+            const foundVideo = await searchYouTubeForTerm(term.term, term.category);
+            if (foundVideo) {
+                youtubeVideo = {
+                    url: foundVideo.url,
+                    title: foundVideo.title,
+                    channel: foundVideo.channel
+                };
+            }
+        } catch (e) {
+            console.error("YouTube automated fetch failed:", e);
+        }
+    }
+
+    const videoUrl = youtubeVideo?.url || term.videoUrl;
+    const videoId = videoUrl ? (videoUrl.match(/[?&]v=([^&#]+)/) || videoUrl.match(/youtu\.be\/([^?&#]+)/))?.[1] : null;
+
     // Handle external vs internal linking (used in the UI)
     // Heuristic: If video is missing, try to find one
     let finalVideoUrl = term.videoUrl;
@@ -217,9 +237,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     let archetypesTitle = "Character Archetypes";
     let archetypesDesc = "The specific roles readers of this keyword demand.";
     let snippetLabel = "Strategy Snippet";
-    let pitfallLabel = "Common Pitfall";
-    let solutionLabel = "Strategic Solution";
-
     if (isFiction) {
         writingLabel = "The Writing Aspect";
         masterclassTitle = "Writers Masterclass";
@@ -229,8 +246,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "Archetype Trio";
         archetypesDesc = "The specific roles readers of this keyword demand.";
         snippetLabel = "Story Snippet";
-        pitfallLabel = "Writing Sin";
-        solutionLabel = "Expert Solution";
     } else if (isColoringBook) {
         writingLabel = "The Design Aspect";
         masterclassTitle = "Designer Masterclass";
@@ -240,8 +255,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "User Profiles";
         archetypesDesc = "The specific hobbyist or practitioner profiles this asset is for.";
         snippetLabel = "Design Tip";
-        pitfallLabel = "Design Error";
-        solutionLabel = "Expert Solution";
     } else if (isNonFiction) {
         writingLabel = "The Authority Angle";
         masterclassTitle = "Authority Masterclass";
@@ -251,8 +264,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "Personas & Avatars";
         archetypesDesc = "The specific student or reader personas this content serves.";
         snippetLabel = "Authority Hook";
-        pitfallLabel = "Common Pitfall";
-        solutionLabel = "Expert Solution";
     } else if (isPractical) {
         writingLabel = "The Execution Logic";
         masterclassTitle = "Practical Masterclass";
@@ -262,8 +273,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "User Profiles";
         archetypesDesc = "The specific hobbyist or practitioner profiles this asset is for.";
         snippetLabel = "Execution Tip";
-        pitfallLabel = "Common Error";
-        solutionLabel = "Expert Solution";
     }
 
     if (isMarketingFocus) {
@@ -275,8 +284,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "Target Personas";
         archetypesDesc = "The specific audience segments this asset is designed to convert.";
         snippetLabel = "Sales Copy Hook";
-        pitfallLabel = "Marketing Trap";
-        solutionLabel = "Sales Solution";
     }
 
     return (
@@ -469,35 +476,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                             </div>
                         </div>
 
-                        {/* Pitfalls vs Solutions */}
-                        <div className="bg-rose-50 border border-rose-100 rounded-[3rem] p-10 space-y-8 mt-10">
-                            <div className="flex items-center gap-3 text-rose-600">
-                                <AlertTriangle size={24} />
-                                <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 italic">Common Pitfalls & <span className="text-rose-600">Solutions</span></h3>
-                            </div>
-                            <div className="grid md:grid-cols-2 gap-8">
-                                {(term.commonPitfalls && term.commonPitfalls.length > 0 ? term.commonPitfalls : [
-                                    { pitfall: "The Secrecy Trap", howToAvoid: "Establish valid, high-stakes reasons for silence." },
-                                    { pitfall: "Passive Character Agency", howToAvoid: "Ensure the lead's choices drive the reveal." }
-                                ]).map((item: any, i: number) => (
-                                    <div key={i} className="space-y-4 p-8 bg-white rounded-[2.5rem] border border-rose-100 shadow-sm">
-                                        <div className="flex gap-4 items-start">
-                                            <div className="mt-1 shrink-0 w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-[10px]">✕</div>
-                                            <div className="space-y-1">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{pitfallLabel}</p>
-                                                <p className="text-xs font-black text-slate-900">{item.pitfall || item.challenge}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-4 items-start pl-10 border-l-2 border-emerald-100 ml-3">
-                                            <div className="space-y-1">
-                                                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{solutionLabel}</p>
-                                                <p className="text-xs font-medium text-slate-600 leading-relaxed">{item.howToAvoid || item.solution}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
 
                         {/* PHASE IV: SUB-GENRE BLENDING */}
                         {term.subGenreVariations && term.subGenreVariations.length > 0 && (
@@ -875,6 +853,96 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         </div>
                                     );
                                 })}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* PHASE V: MULTIMEDIA MASTERY (YOUTUBE) */}
+                    <section className="space-y-12" id="multimedia">
+                        <div className="flex items-center justify-between px-2">
+                             <div className="space-y-1">
+                                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
+                                    V. Multimedia <span className="text-rose-600">Mastery</span>
+                                </h2>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visual Strategy & Video Insights</p>
+                             </div>
+                             <div className="hidden md:block h-px flex-1 bg-slate-200 mx-8 opacity-50"></div>
+                             <div className="flex items-center gap-2 px-3 py-1 bg-rose-50 rounded-full">
+                                <Youtube size={12} className="text-rose-600" />
+                                <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">LIVE INSIGHTS</span>
+                             </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-5 gap-8">
+                            <div className="md:col-span-3">
+                                {videoId ? (
+                                    <div className="aspect-video w-full rounded-[3rem] overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 group relative">
+                                        <iframe 
+                                            src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+                                            title={youtubeVideo?.title || term.term}
+                                            className="w-full h-full"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                            allowFullScreen
+                                        ></iframe>
+                                    </div>
+                                ) : (
+                                    <div className="aspect-video w-full rounded-[3rem] bg-slate-100 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 space-y-4">
+                                        <Youtube size={48} className="text-slate-300" />
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No primary video content available</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="md:col-span-2 space-y-6">
+                                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm h-full flex flex-col justify-center space-y-6">
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Mastery Tip</p>
+                                        <h4 className="text-lg font-black text-slate-900 leading-tight">
+                                            {youtubeVideo?.title || `Analyzing ${term.term} dynamics via visual storytelling.`}
+                                        </h4>
+                                    </div>
+                                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                                        {youtubeVideo?.channel ? `Curated from ${youtubeVideo.channel}. ` : ""}
+                                        Watching how experts implement {term.term} in real-world scenarios is the fastest way to master its commercial application.
+                                    </p>
+                                    <div className="flex items-center gap-4">
+                                        <Link 
+                                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(term.term + " strategy")}`}
+                                            target="_blank"
+                                            className="flex items-center gap-2 text-[10px] font-black text-rose-600 uppercase tracking-widest hover:translate-x-1 transition-transform"
+                                        >
+                                            Explore More on YouTube <ArrowRight size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Marketplace Sub-Section */}
+                        <div className="pt-10 space-y-8">
+                            <div className="flex items-center gap-3">
+                                <ShoppingBag size={20} className="text-emerald-600" />
+                                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Marketplace Insights</h3>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {fullPool.slice(0, 4).map((item: any, i: number) => (
+                                    <Link 
+                                        key={i}
+                                        href={item.link}
+                                        className="group bg-white border border-slate-200 rounded-[2rem] p-6 hover:shadow-xl hover:border-emerald-200 transition-all flex flex-col"
+                                    >
+                                        <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-slate-50 relative">
+                                            <img src={item.imageUrl || '/images/placeholder-product.png'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                            <div className="absolute top-2 right-2 bg-emerald-600 text-white text-[8px] font-black px-2 py-1 rounded-full uppercase tracking-widest">
+                                                {item.type}
+                                            </div>
+                                        </div>
+                                        <h4 className="text-xs font-black text-slate-900 line-clamp-1 mb-2 group-hover:text-emerald-600 transition-colors">{item.title}</h4>
+                                        <div className="mt-auto flex items-center justify-between">
+                                            <span className="text-sm font-black text-slate-900">${item.price}</span>
+                                            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">View Asset</span>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
                         </div>
                     </section>
