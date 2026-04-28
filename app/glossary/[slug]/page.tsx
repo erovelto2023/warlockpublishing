@@ -857,7 +857,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                             rating: p.rating || '4.8'
                                         }))
                                     ];
- }))];
 
                                     if (combinedCategoryPool.length === 0) return null;
 
