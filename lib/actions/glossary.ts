@@ -15,14 +15,26 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
         const queryLower = (query || "").toLowerCase();
         const categoryLower = (preferredCategory || "").toLowerCase();
 
-        // 1. Primary Fetch: Match title, keyword, or ASIN
+        // 1. Primary Fetch: Match title, keyword, or ASIN with a random skip for variety
+        const totalCandidates = await MarketplaceProduct.countDocuments({
+            $or: [
+                { title: { $regex: queryClean, $options: 'i' } },
+                { keyword: { $regex: queryClean, $options: 'i' } },
+                { asin: { $in: targetAsins } }
+            ]
+        });
+
+        const skip = totalCandidates > 20 ? Math.floor(Math.random() * Math.min(totalCandidates - 20, 50)) : 0;
+
         let products = await MarketplaceProduct.find({
             $or: [
                 { title: { $regex: queryClean, $options: 'i' } },
                 { keyword: { $regex: queryClean, $options: 'i' } },
                 { asin: { $in: targetAsins } }
             ]
-        }).limit(100);
+        })
+        .skip(skip)
+        .limit(100);
 
         // 2. Fallback: If no matches, try matching by category
         if (products.length === 0 && categoryLower && categoryLower !== "general") {
@@ -32,10 +44,12 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
             }).limit(100);
         }
 
-        // 3. Final Fallback: If still nothing, return the most recent synced items
+        // 3. Final Fallback: If still nothing, return the most recent synced items with a random offset
         if (products.length === 0) {
             console.log("No specific matches. Pulling recent global assets.");
-            products = await MarketplaceProduct.find().sort({ lastSynced: -1 }).limit(limit);
+            const totalProducts = await MarketplaceProduct.countDocuments();
+            const globalSkip = totalProducts > limit ? Math.floor(Math.random() * Math.min(totalProducts - limit, 100)) : 0;
+            products = await MarketplaceProduct.find().sort({ lastSynced: -1 }).skip(globalSkip).limit(limit);
         }
 
         if (products.length === 0) {
@@ -80,7 +94,7 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
         // Shuffle and return top results to provide variety on every load
         const finalResults = scoredMatches
             .sort((a, b) => b.score - a.score)
-            .filter(item => item.score > 40)
+            .filter(item => item.score > 20) // Much lower threshold for variety
             .slice(0, 40); // Take top 40 relevant candidates
 
         return finalResults
