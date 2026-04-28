@@ -51,9 +51,9 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <p className="text-slate-500 text-[10px] font-black tracking-widest uppercase">
-                        &copy; {new Date().getFullYear()} Warlock Publishing. <span className="text-white/10 mx-2">|</span> Built for the Digital Frontier.
+                <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                        &copy; {new Date().getFullYear()} Warlock Publishing. All rights reserved. <span className="ml-2 text-indigo-500/50">Build v2.4.9</span>
                     </p>
                     <div className="flex gap-4">
                         {[1, 2, 3].map((i) => (
