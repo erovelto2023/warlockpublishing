@@ -47,17 +47,30 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
             let score = 0;
             const titleLower = product.title.toLowerCase();
             const keywordLower = (product.keyword || "").toLowerCase();
+            const categoryLowerField = (product.category || "").toLowerCase();
             const asin = product.asin;
 
+            // NICHE DETECTION (Strict Isolation)
+            const isColoringTerm = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('coloring');
+            const isRomanceTerm = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance');
+
+            const isColoringProduct = titleLower.includes('coloring') || categoryLowerField.includes('coloring') || keywordLower.includes('coloring');
+            const isRomanceProduct = titleLower.includes('romance') || titleLower.includes('billionaire') || categoryLowerField.includes('romance');
+
+            // 0. Manual Override
             if (targetAsins.includes(asin)) score += 1000;
             score += 50; // Base score
+
+            // 1. Cross-Niche Disqualification (The core fix)
+            if (isColoringTerm && isRomanceProduct && !isColoringProduct) score -= 1000;
+            if (isRomanceTerm && isColoringProduct && !isRomanceProduct) score -= 1000;
 
             if (keywordLower === queryLower) score += 300;
             else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
             if (titleLower.includes(queryLower)) score += 100;
             
             // Category Synergy
-            if (categoryLower && (product.category?.toLowerCase().includes(categoryLower) || categoryLower.includes(product.category?.toLowerCase() || ""))) {
+            if (categoryLower && (categoryLowerField.includes(categoryLower) || categoryLower.includes(categoryLowerField))) {
                 score += 80;
             }
 
@@ -66,7 +79,7 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
 
         return scoredMatches
             .sort((a, b) => b.score - a.score)
-            .filter(item => item.score > 40) // Slightly lower threshold for better visibility
+            .filter(item => item.score > 40) // Quality threshold
             .slice(0, limit);
     } catch (err) {
         console.error("Marketplace DB query failed:", err);
