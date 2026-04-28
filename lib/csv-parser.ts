@@ -18,10 +18,10 @@ export interface AmazonProduct {
 }
 
 export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
-    const csvPath = path.join(process.cwd(), 'docs', 'billionairebooks.csv');
+    const csvPath = path.join(process.cwd(), 'docs', 'market_nexus.csv');
     
     if (!fs.existsSync(csvPath)) {
-        console.warn('Amazon CSV not found at:', csvPath);
+        console.warn('Market Nexus CSV not found at:', csvPath);
         return [];
     }
 
@@ -29,26 +29,27 @@ export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
         const content = fs.readFileSync(csvPath, 'utf8');
         const lines = content.split('\n').filter(line => line.trim());
         
-        // Skip header if it exists, but the user's sample looks like data
-        // Let's check if the first line is header
+        // Skip header if it exists
         const isHeader = lines[0].includes('keyword') && lines[0].includes('url');
         const dataLines = isHeader ? lines.slice(1) : lines;
 
         return dataLines.map(line => {
-            // Very basic CSV split (handle quotes)
-            const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
+            // Better CSV split that handles quoted commas
+            const matches = line.match(/"[^"]*"|[^,]+/g);
+            let parts = matches ? Array.from(matches) : [];
+            parts = parts.map(p => p.replace(/^"|"$/g, '').trim());
             
             const shortUrl = (parts[2] || '').trim();
             const fullUrl = (parts[3] || '').trim();
             
-            // Intelligence: If fullUrl is broken (javascript:void), favor the shortUrl if it looks valid
+            // Intelligence: If fullUrl is broken (javascript:void), favor the shortUrl
             const preferredUrl = (fullUrl.includes('javascript:void') && shortUrl.startsWith('http')) ? shortUrl : (fullUrl || shortUrl);
 
             return {
                 index: parts[0] || '',
-                keyword: parts[1] || '',
+                keyword: (parts[1] || '').trim(),
                 shortUrl: shortUrl,
-                fullUrl: preferredUrl, // Store the fixed/preferred one here
+                fullUrl: preferredUrl,
                 imageUrl: parts[4] || '',
                 rank: parts[5] || '',
                 store: parts[6] || '',
@@ -61,7 +62,7 @@ export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
             };
         });
     } catch (err) {
-        console.error('Error parsing Amazon CSV:', err);
+        console.error('Error parsing Market Nexus:', err);
         return [];
     }
 }

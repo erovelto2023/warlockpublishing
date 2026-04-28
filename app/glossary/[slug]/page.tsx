@@ -83,11 +83,12 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     let csvProducts: AmazonProduct[] = [];
     
     try {
+        const targetAsins = term.directoryCategories?.flatMap((cat: any) => cat.productIds || []) || [];
         const results = await Promise.all([
             getRelatedGlossaryTerms(term.category || 'General', term.slug),
             getPublishedProducts(),
             getPublishedSalesPages(),
-            getAmazonProductsFromCsv(term.term || term.slug)
+            getAmazonProductsFromCsv(term.term || term.slug, 20, term.category, targetAsins)
         ]);
         relatedTerms = (results[0] || []) as GlossaryTerm[];
         products = (results[1] || []) as Product[];

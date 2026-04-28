@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { revalidatePath } from 'next/cache';
 
-const CSV_PATH = path.join(process.cwd(), 'docs', 'billionairebooks.csv');
+const CSV_PATH = path.join(process.cwd(), 'docs', 'market_nexus.csv');
 
 export async function getAmazonCsvContent() {
     try {

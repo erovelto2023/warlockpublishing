@@ -7,23 +7,65 @@ import { GlossaryTerm as GlossaryTermType } from '@/lib/types';
 import { AMAZON_AFFILIATE_ID, formatAmazonLink } from '@/lib/utils';
 import { parseAmazonCsv, AmazonProduct } from '@/lib/csv-parser';
 
-export async function getAmazonProductsFromCsv(query: string, limit: number = 4): Promise<AmazonProduct[]> {
+export async function getAmazonProductsFromCsv(query: string, limit: number = 20, preferredCategory: string = "", targetAsins: string[] = []): Promise<AmazonProduct[]> {
     const allProducts = await parseAmazonCsv();
     if (!allProducts || allProducts.length === 0) return [];
     
     const queryLower = query.toLowerCase();
+    const queryWords = queryLower.split(' ').filter(w => w.length > 2);
+    const categoryLower = preferredCategory.toLowerCase();
     
     // Match by keyword or title
-    const matches = allProducts.filter(p => 
-        p.keyword.toLowerCase().includes(queryLower) || 
-        p.title.toLowerCase().includes(queryLower) ||
-        queryLower.includes(p.keyword.toLowerCase())
-    );
+    // Scoring engine for high-relevance matching
+    const scoredMatches = allProducts.map(p => {
+        let score = 0;
+        const titleLower = p.title.toLowerCase();
+        const keywordLower = (p.keyword || "").toLowerCase();
+        const csvCategoryLower = (p.category || "").toLowerCase();
+        const asin = p.asin;
 
-    // If no direct matches, return some default top picks from the CSV
-    if (matches.length === 0) return allProducts.slice(0, limit);
+        // 0. Manual Override (If ASIN is specifically requested for this term)
+        if (targetAsins.includes(asin)) score += 1000;
+
+        // 1. Exact Keyword Match (Highest Priority)
+        if (keywordLower === queryLower) score += 100;
+        else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 50;
+
+        // 2. Word Overlap in Title
+        const matchCount = queryWords.filter(word => titleLower.includes(word)).length;
+        score += (matchCount * 15); // Weighted more heavily
+
+        // 3. Category Synergy
+        if (categoryLower && (csvCategoryLower.includes(categoryLower) || titleLower.includes(categoryLower))) {
+            score += 40;
+        }
+
+        // 4. Negative matching for "Adult" if it's likely Romance vs Coloring
+        // If query has "Coloring" but title has "Romance" or "Billionaire", penalize heavily
+        const isColoringSearch = queryLower.includes('coloring');
+        const isRomanceSearch = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance');
+        
+        const hasRomanceClues = titleLower.includes('romance') || titleLower.includes('billionaire') || titleLower.includes('fake relationship') || titleLower.includes('mafia');
+        const hasColoringClues = titleLower.includes('coloring') || titleLower.includes('illustrations') || titleLower.includes('pages');
+
+        if (isColoringSearch && hasRomanceClues) score -= 500;
+        if (isRomanceSearch && hasColoringClues) score -= 500;
+
+        return { product: p, score };
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+    if (scoredMatches.length === 0) {
+        // Fallback: If no matches, at least try to return something from the same category if possible
+        if (categoryLower) {
+            const catFallback = allProducts.filter(p => (p.category || "").toLowerCase().includes(categoryLower)).slice(0, limit);
+            if (catFallback.length > 0) return catFallback;
+        }
+        return allProducts.slice(0, limit);
+    }
     
-    return matches.slice(0, limit);
+    return scoredMatches.map(m => m.product).slice(0, limit);
 }
 
 // Slugify helper
