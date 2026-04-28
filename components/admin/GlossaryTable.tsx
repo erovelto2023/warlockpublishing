@@ -8,7 +8,7 @@ import {
     ChevronLeft, ChevronRight, MoreHorizontal, Zap, Database
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { deleteGlossaryTerm, runGlossaryAudit } from '@/lib/actions/glossary';
+import { deleteGlossaryTerm, runGlossaryAudit, bulkDeleteGlossaryTerms } from '@/lib/actions/glossary';
 import { GlossaryTerm } from '@/lib/types';
 import BulkTermImport from './BulkTermImport';
 
@@ -25,6 +25,8 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
     const [isAuditing, setIsAuditing] = useState(false);
     const [auditResults, setAuditResults] = useState<string[] | null>(null);
     const [showBulkImport, setShowBulkImport] = useState(false);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     // Categories for filter
     const categories = useMemo(() => {
@@ -78,6 +80,37 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
 
     const clearAudit = () => {
         setAuditResults(null);
+    };
+
+    const toggleSelect = (id: string) => {
+        setSelectedIds(prev => 
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length > 0 && selectedIds.length === paginatedTerms.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(paginatedTerms.map(t => t._id));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        if (!confirm(`SECURITY CHECK: You are about to permanently delete ${selectedIds.length} terms. Proceed?`)) return;
+        
+        setIsBulkDeleting(true);
+        try {
+            await bulkDeleteGlossaryTerms(selectedIds);
+            setSelectedIds([]);
+            alert(`${selectedIds.length} terms purged from database.`);
+            router.refresh();
+        } catch (e) {
+            alert('Bulk deletion failed.');
+        } finally {
+            setIsBulkDeleting(false);
+        }
     };
 
     return (
@@ -136,6 +169,15 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                 >
                     <Upload size={12} /> Bulk Import
                 </button>
+                {selectedIds.length > 0 && (
+                    <button 
+                        onClick={handleBulkDelete}
+                        disabled={isBulkDeleting}
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-tight flex items-center gap-2 shadow-lg shadow-red-100 animate-in zoom-in-95 duration-200 disabled:opacity-50"
+                    >
+                        <Trash2 size={12} /> {isBulkDeleting ? 'Deleting...' : `Delete ${selectedIds.length} Selected`}
+                    </button>
+                )}
             </div>
 
             {/* SEARCH & FILTERS */}
@@ -181,7 +223,12 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                         <thead className="bg-slate-50/50">
                             <tr>
                                 <th className="px-6 py-4 text-left w-10">
-                                    <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                                    <input 
+                                        type="checkbox" 
+                                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                                        onChange={toggleSelectAll}
+                                        checked={selectedIds.length > 0 && selectedIds.length === paginatedTerms.length}
+                                    />
                                 </th>
                                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Term</th>
                                 <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Category</th>
@@ -194,7 +241,12 @@ export default function GlossaryTable({ terms }: GlossaryTableProps) {
                             {paginatedTerms.map((term) => (
                                 <tr key={term._id} className="hover:bg-slate-50/50 transition-colors group">
                                     <td className="px-6 py-4">
-                                        <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                                        <input 
+                                            type="checkbox" 
+                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                                            checked={selectedIds.includes(term._id)}
+                                            onChange={() => toggleSelect(term._id)}
+                                        />
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
