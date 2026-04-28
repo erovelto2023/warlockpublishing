@@ -13,9 +13,12 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
     
     const queryLower = query.toLowerCase();
     const queryWords = queryLower.split(' ').filter(w => w.length > 2);
-    const categoryLower = preferredCategory.toLowerCase();
+    const categoryLower = (preferredCategory || "").toLowerCase();
     
-    // Match by keyword or title
+    // Niche Detection Flags
+    const isColoringNiche = queryLower.includes('coloring') || categoryLower.includes('crafts') || categoryLower.includes('hobbies');
+    const isRomanceNiche = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance');
+
     // Scoring engine for high-relevance matching
     const scoredMatches = allProducts.map(p => {
         let score = 0;
@@ -24,32 +27,33 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
         const csvCategoryLower = (p.category || "").toLowerCase();
         const asin = p.asin;
 
-        // 0. Manual Override (If ASIN is specifically requested for this term)
+        // 0. Manual Override (High Priority)
         if (targetAsins.includes(asin)) score += 1000;
 
-        // 1. Exact Keyword Match (Highest Priority)
+        // 1. Exact Keyword Match
         if (keywordLower === queryLower) score += 100;
         else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 50;
 
         // 2. Word Overlap in Title
         const matchCount = queryWords.filter(word => titleLower.includes(word)).length;
-        score += (matchCount * 15); // Weighted more heavily
+        score += (matchCount * 15);
 
         // 3. Category Synergy
         if (categoryLower && (csvCategoryLower.includes(categoryLower) || titleLower.includes(categoryLower))) {
             score += 40;
         }
 
-        // 4. Negative matching for "Adult" if it's likely Romance vs Coloring
-        // If query has "Coloring" but title has "Romance" or "Billionaire", penalize heavily
-        const isColoringSearch = queryLower.includes('coloring');
-        const isRomanceSearch = queryLower.includes('romance') || queryLower.includes('billionaire') || categoryLower.includes('romance');
-        
-        const hasRomanceClues = titleLower.includes('romance') || titleLower.includes('billionaire') || titleLower.includes('fake relationship') || titleLower.includes('mafia');
-        const hasColoringClues = titleLower.includes('coloring') || titleLower.includes('illustrations') || titleLower.includes('pages');
+        // 4. Strict Niche Isolation
+        const hasRomanceClues = titleLower.includes('romance') || titleLower.includes('billionaire') || titleLower.includes('fake relationship') || titleLower.includes('mafia') || titleLower.includes('steamy');
+        const hasColoringClues = titleLower.includes('coloring') || titleLower.includes('illustrations') || titleLower.includes('pages') || titleLower.includes('drawing');
 
-        if (isColoringSearch && hasRomanceClues) score -= 500;
-        if (isRomanceSearch && hasColoringClues) score -= 500;
+        // If searching for coloring, but book is romance -> Extreme penalty
+        if (isColoringNiche && hasRomanceClues) score -= 2000;
+        // If searching for romance, but book is coloring -> Extreme penalty
+        if (isRomanceNiche && hasColoringClues) score -= 2000;
+
+        // If the book doesn't match the niche at all and we have strong niche detection, penalize
+        if (isColoringNiche && !hasColoringClues && !csvCategoryLower.includes('crafts')) score -= 100;
 
         return { product: p, score };
     })
@@ -57,11 +61,29 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
     .sort((a, b) => b.score - a.score);
 
     if (scoredMatches.length === 0) {
-        // Fallback: If no matches, at least try to return something from the same category if possible
+        // SAFE FALLBACK: Only return items from the same category, never leak across niches
         if (categoryLower) {
-            const catFallback = allProducts.filter(p => (p.category || "").toLowerCase().includes(categoryLower)).slice(0, limit);
-            if (catFallback.length > 0) return catFallback;
+            const catMatches = allProducts.filter(p => {
+                const titleLower = p.title.toLowerCase();
+                const csvCat = (p.category || "").toLowerCase();
+                const hasRomanceClues = titleLower.includes('romance') || titleLower.includes('billionaire');
+                
+                // If it's a coloring term, DON'T return romance even in fallback
+                if (isColoringNiche && hasRomanceClues) return false;
+                
+                return csvCat.includes(categoryLower) || titleLower.includes(categoryLower);
+            });
+            return catMatches.slice(0, limit);
         }
+        
+        // Final sanity check: if the term is non-romance, don't return the default romance results
+        if (!isRomanceNiche) {
+            return allProducts.filter(p => {
+                const titleLower = p.title.toLowerCase();
+                return !titleLower.includes('romance') && !titleLower.includes('billionaire');
+            }).slice(0, limit);
+        }
+
         return allProducts.slice(0, limit);
     }
     
