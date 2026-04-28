@@ -186,10 +186,12 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const productLink = featuredPoolItem?.link || "/products";
     
     // --- CATEGORY INTELLIGENCE ENGINE ---
+    const isColoringBook = term.category.includes('Coloring') || term.niche?.includes('Coloring');
+    
     const isFiction = [
         'Romance', 'Literature & Fiction', 'Mystery, Thriller & Suspense', 
         'Science Fiction & Fantasy', 'Teen & Young Adult', 'Comics & Graphic Novels', 'Trope', 'Genre'
-    ].includes(term.category);
+    ].includes(term.category) && !isColoringBook;
 
     const isNonFiction = [
         'Biographies & Memoirs', 'Business & Money', 'Health, Fitness & Dieting', 
@@ -200,7 +202,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
 
     const isPractical = [
         'Cookbooks, Food & Wine', 'Crafts, Hobbies & Home', 'Travel', 'Humor & Entertainment', 'Children\'s Books'
-    ].includes(term.category);
+    ].includes(term.category) || isColoringBook;
 
     // Marketing/Production keyword detection logic (Fallback)
     const marketingKeywords = ['cover', 'video', 'checklist', 'marketing', 'sales', 'blurb', 'design', 'art', 'promo', 'ad', 'social', 'email', 'funnel'];
@@ -215,6 +217,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     let archetypesTitle = "Character Archetypes";
     let archetypesDesc = "The specific roles readers of this keyword demand.";
     let snippetLabel = "Strategy Snippet";
+    let pitfallLabel = "Common Pitfall";
+    let solutionLabel = "Strategic Solution";
 
     if (isFiction) {
         writingLabel = "The Writing Aspect";
@@ -225,6 +229,19 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "Archetype Trio";
         archetypesDesc = "The specific roles readers of this keyword demand.";
         snippetLabel = "Story Snippet";
+        pitfallLabel = "Writing Sin";
+        solutionLabel = "Expert Solution";
+    } else if (isColoringBook) {
+        writingLabel = "The Design Aspect";
+        masterclassTitle = "Designer Masterclass";
+        masterclassDesc = "The high-engagement design framework designed for relaxation and coloring satisfaction.";
+        structuralTitle = "Thematic Structure";
+        pacingTitle = "Engagement Flow";
+        archetypesTitle = "User Profiles";
+        archetypesDesc = "The specific hobbyist or practitioner profiles this asset is for.";
+        snippetLabel = "Design Tip";
+        pitfallLabel = "Design Error";
+        solutionLabel = "Expert Solution";
     } else if (isNonFiction) {
         writingLabel = "The Authority Angle";
         masterclassTitle = "Authority Masterclass";
@@ -234,6 +251,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "Personas & Avatars";
         archetypesDesc = "The specific student or reader personas this content serves.";
         snippetLabel = "Authority Hook";
+        pitfallLabel = "Common Pitfall";
+        solutionLabel = "Expert Solution";
     } else if (isPractical) {
         writingLabel = "The Execution Logic";
         masterclassTitle = "Practical Masterclass";
@@ -243,6 +262,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "User Profiles";
         archetypesDesc = "The specific hobbyist or practitioner profiles this asset is for.";
         snippetLabel = "Execution Tip";
+        pitfallLabel = "Common Error";
+        solutionLabel = "Expert Solution";
     }
 
     if (isMarketingFocus) {
@@ -254,6 +275,8 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         archetypesTitle = "Target Personas";
         archetypesDesc = "The specific audience segments this asset is designed to convert.";
         snippetLabel = "Sales Copy Hook";
+        pitfallLabel = "Marketing Trap";
+        solutionLabel = "Sales Solution";
     }
 
     return (
@@ -439,18 +462,18 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         <div className="flex gap-4 items-start">
                                             <div className="mt-1 shrink-0 w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-[10px]">✕</div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Writing Sin</p>
-                                                <p className="text-xs font-black text-slate-900">{item.pitfall || item.challenge}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-4 items-start pl-10 border-l-2 border-emerald-100 ml-3">
-                                            <div className="space-y-1">
-                                                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Expert Solution</p>
-                                                <p className="text-xs font-medium text-slate-600 leading-relaxed">{item.howToAvoid || item.solution}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{pitfallLabel}</p>
+                                                 <p className="text-xs font-black text-slate-900">{item.pitfall || item.challenge}</p>
+                                             </div>
+                                         </div>
+                                         <div className="flex gap-4 items-start pl-10 border-l-2 border-emerald-100 ml-3">
+                                             <div className="space-y-1">
+                                                 <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{solutionLabel}</p>
+                                                 <p className="text-xs font-medium text-slate-600 leading-relaxed">{item.howToAvoid || item.solution}</p>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 ))}
                             </div>
                         </div>
                     </section>
@@ -464,7 +487,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     <Sparkles size={12} /> Phase III
                                 </div>
                                 <h2 id="masterclass" className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                                    {isMarketingFocus ? 'III. Marketing ' : 'III. Writers '}<span className="text-amber-400">Masterclass</span>
+                                    {isMarketingFocus ? 'III. Marketing ' : (isColoringBook ? 'III. Designer ' : (isFiction ? 'III. Writers ' : 'III. Authority '))}<span className="text-amber-400">Masterclass</span>
                                 </h2>
                                 <p className="text-lg md:text-xl font-medium opacity-90 max-w-3xl leading-relaxed">
                                     {masterclassDesc}
@@ -473,7 +496,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         </div>
 
                         <div className="p-10 md:p-14 space-y-20">
-                            {/* Module 1: The Three-Act Foundation */}
+                            {/* Module 1: The Foundation */}
                             <div className="grid md:grid-cols-2 gap-12 items-center">
                                 <div className="space-y-8">
                                     <div className="space-y-4">
@@ -485,18 +508,18 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     </div>
                                     <div className="space-y-6">
                                         {[
-                                            { act: "Act I: Setup & Trigger", range: "0–25%", desc: term.masterclass?.threeActStructure?.act1 || "Introduces the protagonist and the catalyst for action.", example: `She stared at the ${term.term}, her heart hammering. It was supposed to be a secret, but secrets have a way of screaming in the silence.` },
-                                            { act: "Act II: Conflict & Friction", range: "25–75%", desc: term.masterclass?.threeActStructure?.act2 || "The core drama where stakes rise and lead takes control.", example: `"You think a simple ${term.term} changes things?" he growled, closing the distance. "In this world, it changes everything."` },
-                                            { act: "Act III: Payoff & Resolution", range: "75–100%", desc: term.masterclass?.threeActStructure?.act3 || "The final push toward the Climax and HEA/HFN.", example: `The truth of the ${term.term} was finally out, but as their eyes met, she realized the cost was worth every shattered lie.` }
+                                            { act: isFiction ? "Act I: Setup & Trigger" : (isColoringBook ? "Phase I: Concept & Theme" : "Step I: Introduction"), range: isFiction ? "0–25%" : (isColoringBook ? "Start" : "Phase 1"), desc: term.masterclass?.threeActStructure?.act1 || (isColoringBook ? "Establishing the central visual theme and initial pattern complexity." : "Introduces the protagonist and the catalyst for action."), example: isColoringBook ? `This page features a bold ${term.term} center-piece to draw the eye.` : `She stared at the ${term.term}, her heart hammering.` },
+                                            { act: isFiction ? "Act II: Conflict & Friction" : (isColoringBook ? "Phase II: Detail & Variety" : "Step II: Implementation"), range: isFiction ? "25–75%" : (isColoringBook ? "Mid" : "Phase 2"), desc: term.masterclass?.threeActStructure?.act2 || (isColoringBook ? "Developing secondary patterns and increasing intricate details for engagement." : "The core drama where stakes rise and lead takes control."), example: isColoringBook ? `The intricate ${term.term} patterns here encourage longer coloring sessions.` : `"You think a simple ${term.term} changes things?"` },
+                                            { act: isFiction ? "Act III: Payoff & Resolution" : (isColoringBook ? "Phase III: Finish & Review" : "Step III: Outcome"), range: isFiction ? "75–100%" : (isColoringBook ? "End" : "Phase 3"), desc: term.masterclass?.threeActStructure?.act3 || (isColoringBook ? "Finalizing the collection and ensuring high-contrast production quality." : "The final push toward the Climax and HEA/HFN."), example: isColoringBook ? `A high-contrast ${term.term} finish ensures a professional look.` : `The truth of the ${term.term} was finally out.` }
                                         ].map((act, i) => (
                                             <div key={i} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between items-center">
                                                         <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">
-                                                            {isFiction ? act.act : (isNonFiction ? act.act.replace('Act', 'Phase') : act.act.replace('Act', 'Step'))}
+                                                            {act.act}
                                                         </h5>
                                                         <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded">
-                                                            {isFiction ? act.range : (isNonFiction ? 'Goal' : 'Action')}
+                                                            {act.range}
                                                         </span>
                                                     </div>
                                                     <p className="text-xs text-slate-500 leading-relaxed font-medium">{act.desc}</p>
@@ -506,7 +529,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                                         <Sparkles size={10} /> {snippetLabel}
                                                     </p>
                                                     <p className="text-[10px] text-slate-400 font-bold italic leading-relaxed">
-                                                        &quot;{isMarketingFocus ? `Check out this ${term.term} to supercharge your blurb conversion rate instantly.` : act.example}&quot;
+                                                        &quot;{act.example}&quot;
                                                     </p>
                                                 </div>
                                             </div>
@@ -517,12 +540,19 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     <div className="absolute top-0 right-0 p-6 opacity-5 rotate-12"><Activity size={100} /></div>
                                     <h4 className="text-lg font-black uppercase tracking-tight text-indigo-400">{pacingTitle}</h4>
                                     <div className="space-y-6">
-                                        {(term.masterclass?.profitBeats && term.masterclass.profitBeats.length > 0 ? term.masterclass.profitBeats : [
-                                            { title: "The Hook", timing: "10%", description: "Establish protagonist empathy." },
-                                            { title: "Pinch Points", timing: "35% & 60%", description: "Antagonist power reminder." },
-                                            { title: "All is Lost", timing: "75%", description: "Emotional low point for 5-star review payoff." },
-                                            { title: "Grand Gesture", timing: "Climax", description: "Character growth proof." }
-                                        ]).map((beat: any, i: number) => (
+                                        {(term.masterclass?.profitBeats && term.masterclass.profitBeats.length > 0 ? term.masterclass.profitBeats : (
+                                            isColoringBook ? [
+                                                { title: "Visual Hook", timing: "Cover", description: "Establish immediate thematic appeal." },
+                                                { title: "Pattern Variance", timing: "Pages 1-10", description: "Balance simple and complex designs." },
+                                                { title: "Flow State", timing: "Pages 11-40", description: "Maintain meditative engagement levels." },
+                                                { title: "Signature Page", timing: "Final Page", description: "Highest complexity for social sharing payoff." }
+                                            ] : [
+                                                { title: "The Hook", timing: "10%", description: "Establish protagonist empathy." },
+                                                { title: "Pinch Points", timing: "35% & 60%", description: "Antagonist power reminder." },
+                                                { title: "All is Lost", timing: "75%", description: "Emotional low point for payoff." },
+                                                { title: "Grand Gesture", timing: "Climax", description: "Character growth proof." }
+                                            ]
+                                        )).map((beat: any, i: number) => (
                                             <div key={i} className="flex gap-4 group/beat">
                                                 <div className="shrink-0 w-1 bg-indigo-500/30 rounded-full group-hover/beat:bg-indigo-500 transition-colors"></div>
                                                 <div className="space-y-1 flex-1">
@@ -536,7 +566,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                                     <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover/beat:border-indigo-500/30 transition-all">
                                                         <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">{snippetLabel}</p>
                                                         <p className="text-[9px] text-slate-300 font-bold italic leading-tight">
-                                                            &quot;{isMarketingFocus ? `Our ${term.term} guide reduces CPA by 40% while doubling organic reach.` : `The moment of ${term.term} was a thunderclap in the quiet room.`}&quot;
+                                                            &quot;{isColoringBook ? `The ${term.term} detail here is designed for maximum stress relief.` : `The moment of ${term.term} was a thunderclap.`}&quot;
                                                         </p>
                                                     </div>
                                                 </div>
@@ -557,26 +587,32 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                     <p className="text-sm text-slate-500 font-bold">{archetypesDesc}</p>
                                 </div>
                                 <div className="grid md:grid-cols-3 gap-8">
-                                    {(term.masterclass?.characterArchetypes && term.masterclass.characterArchetypes.length > 0 ? term.masterclass.characterArchetypes : [
-                                        { role: "The Alpha / Specialist", description: "High-status lead (Billionaire, Elite)." },
-                                        { role: "The Relatable Proxy", description: "The character the reader identifies with." },
-                                        { role: "The Foil", description: "Highlights traits by stark contrast." }
-                                    ]).map((char: any, i: number) => (
+                                    {(term.masterclass?.characterArchetypes && term.masterclass.characterArchetypes.length > 0 ? term.masterclass.characterArchetypes : (
+                                        isColoringBook ? [
+                                            { role: "The Stress-Relief Seeker", description: "Looking for repetitive, meditative patterns." },
+                                            { role: "The Creative Explorer", description: "Demands intricate details and unique themes." },
+                                            { role: "The Hobbyist Artist", description: "Wants high-contrast lines for professional results." }
+                                        ] : [
+                                            { role: "The Alpha / Specialist", description: "High-status lead (Billionaire, Elite)." },
+                                            { role: "The Relatable Proxy", description: "The character the reader identifies with." },
+                                            { role: "The Foil", description: "Highlights traits by stark contrast." }
+                                        ]
+                                    )).map((char: any, i: number) => (
                                         <div key={i} className="bg-slate-50 border border-slate-200 rounded-[2.5rem] p-8 space-y-6 flex flex-col h-full">
                                             <div className="flex items-center justify-between">
                                                 <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-sm">
                                                     {i + 1}
                                                 </div>
-                                                <span className="text-[8px] font-black text-indigo-600/50 uppercase tracking-[0.2em]">Archetype</span>
+                                                <span className="text-[8px] font-black text-indigo-600/50 uppercase tracking-[0.2em]">{isColoringBook ? 'User Profile' : 'Archetype'}</span>
                                             </div>
                                             <div className="space-y-2 flex-1">
-                                                <h6 className="text-sm font-black text-slate-900 uppercase tracking-tight">{isMarketingFocus ? char.role.replace('Alpha / Specialist', 'High-LTV Buyer').replace('Relatable Proxy', 'Newsletter Sub').replace('Foil', 'Window Shopper') : char.role}</h6>
+                                                <h6 className="text-sm font-black text-slate-900 uppercase tracking-tight">{char.role}</h6>
                                                 <p className="text-xs text-slate-500 font-medium leading-relaxed">{char.description}</p>
                                             </div>
                                             <div className="pt-4 border-t border-slate-200">
                                                 <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-1">{snippetLabel}</p>
                                                 <p className="text-[10px] text-slate-400 font-bold italic leading-relaxed">
-                                                    &quot;{isMarketingFocus ? `This ${term.term} asset is the perfect lead magnet for this segment.` : char.example}&quot;
+                                                    &quot;{isColoringBook ? `A perfect gift for the ${char.role}.` : `She was the ultimate ${char.role}.`}&quot;
                                                 </p>
                                             </div>
                                         </div>
@@ -607,27 +643,27 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 </div>
                                 <div className="space-y-6">
                                     <div className="space-y-2 group/tech">
-                                        <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">The &quot;Power&quot; Title</h6>
+                                        <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">{isColoringBook ? 'The "Signature" Title' : 'The "Power" Title'}</h6>
                                         <p className="text-xs text-slate-600 font-bold leading-relaxed border-l-2 border-slate-100 pl-4">
-                                            {term.masterclass?.technicalComponents?.powerTitle || "Keyword-optimized strategic title idea."}
+                                            {term.masterclass?.technicalComponents?.powerTitle || (isColoringBook ? `${term.term} Relaxation: A Premium Adult Coloring Collection` : "Keyword-optimized strategic title idea.")}
                                         </p>
                                     </div>
                                     <div className="space-y-2 group/tech">
-                                        <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">Essential Tropes (Meta-Tags)</h6>
+                                        <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">{isColoringBook ? 'Design Styles (Categories)' : 'Essential Tropes (Meta-Tags)'}</h6>
                                         <p className="text-xs text-slate-600 font-bold leading-relaxed border-l-2 border-slate-100 pl-4">
-                                            {term.masterclass?.technicalComponents?.tropes?.join(', ') || "Algorithm categorization tags."}
+                                            {term.masterclass?.technicalComponents?.tropes?.join(', ') || (isColoringBook ? "Mandala, Stress-Relief, Thematic, High-Contrast" : "Algorithm categorization tags.")}
                                         </p>
                                     </div>
                                     <div className="space-y-3 group/tech">
-                                        <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">The High-Convert Hook (Blurb Line)</h6>
+                                        <h6 className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] group-hover/tech:translate-x-2 transition-transform">{isColoringBook ? 'The High-Convert Description' : 'The High-Convert Hook (Blurb Line)'}</h6>
                                         <div className="space-y-3">
                                             <p className="text-xs text-slate-600 font-bold leading-relaxed border-l-2 border-slate-100 pl-4">
-                                                {term.masterclass?.technicalComponents?.hook || "Blurb's first line designed to convert browsers to buyers."}
+                                                {term.masterclass?.technicalComponents?.hook || (isColoringBook ? `Unlock meditative peace with our uniquely crafted ${term.term} illustrations.` : "Blurb's first line designed to convert.")}
                                             </p>
                                             <div className="ml-4 p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
-                                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Story Snippet</p>
+                                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">{snippetLabel}</p>
                                                 <p className="text-[9px] text-indigo-900/60 font-bold italic leading-tight">
-                                                    &quot;In the heart of the city, a single ${term.term} could bring empires to their knees.&quot;
+                                                    &quot;{isColoringBook ? `Experience the soothing power of ${term.term} in every stroke.` : `In the heart of the city, a single ${term.term} could change everything.`}&quot;
                                                 </p>
                                             </div>
                                         </div>
@@ -644,12 +680,19 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         <p className="text-slate-400 text-xs font-medium">Verify these metrics before final production.</p>
                                     </div>
                                     <div className="space-y-4">
-                                        {(term.masterclass?.profitabilityChecklist && term.masterclass.profitabilityChecklist.length > 0 ? term.masterclass.profitabilityChecklist : [
-                                            "Does Chapter 1 end with an urgent question?",
-                                            "Does every chapter drive toward the goal?",
-                                            "Are the 'Top 3 Tropes' fully satisfied?",
-                                            "Is the resolution market-compliant?"
-                                        ]).map((item: string, i: number) => (
+                                        {(term.masterclass?.profitabilityChecklist && term.masterclass.profitabilityChecklist.length > 0 ? term.masterclass.profitabilityChecklist : (
+                                            isColoringBook ? [
+                                                "Does the line art have sufficient contrast?",
+                                                "Is the pattern complexity appropriate for adults?",
+                                                "Is the resolution market-compliant (300DPI+)?",
+                                                "Is the bleed management correct?"
+                                            ] : [
+                                                "Does Chapter 1 end with an urgent question?",
+                                                "Does every chapter drive toward the goal?",
+                                                "Are the 'Top 3 Tropes' fully satisfied?",
+                                                "Is the resolution market-compliant?"
+                                            ]
+                                        )).map((item: string, i: number) => (
                                             <div key={i} className="flex gap-4 items-center p-4 bg-white/5 border border-white/10 rounded-2xl">
                                                 <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
                                                 <p className="text-xs font-medium text-slate-200">{item}</p>
