@@ -21,8 +21,7 @@ import AmazonLibrarySection from '@/components/glossary/AmazonLibrarySection';
 import { getAmazonProductsFromCsv } from '@/lib/actions/glossary';
 import { AmazonProduct } from '@/lib/csv-parser';
 
-export const dynamic = 'force-static';
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await props.params;
