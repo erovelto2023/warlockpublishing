@@ -94,16 +94,6 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         products = (results[1] || []) as Product[];
         offers = (results[2] || []) as SalesPage[];
         csvProducts = results[3] || [];
-        
-        // DE-DUPLICATION: Remove the featured resource from the secondary list
-        if (featuredPoolItem) {
-            csvProducts = csvProducts.filter(p => p.asin !== (featuredPoolItem as any).asin);
-        }
-
-        // Ensure rotation on every load by shuffling candidates
-        if (csvProducts.length > 0) {
-            csvProducts = [...csvProducts].sort(() => Math.random() - 0.5).slice(0, 4);
-        }
     } catch (err) {
         console.error("Secondary data fetch failed:", err);
     };
@@ -160,6 +150,16 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
     const relatedProducts = contextualMatches
         .filter(item => item.id !== featuredPoolItem?.id)
         .slice(0, 4);
+
+    // DE-DUPLICATION & ROTATION: Marketplace CSV Library
+    if (featuredPoolItem && csvProducts.length > 0) {
+        csvProducts = csvProducts.filter(p => p.asin !== (featuredPoolItem as any).asin);
+    }
+    
+    // Final Shuffle and Limit
+    if (csvProducts.length > 0) {
+        csvProducts = [...csvProducts].sort(() => Math.random() - 0.5).slice(0, 4);
+    }
 
     // YouTube Data fetch if missing
     let youtubeVideo = term.youtubeVideo;
