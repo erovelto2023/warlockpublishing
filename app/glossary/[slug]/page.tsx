@@ -152,14 +152,17 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
         .slice(0, 4);
 
     // DE-DUPLICATION & ROTATION: Marketplace CSV Library
-    if (featuredPoolItem && csvProducts.length > 0) {
-        csvProducts = csvProducts.filter(p => p.asin !== (featuredPoolItem as any).asin);
+    let marketplacePool = [...csvProducts];
+    if (featuredPoolItem && marketplacePool.length > 0) {
+        marketplacePool = marketplacePool.filter(p => p.asin !== (featuredPoolItem as any).asin);
     }
     
-    // Final Shuffle and Limit
-    if (csvProducts.length > 0) {
-        csvProducts = [...csvProducts].sort(() => Math.random() - 0.5).slice(0, 4);
-    }
+    // Final Shuffle for the entire page pool
+    marketplacePool = marketplacePool.sort(() => Math.random() - 0.5);
+
+    // Split the pool for different sections to ensure variety
+    const directoryProducts = marketplacePool.slice(0, 4);
+    const exploreProducts = marketplacePool.slice(4, 8);
 
     // YouTube Data fetch if missing
     let youtubeVideo = term.youtubeVideo;
@@ -819,9 +822,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                         item.category?.toLowerCase() === cat.name?.toLowerCase() ||
                                         item.title?.toLowerCase().includes(term.term.toLowerCase())
                                     );
-                                    const csvMatches = cat.productIds?.length > 0 
-                                        ? csvProducts.filter(p => cat.productIds.includes(p.asin))
-                                        : (idx === 0 ? csvProducts.slice(0, 6) : []);
+                                    const csvMatches = idx === 0 ? directoryProducts : [];
 
                                     const combinedCategoryPool = [...internalCatMatches, ...csvMatches.map(p => ({
                                         id: p.asin,
@@ -941,7 +942,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Marketplace Insights</h3>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {fullPool.slice(0, 4).map((item: any, i: number) => (
+                                {relatedProducts.map((item: any, i: number) => (
                                     <Link 
                                         key={i}
                                         href={item.link}
@@ -1047,7 +1048,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         subtitle={`Live Marketplace Assets for ${term.category || 'Publishing'}`}
                         term={term.term} 
                         category={term.category || 'General'} 
-                        products={csvProducts}
+                        products={exploreProducts}
                     />
                 </div>
 
