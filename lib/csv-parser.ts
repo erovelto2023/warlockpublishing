@@ -34,10 +34,24 @@ export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
             const dataLines = isHeader ? lines.slice(1) : lines;
 
             const products = dataLines.map(line => {
-                const matches = line.match(/"[^"]*"|[^,]+/g);
-                let parts = matches ? Array.from(matches) : [];
-                parts = parts.map(p => p.replace(/^"|"$/g, '').trim());
+                // Robust CSV splitting that handles quotes and preserves empty fields
+                const parts: string[] = [];
+                let current = '';
+                let inQuotes = false;
                 
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        parts.push(current.trim().replace(/^"|"$/g, ''));
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                parts.push(current.trim().replace(/^"|"$/g, ''));
+
                 const shortUrl = (parts[2] || '').trim();
                 const fullUrl = (parts[3] || '').trim();
                 const preferredUrl = (fullUrl.includes('javascript:void') && shortUrl.startsWith('http')) ? shortUrl : (fullUrl || shortUrl);
@@ -55,7 +69,7 @@ export async function parseAmazonCsv(): Promise<AmazonProduct[]> {
                     title: parts[9] || '',
                     rating: parts[15] || '',
                     reviewCount: parts[16] || '',
-                    price: (parts[11] && parts[11] !== 'not-given') ? parts[11] : (parts[10] && parts[10] !== 'not-given' ? parts[10] : '19.99')
+                    price: (parts[11] && parts[11] !== 'not-given' && parts[11] !== '') ? parts[11] : (parts[10] && parts[10] !== 'not-given' && parts[10] !== '' ? parts[10] : '19.99')
                 };
             });
             allResults.push(...products);

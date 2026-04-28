@@ -38,17 +38,23 @@ export async function getAmazonProductsFromCsv(query: string, limit: number = 20
         // 0. Manual Override (High Priority)
         if (targetAsins.includes(asin)) score += 1000;
 
+        // BASE SCORE for being in the Marketplace pool
+        score += 50;
+
         // 1. Exact Keyword Match
-        if (keywordLower === queryLower) score += 200;
-        else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 100;
-
-        // 2. Word Overlap in Title
-        const matchCount = queryWords.filter(word => titleLower.includes(word)).length;
-        score += (matchCount * 25);
-
-        // 3. Category Synergy
-        if (categoryLower && (csvCategoryLower.includes(categoryLower) || titleLower.includes(categoryLower))) {
-            score += 50;
+        if (keywordLower === queryLower) score += 300;
+        else if (keywordLower.includes(queryLower) || queryLower.includes(keywordLower)) score += 150;
+        
+        // 2. Title Match
+        if (titleLower.includes(queryLower)) score += 100;
+        
+        // 3. Niche Alignment
+        if (isRomanceNiche && hasRomanceClues) score += 100;
+        if (isColoringNiche && hasColoringClues) score += 100;
+        
+        // 4. Category Match
+        if (categoryLower && (p.category?.toLowerCase().includes(categoryLower) || categoryLower.includes(p.category?.toLowerCase() || ""))) {
+            score += 80;
         }
 
         // Penalty for mismatching niche when niche is detected
