@@ -6,7 +6,7 @@ import { getPublishedProducts } from '@/lib/actions/product.actions';
 import { getPublishedSalesPages } from '@/lib/actions/sales-page.actions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Sparkles, Zap, TrendingUp, BookOpen, AlertTriangle, Star, Layout, Users, Activity, Palette, Rocket, ListChecks, CheckCircle2, ShoppingBag, ArrowRight, Target, FileText, Megaphone, Copy, ShieldCheck, Globe, DollarSign, ExternalLink, MessageSquareQuote, Youtube, Clock, Hash, Tag, Share2, PieChart, UserCheck, ChevronRight, BookDashed } from 'lucide-react';
+import { Sparkles, Zap, TrendingUp, BookOpen, AlertTriangle, Star, Layout, Users, Activity, Palette, Rocket, ListChecks, CheckCircle2, ShoppingBag, ArrowRight, Target, FileText, Megaphone, Copy, ShieldCheck, Globe, DollarSign, ExternalLink, MessageSquareQuote, Youtube, Clock, Hash, Tag, Share2, PieChart, UserCheck, ChevronRight, BookDashed, Brain } from 'lucide-react';
 import AIPromptCard from '@/components/glossary/AIPromptCard';
 import StructuredData from '@/components/glossary/StructuredData';
 import CopyPromptButton from '@/components/glossary/CopyPromptButton';
@@ -350,38 +350,60 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                 </div>
                             </div>
 
-                            <div className="space-y-4 border-l-4 border-amber-400 pl-6">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">SGE Quick Guide</span>
+                    <div className="space-y-4 border-l-4 border-amber-400 pl-6">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">Phase I: SGE Authority Hook</span>
                                 <p className="text-lg md:text-xl font-medium leading-relaxed opacity-95 max-w-3xl">
-                                    {term.featuredSnippet || term.shortDefinition || `Mastering ${term.term} is the key to unlocking consistent narrative engagement and commercial authority in the ${term.category} niche.`}
+                                    {term.definition || `Mastering ${term.term} is the key to unlocking consistent narrative engagement and commercial authority in the ${term.category} niche.`}
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
-                                <div className="space-y-2 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
-                                    <div className="flex items-center gap-2 text-amber-400 mb-1">
-                                        <Target size={16} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{writingLabel}</span>
+                                <div className="space-y-4 p-8 bg-indigo-50/50 rounded-[2.5rem] border border-indigo-100/50 backdrop-blur-sm">
+                                    <div className="flex items-center gap-3 text-indigo-600">
+                                        <Brain size={20} />
+                                        <h3 className="text-[11px] font-black uppercase tracking-widest">Phase II: Reader Psychology</h3>
                                     </div>
-                                    <p className="text-xs text-indigo-100 leading-relaxed font-medium">
-                                        {term.writingAspect || (isMarketingFocus 
-                                            ? `From a conversion standpoint, ${term.term} acts as a high-intent signal, attracting users looking for specific production assets and implementation tools.`
-                                            : `In a narrative context, ${term.term} functions as a structural catalyst, driving character development and pacing through established genre tropes.`)}
-                                    </p>
-                                </div>
-                                <div className="space-y-2 p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
-                                    <div className="flex items-center gap-2 text-emerald-400 mb-1">
-                                        <TrendingUp size={16} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Market Status</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <p className="text-xs text-indigo-100 leading-relaxed font-medium">
-                                            {term.geoTagging || `Trending in US/UK markets.`}
+                                    <div className="space-y-3">
+                                        <p className="text-xs text-slate-600 leading-relaxed font-bold">
+                                            {term.readerPsychology?.whyWeCraveIt || (isFiction ? "Humans are hardwired for pattern recognition. This trope provides emotional safety and a predictable emotional payoff that readers demand for wish fulfillment." : "This concept provides a structural shortcut for achieving specific results with minimal friction.")}
                                         </p>
-                                        <div className="text-right">
-                                            <p className="text-[9px] font-black text-indigo-300 uppercase">Opportunity</p>
-                                            <p className="text-lg font-black text-emerald-400 leading-none">{term.opportunityScore || '92'}</p>
+                                        <div className="pt-3 border-t border-indigo-100/50">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Cognitive Shortcut</p>
+                                            <p className="text-[10px] text-indigo-600 font-bold italic">"{term.readerPsychology?.cognitiveShortcut || "Bypasses conscious resistance for immediate immersion."}"</p>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 p-6 bg-slate-900 rounded-[2.5rem] border border-slate-800 shadow-xl">
+                                    <div className="flex items-center justify-between text-indigo-400 mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <Activity size={16} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">3-Factor Framework</span>
+                                        </div>
+                                        <span className="text-[9px] font-black text-slate-500 uppercase">Market Status</span>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div className="text-center">
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Demand</p>
+                                            <p className="text-lg font-black text-white">{term.marketDemand?.demandScore || '9.2'}</p>
+                                        </div>
+                                        <div className="text-center border-x border-white/10">
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Passion</p>
+                                            <p className="text-lg font-black text-white">{term.marketDemand?.passionScore || '9.8'}</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Saturate</p>
+                                            <p className="text-lg font-black text-white">{term.marketDemand?.saturationScore || '1.5'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t border-white/10">
+                                         <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase">Trend Velocity</span>
+                                            <span className="text-[9px] font-black text-emerald-400 uppercase">{term.marketDemand?.trendStatus || 'Rising'}</span>
+                                         </div>
+                                         <div className="h-1.5 bg-white/5 rounded-full mt-2 overflow-hidden">
+                                            <div className="h-full bg-indigo-500 w-[85%]"></div>
+                                         </div>
                                     </div>
                                 </div>
                                 
@@ -414,11 +436,11 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         </div>
                     </section>
 
-                    {/*  PHASE II: THE ANATOMY OF MASTERY (EEAT LAYER)  */}
+                    {/*  PHASE III: THE ANATOMY OF MASTERY (EEAT LAYER)  */}
                     <section className="space-y-10" id="anatomy">
                         <div className="flex items-center justify-between px-2">
                              <h2 id="anatomy" className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
-                                II. Anatomy of <span className="text-indigo-600">Mastery</span>
+                                III. Anatomy of <span className="text-indigo-600">Mastery</span>
                              </h2>
                              <div className="hidden md:block h-px flex-1 bg-slate-200 mx-8 opacity-50"></div>
                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">EEAT Signals</span>
@@ -448,7 +470,7 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         </div>
 
                         {/* Pitfalls vs Solutions */}
-                        <div className="bg-rose-50 border border-rose-100 rounded-[3rem] p-10 space-y-8">
+                        <div className="bg-rose-50 border border-rose-100 rounded-[3rem] p-10 space-y-8 mt-10">
                             <div className="flex items-center gap-3 text-rose-600">
                                 <AlertTriangle size={24} />
                                 <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 italic">Common Pitfalls & <span className="text-rose-600">Solutions</span></h3>
@@ -476,6 +498,85 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                                  ))}
                             </div>
                         </div>
+
+                        {/* PHASE IV: SUB-GENRE BLENDING */}
+                        {term.subGenreVariations && term.subGenreVariations.length > 0 && (
+                            <div className="space-y-8 pt-10">
+                                <div className="flex items-center gap-3">
+                                    <Globe size={24} className="text-indigo-600" />
+                                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Phase IV: Sub-Genre Blending</h3>
+                                </div>
+                                <div className="grid md:grid-cols-3 gap-6">
+                                    {term.subGenreVariations.map((v: any, i: number) => (
+                                        <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-3">
+                                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[9px] font-black uppercase rounded-full">{v.genre}</span>
+                                            <p className="text-xs text-slate-600 font-bold leading-relaxed">{v.variation}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </section>
+
+                    {/* PHASE V: SHOPPABLE CURATION BY READER VIBE */}
+                    {term.vibeCuration && term.vibeCuration.length > 0 && (
+                        <section className="bg-slate-900 border border-slate-800 rounded-[3.5rem] shadow-2xl overflow-hidden" id="curation">
+                            <div className="p-10 md:p-14 space-y-12">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full w-fit">
+                                        <ShoppingBag size={12} className="text-indigo-400" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Phase V: Shoppable Curation</span>
+                                    </div>
+                                    <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">
+                                        Curation by <span className="text-indigo-500">Reader Vibe</span>
+                                    </h2>
+                                    <p className="text-slate-400 font-medium max-w-2xl">Modern readers shop by aesthetic. Explore these hand-picked recommendations based on your current reading mood.</p>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 gap-12">
+                                    {term.vibeCuration.map((vibeGroup: any, i: number) => (
+                                        <div key={i} className="space-y-8">
+                                            <div className="flex items-start gap-4">
+                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${
+                                                    vibeGroup.vibe === 'Yellow' ? 'bg-amber-400 text-amber-950' : 
+                                                    vibeGroup.vibe === 'Blue' ? 'bg-blue-500 text-white' : 
+                                                    'bg-indigo-600 text-white'
+                                                }`}>
+                                                    <Palette size={24} />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <h3 className="text-xl font-black text-white uppercase tracking-tight">The {vibeGroup.vibe} Reader</h3>
+                                                    <p className="text-xs text-slate-500 font-bold italic">{vibeGroup.vibeDescription}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {vibeGroup.books?.map((book: any, bi: number) => (
+                                                    <div key={bi} className="p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all group/book flex gap-6 items-center">
+                                                        <div className="w-16 h-24 bg-white/10 rounded-xl shrink-0 overflow-hidden shadow-2xl">
+                                                            <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center p-2">
+                                                                <BookOpen size={24} className="text-white/20" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 space-y-2">
+                                                            <div className="flex items-center justify-between">
+                                                                <h4 className="text-sm font-black text-white uppercase tracking-tight line-clamp-1">{book.title}</h4>
+                                                                <span className="text-[10px] font-black text-indigo-400">{book.author}</span>
+                                                            </div>
+                                                            <p className="text-[11px] text-slate-400 font-medium leading-relaxed italic">&quot;{book.salesHook}&quot;</p>
+                                                            <Link href={book.buyUrl || '#'} className="inline-flex items-center gap-2 text-[10px] font-black text-white uppercase tracking-widest bg-indigo-600 px-4 py-2 rounded-full hover:bg-indigo-500 transition-colors mt-2">
+                                                                Buy Now <ArrowRight size={12} />
+                                                            </Link>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+                    )}
                     </section>
 
                     {/*  PHASE III: THE WRITERS MASTERCLASS (THE BLUEPRINT)  */}
@@ -779,35 +880,80 @@ export default async function RegistryDetailPage(props: { params: Promise<{ slug
                         </div>
                     </section>
 
-                    {/*  PHASE V: AI COMMAND CENTER (THE PRODUCTION LAYER)  */}
-                    <section className="space-y-10" id="ai">
+                    {/*  PHASE VI: PRODUCTION HUB & COMMUNITY (COMMAND CENTER)  */}
+                    <section className="space-y-12" id="production">
                         <div className="flex items-center justify-between px-2">
-                             <h2 id="ai" className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
-                                V. AI <span className="text-indigo-600">Command Center</span>
-                             </h2>
+                             <div className="space-y-1">
+                                <h2 id="production" className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">
+                                    VI. Production <span className="text-indigo-600">Hub</span>
+                                </h2>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Community & Creator Resources</p>
+                             </div>
                              <div className="hidden md:block h-px flex-1 bg-slate-200 mx-8 opacity-50"></div>
-                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Production Prompts</span>
+                             <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full">
+                                <Users size={12} className="text-indigo-600" />
+                                <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest">#BOOKTOK READY</span>
+                             </div>
                         </div>
 
-                        <div className="grid md:grid-cols-3 gap-6">
-                            <AIPromptCard 
-                                title="Scene Generator" 
-                                icon={<Activity className="text-indigo-600" />} 
-                                desc="Generate high-tension scenes."
-                                prompt={term.aiPromptCommandCenter?.productIdeaPrompt || `Draft a scene where [Alpha] first sees [Proxy]'s secret involving ${term.term}.`}
-                            />
-                            <AIPromptCard 
-                                title="Blurb/Marketing" 
-                                icon={<Megaphone className="text-amber-500" />} 
-                                desc="High-CTR hooks & hooks."
-                                prompt={term.aiPromptCommandCenter?.contentStrategyPrompt || `Create 5 high-converting TikTok hooks for a ${term.term} reveal.`}
-                            />
-                            <AIPromptCard 
-                                title="Visual Asset" 
-                                icon={<Palette className="text-emerald-500" />} 
-                                desc="Thematic cover/Pinterest art."
-                                prompt={term.aiPromptCommandCenter?.aiImagePrompt || `Cinematic book cover art representing ${term.term} with high emotional contrast.`}
-                            />
+                        <div className="grid lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-8">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <AIPromptCard 
+                                        title="Scene Generator"
+                                        desc="Generate high-tension narrative beats or detailed pattern concepts."
+                                        prompt={term.aiPromptCommandCenter?.sceneGeneratorPrompt || `Draft a scene where [Alpha] first sees [Proxy]'s secret involving ${term.term}.`}
+                                        icon={<MessageSquareQuote size={20} className="text-indigo-600" />}
+                                    />
+                                    <AIPromptCard 
+                                        title="Marketing Hooks"
+                                        desc="High-CTR hooks for TikTok, Pinterest, and Instagram."
+                                        prompt={term.aiPromptCommandCenter?.marketingHookPrompt || `Create 5 high-converting TikTok hooks for a ${term.term} reveal in a ${term.category} novel.`}
+                                        icon={<Hash size={20} className="text-amber-500" />}
+                                    />
+                                </div>
+                                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6 flex flex-col group hover:border-indigo-200 transition-all">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-slate-50 rounded-2xl group-hover:scale-110 transition-transform"><Palette size={20} className="text-emerald-500" /></div>
+                                        <div>
+                                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Visual Asset Prompt</h4>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Cinematic book cover art or aesthetic moodboard prompts.</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-950 p-6 rounded-2xl relative overflow-hidden flex-1 min-h-[100px]">
+                                        <p className="text-[10px] text-slate-400 font-mono leading-relaxed">
+                                            {term.aiPromptCommandCenter?.aiImagePrompt || `Cinematic book cover art representing ${term.term} with high emotional contrast, professional lighting, 8k resolution.`}
+                                        </p>
+                                        <CopyPromptButton prompt={term.aiPromptCommandCenter?.aiImagePrompt || `Cinematic book cover art representing ${term.term} with high emotional contrast, professional lighting, 8k resolution.`} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                                        <Hash size={16} className="text-indigo-600" /> Community Tags
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['booktok', 'bookstagram', 'lemon8bookclub', 'aestheticbooks', 'tropetalk', term.category.toLowerCase().replace(/\s+/g, '')].map((tag) => (
+                                            <span key={tag} className="px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer">
+                                                #{tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-indigo-600 p-8 rounded-[2.5rem] text-white space-y-4 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 group-hover:scale-110 transition-transform"><Sparkles size={60} /></div>
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-indigo-200">Aesthetic Guide</h4>
+                                    <p className="text-xs font-medium leading-relaxed opacity-90">This trope perfectly matches the <span className="font-black text-amber-400">Dark Academia</span> or <span className="font-black text-amber-400">Cozy Minimalist</span> aesthetic depending on execution.</p>
+                                    <div className="flex gap-2 pt-2">
+                                        <div className="w-6 h-6 rounded-full bg-slate-950 border border-white/20"></div>
+                                        <div className="w-6 h-6 rounded-full bg-indigo-900 border border-white/20"></div>
+                                        <div className="w-6 h-6 rounded-full bg-amber-900 border border-white/20"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
 

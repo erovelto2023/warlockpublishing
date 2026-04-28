@@ -65,7 +65,31 @@ export interface GlossaryTerm {
         monetizationPotential?: string;
         averagePriceRange?: string;
         marketSize?: string;
+        // 3-Factor Framework
+        demandScore?: string;
+        passionScore?: string;
+        saturationScore?: string;
     };
+    readerPsychology?: {
+        whyWeCraveIt?: string;
+        cognitiveShortcut?: string;
+        emotionalPayoff?: string;
+        catharticRelease?: string;
+    };
+    subGenreVariations?: {
+        genre?: string;
+        variation?: string;
+    }[];
+    vibeCuration?: {
+        vibe?: 'Yellow' | 'Blue' | 'Red' | 'Green' | 'Purple' | string;
+        vibeDescription?: string;
+        books?: {
+            title?: string;
+            author?: string;
+            salesHook?: string;
+            buyUrl?: string;
+        }[];
+    }[];
     howItMakesMoney?: string;
     bestFor?: string;
     commonMistakes?: string;
@@ -154,6 +178,8 @@ export interface GlossaryTerm {
         productIdeaPrompt?: string;
         contentStrategyPrompt?: string;
         aiImagePrompt?: string;
+        sceneGeneratorPrompt?: string;
+        marketingHookPrompt?: string;
     };
     imagePrompt?: string;
     productPrompt?: string;

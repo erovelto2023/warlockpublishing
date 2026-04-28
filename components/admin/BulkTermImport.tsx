@@ -91,41 +91,64 @@ export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps)
 - For "visualAsset", create prompts for thematic cover art or Pinterest-style coloring page previews.`;
         }
 
-        const prompt = `CRITICAL: Generate a STRICT JSON array of research objects for the keywords provided below. 
-CATEGORY CONTEXT: ${category}
-INSTRUCTIONS: ${categorySpecificInstructions}
-- For "commonPitfalls", frame the "pitfall" as a "Writing Sin" (for fiction) or "Design Error" (for coloring books) and the "howToAvoid" as the "Expert Solution".
+        const prompt = `Act as an Expert UX/UI Data Architect, Literary Analyst, and E-Commerce SEO Strategist. Your task is to design the "Ultimate JSON Data" for these keywords.
 
-OUTPUT REQUIREMENTS:
+For EACH keyword, you must generate a structured JSON object that follows this EXACT schema. This is for the "Ultimate Authority Pipeline" - so ensure the data is high-ranking, high-converting, and reader-focused.
+
+### MANDATORY RULES:
 1. Valid JSON Array only. No conversational text.
 2. Use DOUBLE QUOTES (") for all keys and string values.
-3. CRITICAL: For "targetAudience", ensure "painPoints" are visceral and "desiredOutcomes" are specific.
+3. CRITICAL: Tropes are "cognitive shortcuts". Explain the psychology behind them.
 
 SCHEMA:
 {
   "term": "Main Term",
   "slug": "main-term",
-  "shortDefinition": "...",
-  "definition": "...",
+  "shortDefinition": "1-sentence punchy summary.",
+  "definition": "Clear, authoritative definition for SGE. Explain plot movement or rhetorical purpose.",
   "category": "${category}",
-  "targetAudience": { "primaryDemographic": "...", "painPoints": [], "desiredOutcomes": [] },
-  "marketDemand": { "trendStatus": "...", "monetizationPotential": "..." },
-  "productIdeas": [ { "type": "...", "title": "...", "description": "..." } ],
-  "youtubeVideo": { "title": "...", "url": "..." },
-  "blogArticle": { "title": "...", "content": "..." },
-  "faqs": [ { "question": "...", "answer": "..." } ],
-  "commonMyths": [ { "myth": "...", "fact": "..." } ],
-  "commonPitfalls": [ { "pitfall": "Writing Sin/Design Error", "howToAvoid": "Expert Solution" } ],
-  "aiPromptCommandCenter": {
-    "productIdeaPrompt": "Scene/Pattern Generator...",
-    "contentStrategyPrompt": "Marketing/TikTok Hooks...",
-    "aiImagePrompt": "Visual Asset Prompt..."
+  "marketDemand": { 
+    "demandScore": "X/10", 
+    "passionScore": "X/10", 
+    "saturationScore": "X/10",
+    "trendStatus": "Rising/Stable/Oversaturated"
+  },
+  "readerPsychology": {
+    "whyWeCraveIt": "Explain why the human brain craves this trope.",
+    "cognitiveShortcut": "How this trope acts as a mental shortcut for the reader.",
+    "emotionalPayoff": "The specific emotional reward.",
+    "catharticRelease": "Exploration of taboo/catharsis."
   },
   "masterclass": {
-    "threeActStructure": { "act1": "...", "act2": "...", "act3": "..." },
+    "threeActStructure": { "act1": "Phase I: Setup", "act2": "Phase II: Friction", "act3": "Phase III: Payoff" },
     "profitBeats": [ { "title": "...", "description": "...", "timing": "..." } ],
-    "technicalComponents": { "powerTitle": "...", "tropes": [] },
-    "profitabilityChecklist": []
+    "technicalComponents": { "powerTitle": "...", "tropes": [], "hook": "..." },
+    "profitabilityChecklist": ["Verify X", "Verify Y"]
+  },
+  "subGenreVariations": [
+    { "genre": "Sci-Fi", "variation": "How it works here" }
+  ],
+  "vibeCuration": [
+    {
+      "vibe": "Yellow",
+      "vibeDescription": "For the reader seeking emotional catharsis and passion.",
+      "books": [
+        { "title": "Book 1", "author": "Author A", "salesHook": "1-sentence hook", "buyUrl": "#" }
+      ]
+    },
+    {
+      "vibe": "Blue",
+      "vibeDescription": "For the reader seeking introspective depth.",
+      "books": [
+        { "title": "Book 2", "author": "Author B", "salesHook": "1-sentence hook", "buyUrl": "#" }
+      ]
+    }
+  ],
+  "commonPitfalls": [ { "pitfall": "Writing Sin/Design Error", "howToAvoid": "Expert Solution" } ],
+  "aiPromptCommandCenter": {
+    "sceneGeneratorPrompt": "Prompt for high-tension scene...",
+    "marketingHookPrompt": "Prompt for TikTok/Pinterest hooks...",
+    "aiImagePrompt": "Visual Asset Prompt..."
   }
 }
 
