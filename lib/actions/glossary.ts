@@ -783,13 +783,16 @@ export async function backfillAffiliateTags(affiliateId: string = AMAZON_AFFILIA
 // Helper to find high-quality YouTube videos
 export async function searchYouTubeForTerm(term: string, category: string = ""): Promise<{ url: string, title: string, channel: string } | null> {
     try {
-        const query = `${term} ${category} explained strategy tutorial`.trim();
+        // High-intent tutorial/masterclass query
+        const query = `${term} ${category} masterclass strategy tutorial explained`.trim();
         const searchRes = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9'
+            }
         });
         const html = await searchRes.text();
         
-        // More robust regex for YouTube's initial data
         const match = html.match(/ytInitialData\s*=\s*({.+?})(?:;|<\/script)/) || 
                       html.match(/window\["ytInitialData"\]\s*=\s*({.+?});/);
         
@@ -798,41 +801,51 @@ export async function searchYouTubeForTerm(term: string, category: string = ""):
         const data = JSON.parse(match[1]);
         const contents = data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents || [];
         
+        // Try top 10 results to find a valid one
+        let checkedCount = 0;
         for (const item of contents) {
-            if (item.videoRenderer) {
+            if (item.videoRenderer && checkedCount < 10) {
+                checkedCount++;
                 const video = item.videoRenderer;
                 const videoId = video.videoId;
                 const title = video.title?.runs?.[0]?.text || '';
                 const channel = video.ownerText?.runs?.[0]?.text || '';
                 const lengthText = video.lengthText?.simpleText || "";
 
-                // FILTER: Avoid "Shorts" or extremely short videos (< 1:30)
+                // CRITICAL FILTER: Absolutely avoid Shorts
+                if (title.toLowerCase().includes('#shorts') || title.toLowerCase().includes('short')) continue;
+                
+                // FILTER: Duration check (prefer 3+ minutes for "Mastery" feel)
                 if (lengthText.includes(':')) {
                     const parts = lengthText.split(':');
-                    const minutes = parseInt(parts[parts.length - 2] || "0");
-                    const seconds = parseInt(parts[parts.length - 1] || "0");
-                    const totalSeconds = (minutes * 60) + seconds;
-                    if (totalSeconds < 90 && parts.length === 2) continue; 
+                    if (parts.length === 2) {
+                        const minutes = parseInt(parts[0]);
+                        if (minutes < 2) continue; // Too short for a deep dive
+                    }
+                    if (parts.length < 2) continue; // Invalid format
                 } else {
                     continue; 
                 }
 
-                // FILTER: Title Relevance Check
-                const termLower = term.toLowerCase();
-                const titleLower = title.toLowerCase();
-                const relevanceKeywords = termLower.split(' ').filter(k => k.length > 3);
-                const matchCount = relevanceKeywords.filter(k => titleLower.includes(k)).length;
-                if (relevanceKeywords.length > 0 && matchCount === 0) continue;
-
                 const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
-                const verifyRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(newUrl)}&format=json`);
-                if (verifyRes.status === 200) {
-                    return { url: newUrl, title, channel };
+                
+                // VALIDATION: Check if video is embeddable and public
+                try {
+                    const verifyRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(newUrl)}&format=json`);
+                    if (verifyRes.status === 200) {
+                        const oembedData = await verifyRes.json();
+                        // oembed title check for "Deleted" or "Private"
+                        if (oembedData.title === "Deleted video" || oembedData.title === "Private video") continue;
+                        
+                        return { url: newUrl, title, channel };
+                    }
+                } catch (vErr) {
+                    continue;
                 }
             }
         }
     } catch (e) {
-        console.error('YouTube search failed:', e);
+        console.error('YouTube robust search failed:', e);
     }
     return null;
 }
@@ -979,10 +992,16 @@ export async function runGlossaryAudit(type: 'video' | 'affiliate' | 'article') 
                 { "videoUrl": { $exists: false } }
             ] 
         });
+
+        const unwatchableTerms = await verifyYouTubeLinksBatch(false).then(res => res.broken || []);
+        const totalTermsToFix = [...missingVideoTerms, ...unwatchableTerms];
         
         const stillMissing = [];
         
-        for (const term of missingVideoTerms) {
+        for (const termObj of totalTermsToFix) {
+            const term = typeof termObj.term === 'string' ? await GlossaryTerm.findById(termObj.id || termObj._id) : termObj;
+            if (!term) continue;
+
             const bestVideo = await searchYouTubeForTerm(term.term, term.category);
             if (bestVideo) {
                 term.videoUrl = bestVideo.url;
