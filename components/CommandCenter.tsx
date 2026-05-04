@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 export default function CommandCenter() {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<{ products: any[], glossary: any[], blog: any[] }>({ products: [], glossary: [], blog: [] });
+    const [results, setResults] = useState<{ products: any[], blog: any[] }>({ products: [], blog: [] });
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -28,7 +28,7 @@ export default function CommandCenter() {
 
     useEffect(() => {
         if (!query.trim()) {
-            setResults({ products: [], glossary: [], blog: [] });
+            setResults({ products: [], blog: [] });
             return;
         }
 
@@ -68,7 +68,7 @@ export default function CommandCenter() {
                     <input 
                         autoFocus
                         type="text" 
-                        placeholder="Search glossary, products, articles..."
+                        placeholder="Search products, articles..."
                         className="flex-1 bg-transparent border-none outline-none text-lg font-medium text-slate-900 placeholder-slate-400"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
@@ -99,38 +99,13 @@ export default function CommandCenter() {
                         </div>
                     )}
 
-                    {!loading && query && (results.products.length + results.glossary.length + results.blog.length === 0) && (
+                    {!loading && query && (results.products.length + results.blog.length === 0) && (
                         <div className="p-12 text-center">
                             <p className="text-sm text-slate-400 italic">No matches found for "{query}"</p>
                         </div>
                     )}
 
-                    {/* Glossary Results */}
-                    {results.glossary.length > 0 && (
-                        <div className="space-y-3">
-                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-3">Glossary Terms</h4>
-                            <div className="grid grid-cols-1 gap-1">
-                                {results.glossary.map((term: any) => (
-                                    <button 
-                                        key={term._id}
-                                        onClick={() => navigateTo(`/glossary/${term.slug}`)}
-                                        className="w-full flex items-center justify-between p-3 hover:bg-indigo-50 rounded-xl transition-all group"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
-                                                <BookOpen size={16} />
-                                            </div>
-                                            <div className="text-left leading-tight">
-                                                <div className="text-sm font-bold text-slate-900 group-hover:text-indigo-700">{term.term}</div>
-                                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-tight">{term.category}</div>
-                                            </div>
-                                        </div>
-                                        <ArrowRight size={14} className="text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+
 
                     {/* Product Results */}
                     {results.products.length > 0 && (

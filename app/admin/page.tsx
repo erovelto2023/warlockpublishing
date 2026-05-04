@@ -31,17 +31,18 @@ export default async function AdminPage() {
     }
 
     // Fetch All Data in parallel
-    const [products, penNames, offers, blogResult, messagesResult, glossaryTerms, subscribers, analytics] = await Promise.all([
+    const [products, penNames, offers, blogResult, messagesResult, subscribers, glossaryResult, analytics] = await Promise.all([
         getAllProducts(),
         getPenNames(),
         getSalesPages(),
         getPosts({ limit: 100 }),
         getAllMessagesForAdmin({ limit: 100 }),
-        getGlossaryTerms({ publishedOnly: false }),
+
         (async () => {
             await connectToDatabase();
             return Subscriber.find({}).sort({ createdAt: -1 }).lean();
         })(),
+        getGlossaryTerms({ limit: 1000, publishedOnly: false }),
         getAnalyticsSummary()
     ]);
 
@@ -52,8 +53,9 @@ export default async function AdminPage() {
             offers={JSON.parse(JSON.stringify(offers))}
             blogPosts={JSON.parse(JSON.stringify(blogResult.posts))}
             messages={JSON.parse(JSON.stringify(messagesResult.messages))}
-            glossaryTerms={JSON.parse(JSON.stringify(glossaryTerms))}
+
             subscribers={JSON.parse(JSON.stringify(subscribers))}
+            glossaryTerms={JSON.parse(JSON.stringify(glossaryResult.terms))}
             analytics={JSON.parse(JSON.stringify(analytics))}
         />
     );

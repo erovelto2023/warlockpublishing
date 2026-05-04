@@ -63,7 +63,6 @@ interface AdminModuleGridProps {
         subscribers: number;
         messages: number;
         posts: number;
-        glossary: number;
     };
     setActiveTab: (tab: any) => void;
 }
@@ -110,14 +109,7 @@ export default function AdminModuleGrid({ stats, setActiveTab }: AdminModuleGrid
             metric: stats.posts.toString(),
             color: 'bg-emerald-500',
         },
-        {
-            id: 'glossary',
-            title: 'Intelligence',
-            description: 'Encyclopedic knowledge base and SEO glossary terms.',
-            icon: BookOpen,
-            metric: stats.glossary.toString(),
-            color: 'bg-purple-500',
-        },
+
         {
             id: 'warehouse',
             title: 'Warehouse',

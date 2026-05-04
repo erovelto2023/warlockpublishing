@@ -1,0 +1,464 @@
+{
+  "checklists": {
+    "ai-overview": {
+      "title": "Getting Started with AI Overviews",
+      "description": "Follow these steps to optimize your content for Google AI Overviews and increase citation chances.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Audit current content for AI Overview optimization gaps",
+          "description": "Review your top 10 pages and identify which ones could appear in AI Overviews"
+        },
+        {
+          "id": 2,
+          "task": "Create clear, concise 1-2 sentence answers to common questions",
+          "description": "Ensure your content includes direct answers that AI models can easily cite"
+        },
+        {
+          "id": 3,
+          "task": "Implement schema markup (DefinedTerm, FAQPage, BreadcrumbList)",
+          "description": "Add JSON-LD structured data to help Google understand your content"
+        },
+        {
+          "id": 4,
+          "task": "Build E-E-A-T signals (author bios, credentials, citations)",
+          "description": "Display expertise, experience, authority, and trustworthiness prominently"
+        },
+        {
+          "id": 5,
+          "task": "Create comprehensive topic clusters with internal linking",
+          "description": "Link related pages to establish topical authority"
+        },
+        {
+          "id": 6,
+          "task": "Monitor Google Search Console for AI Overview impressions",
+          "description": "Track how often your content appears in AI Overviews"
+        },
+        {
+          "id": 7,
+          "task": "Test content with Google's AI Overviews preview tool",
+          "description": "Use Search Console to see how your content appears in AI Overviews"
+        },
+        {
+          "id": 8,
+          "task": "Optimize for featured snippets (paragraph, list, table formats)",
+          "description": "Featured snippets often feed into AI Overviews"
+        }
+      ]
+    },
+    "generative-engine-optimization": {
+      "title": "Getting Started with GEO",
+      "description": "Implement Generative Engine Optimization to rank in AI search engines like Perplexity and ChatGPT Search.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Identify which AI search engines your audience uses",
+          "description": "Research Perplexity, ChatGPT Search, Claude, and other platforms relevant to your niche"
+        },
+        {
+          "id": 2,
+          "task": "Create authoritative, citation-ready content",
+          "description": "Write content that AI models will want to quote and attribute to your site"
+        },
+        {
+          "id": 3,
+          "task": "Implement LLMs.txt file for AI crawler instructions",
+          "description": "Create /llms.txt with guidelines for how AI systems should cite your content"
+        },
+        {
+          "id": 4,
+          "task": "Build topical authority in your niche",
+          "description": "Create comprehensive guides that cover all aspects of your topic"
+        },
+        {
+          "id": 5,
+          "task": "Use clear formatting (headers, lists, tables) for easy parsing",
+          "description": "Make your content easy for AI models to extract and cite"
+        },
+        {
+          "id": 6,
+          "task": "Include original research and unique insights",
+          "description": "AI models prefer citing original, authoritative sources"
+        },
+        {
+          "id": 7,
+          "task": "Add author credentials and expertise markers",
+          "description": "Help AI systems understand why your content is authoritative"
+        },
+        {
+          "id": 8,
+          "task": "Monitor mentions in AI-generated responses",
+          "description": "Track how often AI systems cite your content"
+        }
+      ]
+    },
+    "core-web-vitals": {
+      "title": "Getting Started with Core Web Vitals",
+      "description": "Improve your site's performance and ranking by optimizing Core Web Vitals metrics.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Measure current Core Web Vitals using Google PageSpeed Insights",
+          "description": "Get baseline metrics for LCP, INP, and CLS"
+        },
+        {
+          "id": 2,
+          "task": "Optimize images (compress, lazy load, modern formats)",
+          "description": "Images are often the biggest contributor to LCP issues"
+        },
+        {
+          "id": 3,
+          "task": "Minimize JavaScript and defer non-critical scripts",
+          "description": "Reduce blocking JavaScript to improve INP"
+        },
+        {
+          "id": 4,
+          "task": "Implement a Content Delivery Network (CDN)",
+          "description": "Serve content from servers closer to your users"
+        },
+        {
+          "id": 5,
+          "task": "Fix layout shifts by reserving space for dynamic content",
+          "description": "Use CSS to prevent unexpected layout changes"
+        },
+        {
+          "id": 6,
+          "task": "Enable browser caching and compression",
+          "description": "Reduce server response time and file sizes"
+        },
+        {
+          "id": 7,
+          "task": "Use web fonts efficiently (limit fonts, use font-display)",
+          "description": "Prevent font loading from blocking page rendering"
+        },
+        {
+          "id": 8,
+          "task": "Monitor Core Web Vitals in Google Search Console",
+          "description": "Track improvements over time and identify remaining issues"
+        }
+      ]
+    },
+    "schema-markup": {
+      "title": "Getting Started with Schema Markup",
+      "description": "Implement structured data to help search engines understand your content better.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Choose relevant schema types for your content",
+          "description": "Select from Article, Product, Event, FAQ, Recipe, etc."
+        },
+        {
+          "id": 2,
+          "task": "Use Google's Structured Data Markup Helper",
+          "description": "Generate initial schema code for your pages"
+        },
+        {
+          "id": 3,
+          "task": "Implement JSON-LD format (Google's preferred method)",
+          "description": "Add schema in the page head without modifying HTML"
+        },
+        {
+          "id": 4,
+          "task": "Add FAQ schema for Q&A content",
+          "description": "Enable FAQ rich snippets in search results"
+        },
+        {
+          "id": 5,
+          "task": "Implement BreadcrumbList schema for navigation",
+          "description": "Help users and search engines understand site structure"
+        },
+        {
+          "id": 6,
+          "task": "Add Article schema with author and publish date",
+          "description": "Provide publication metadata to search engines"
+        },
+        {
+          "id": 7,
+          "task": "Validate schema using Google's Rich Results Test",
+          "description": "Ensure your markup is correct and error-free"
+        },
+        {
+          "id": 8,
+          "task": "Monitor rich snippets in Google Search Console",
+          "description": "Track which rich results are appearing in search results"
+        }
+      ]
+    },
+    "e-e-a-t": {
+      "title": "Getting Started with E-E-A-T",
+      "description": "Build Experience, Expertise, Authoritativeness, and Trustworthiness signals.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Create detailed author bios with credentials",
+          "description": "Display expertise, certifications, and experience prominently"
+        },
+        {
+          "id": 2,
+          "task": "Cite authoritative sources and link to them",
+          "description": "Show that your content is based on reliable information"
+        },
+        {
+          "id": 3,
+          "task": "Add customer testimonials and case studies",
+          "description": "Demonstrate real-world results and user satisfaction"
+        },
+        {
+          "id": 4,
+          "task": "Build backlinks from authoritative websites",
+          "description": "Get endorsements from trusted sources in your industry"
+        },
+        {
+          "id": 5,
+          "task": "Display trust signals (SSL certificate, privacy policy, contact info)",
+          "description": "Show visitors that your site is secure and legitimate"
+        },
+        {
+          "id": 6,
+          "task": "Keep content fresh and up-to-date",
+          "description": "Regularly update pages with current information"
+        },
+        {
+          "id": 7,
+          "task": "Share your first-hand experience and knowledge",
+          "description": "Demonstrate personal expertise and real-world experience"
+        },
+        {
+          "id": 8,
+          "task": "Build a strong brand presence and reputation",
+          "description": "Establish recognition and trust in your industry"
+        }
+      ]
+    },
+    "topical-authority": {
+      "title": "Getting Started with Topical Authority",
+      "description": "Build comprehensive expertise in a specific topic area.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Define your main topic (pillar) and subtopics (clusters)",
+          "description": "Map out all aspects of your chosen subject"
+        },
+        {
+          "id": 2,
+          "task": "Create a pillar page covering the main topic comprehensively",
+          "description": "Write a 3,000+ word guide on your main topic"
+        },
+        {
+          "id": 3,
+          "task": "Create cluster content for each subtopic",
+          "description": "Write 5-10 detailed articles on specific aspects"
+        },
+        {
+          "id": 4,
+          "task": "Link cluster articles back to the pillar page",
+          "description": "Use keyword-rich anchor text for internal links"
+        },
+        {
+          "id": 5,
+          "task": "Link between related cluster articles",
+          "description": "Create a web of interconnected content"
+        },
+        {
+          "id": 6,
+          "task": "Use consistent terminology and language",
+          "description": "Reinforce topic relevance through vocabulary"
+        },
+        {
+          "id": 7,
+          "task": "Build backlinks to your pillar page",
+          "description": "Get external links pointing to your main topic page"
+        },
+        {
+          "id": 8,
+          "task": "Monitor rankings for all related keywords",
+          "description": "Track improvement across your topic cluster"
+        }
+      ]
+    },
+    "backlinks": {
+      "title": "Getting Started with Backlinks",
+      "description": "Build a high-quality backlink profile to boost authority.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Audit your current backlink profile",
+          "description": "Use tools like Ahrefs or Semrush to see who links to you"
+        },
+        {
+          "id": 2,
+          "task": "Identify and disavow toxic or spammy backlinks",
+          "description": "Remove low-quality links that could hurt your rankings"
+        },
+        {
+          "id": 3,
+          "task": "Create link-worthy content (guides, research, tools)",
+          "description": "Make content so valuable that others want to link to it"
+        },
+        {
+          "id": 4,
+          "task": "Reach out to relevant websites for guest posting",
+          "description": "Write articles for industry publications with backlinks"
+        },
+        {
+          "id": 5,
+          "task": "Build relationships with influencers and journalists",
+          "description": "Network with people who can link to your content"
+        },
+        {
+          "id": 6,
+          "task": "Get listed in industry directories and resource pages",
+          "description": "Find niche directories where your site belongs"
+        },
+        {
+          "id": 7,
+          "task": "Create original research or data that gets cited",
+          "description": "Publish studies or statistics that others will reference"
+        },
+        {
+          "id": 8,
+          "task": "Monitor competitor backlinks and replicate",
+          "description": "Find where competitors get links and pursue similar opportunities"
+        }
+      ]
+    },
+    "mobile-first-indexing": {
+      "title": "Getting Started with Mobile-First Indexing",
+      "description": "Ensure your site is optimized for mobile-first indexing.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Test mobile usability using Google Mobile-Friendly Test",
+          "description": "Check if your site passes mobile usability requirements"
+        },
+        {
+          "id": 2,
+          "task": "Implement responsive design or dynamic serving",
+          "description": "Ensure your site works well on all screen sizes"
+        },
+        {
+          "id": 3,
+          "task": "Ensure mobile content matches desktop content",
+          "description": "Don't hide important content on mobile"
+        },
+        {
+          "id": 4,
+          "task": "Optimize mobile page speed",
+          "description": "Mobile users expect fast-loading pages"
+        },
+        {
+          "id": 5,
+          "task": "Make buttons and links touch-friendly",
+          "description": "Use adequate spacing for mobile interaction"
+        },
+        {
+          "id": 6,
+          "task": "Avoid intrusive interstitials and pop-ups",
+          "description": "Don't block content with ads or overlays on mobile"
+        },
+        {
+          "id": 7,
+          "task": "Test mobile rendering in Google Search Console",
+          "description": "Use Fetch as Google to see how Googlebot sees mobile pages"
+        },
+        {
+          "id": 8,
+          "task": "Monitor mobile rankings and traffic",
+          "description": "Track performance on mobile search results"
+        }
+      ]
+    },
+    "featured-snippet": {
+      "title": "Getting Started with Featured Snippets",
+      "description": "Optimize your content to rank in featured snippets.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Research keywords with featured snippets in SERPs",
+          "description": "Use SEO tools to find snippet opportunities"
+        },
+        {
+          "id": 2,
+          "task": "Analyze current featured snippet content",
+          "description": "Study what Google is currently showing"
+        },
+        {
+          "id": 3,
+          "task": "Create better paragraph answers (40-60 words)",
+          "description": "Write concise, direct answers to questions"
+        },
+        {
+          "id": 4,
+          "task": "Use lists and tables for structured data",
+          "description": "Format content in ways Google can easily extract"
+        },
+        {
+          "id": 5,
+          "task": "Add FAQ schema markup to your pages",
+          "description": "Help Google understand Q&A content"
+        },
+        {
+          "id": 6,
+          "task": "Include relevant images with descriptive alt text",
+          "description": "Visual snippets often get more clicks"
+        },
+        {
+          "id": 7,
+          "task": "Rank in top 10 for your target keyword first",
+          "description": "Featured snippets come from top 10 results"
+        },
+        {
+          "id": 8,
+          "task": "Monitor featured snippet rankings",
+          "description": "Track which snippets you've won"
+        }
+      ]
+    },
+    "long-tail-keywords": {
+      "title": "Getting Started with Long-Tail Keywords",
+      "description": "Target specific, lower-volume keywords with higher intent.",
+      "items": [
+        {
+          "id": 1,
+          "task": "Use keyword research tools to find long-tail variations",
+          "description": "Tools like Ahrefs, Semrush, and Ubersuggest show long-tail keywords"
+        },
+        {
+          "id": 2,
+          "task": "Analyze search intent for long-tail keywords",
+          "description": "Understand what users are looking for with these queries"
+        },
+        {
+          "id": 3,
+          "task": "Create content targeting 3-5 word phrases",
+          "description": "Focus on specific, conversational queries"
+        },
+        {
+          "id": 4,
+          "task": "Optimize for question-based long-tail keywords",
+          "description": "Target 'how to', 'what is', 'why' queries"
+        },
+        {
+          "id": 5,
+          "task": "Build content around long-tail keyword clusters",
+          "description": "Create related content around similar long-tail terms"
+        },
+        {
+          "id": 6,
+          "task": "Target location-specific long-tail keywords",
+          "description": "Include city names and local modifiers"
+        },
+        {
+          "id": 7,
+          "task": "Monitor rankings for long-tail keywords",
+          "description": "Track progress in Google Search Console"
+        },
+        {
+          "id": 8,
+          "task": "Optimize conversion funnels for long-tail traffic",
+          "description": "Long-tail traffic often converts better"
+        }
+      ]
+    }
+  }
+}

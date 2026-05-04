@@ -20,8 +20,8 @@ export default async function Navbar() {
     const navLinks = [
         { name: 'Ebooks', href: '/products' },
         { name: 'Marketplace', href: '/offers' },
-        { name: 'Blog', href: '/blog' },
         { name: 'Glossary', href: '/glossary' },
+        { name: 'Blog', href: '/blog' },
     ];
 
     return (

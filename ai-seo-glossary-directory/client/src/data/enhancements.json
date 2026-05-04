@@ -1,0 +1,280 @@
+{
+  "glossaryEnhancements": {
+    "ai-overview": {
+      "productIdeas": [
+        {
+          "id": 1,
+          "title": "AI Overview Optimization Course",
+          "description": "Comprehensive course teaching content creators how to optimize for Google AI Overviews",
+          "monetizationType": "Digital Course",
+          "estimatedPrice": "$97-$297",
+          "targetAudience": "Content creators, SEO professionals, bloggers"
+        },
+        {
+          "id": 2,
+          "title": "AI Overview Audit Service",
+          "description": "Done-for-you audit of client websites to identify AI Overview optimization opportunities",
+          "monetizationType": "Service",
+          "estimatedPrice": "$500-$2000 per audit",
+          "targetAudience": "Agencies, freelancers, in-house SEO teams"
+        },
+        {
+          "id": 3,
+          "title": "Content Optimization Template Pack",
+          "description": "Ready-to-use templates for optimizing content for AI Overviews",
+          "monetizationType": "Digital Product",
+          "estimatedPrice": "$27-$47",
+          "targetAudience": "Content creators, marketers, business owners"
+        }
+      ],
+      "marketingStrategy": {
+        "hooks": [
+          "Your content is invisible to Google's AI. Here's how to fix it.",
+          "AI Overviews are stealing your traffic. Learn how to get cited instead.",
+          "The #1 reason your content isn't appearing in AI Overviews (and how to fix it)"
+        ],
+        "headlines": [
+          "How to Get Your Content Featured in Google AI Overviews",
+          "The Complete Guide to Optimizing for AI Overviews in 2026",
+          "AI Overviews: The New SEO Battleground (And How to Win)"
+        ],
+        "titles": [
+          "AI Overview Optimization Mastery",
+          "Rank in Google AI Overviews: The Complete Playbook",
+          "From Invisible to Cited: Your AI Overview Success Guide"
+        ],
+        "contentIdeas": [
+          "Case study: How we got 47 pages into AI Overviews in 90 days",
+          "The 8-step framework for AI Overview optimization",
+          "AI Overviews vs Featured Snippets: Which should you prioritize?",
+          "How to audit your site for AI Overview opportunities",
+          "The E-E-A-T signals that matter most for AI Overviews"
+        ],
+        "socialPosts": [
+          "🤖 Your content is competing against AI now. Most creators don't realize Google AI Overviews are pulling answers from websites without always driving traffic back. The solution? Optimize specifically for AI citations. Here's how...",
+          "Did you know? 64% of searches now show AI Overviews. If your content isn't optimized for them, you're leaving traffic on the table. The good news: it's not complicated. 5 quick wins inside 👇",
+          "Stop writing for Google. Start writing for Google's AI. The rules have changed. Your content structure, your citations, your E-E-A-T signals—they all matter differently now. Here's what actually works in 2026..."
+        ]
+      },
+      "seoStrategy": {
+        "monthlySearchVolume": "4200",
+        "volumeRange": "1k - 5k /mo",
+        "difficulty": "High",
+        "relatedKeywords": [
+          "Google AI Overview optimization",
+          "AI Overviews ranking",
+          "How to get in AI Overviews",
+          "AI Overview SEO",
+          "Google SGE optimization"
+        ]
+      }
+    },
+    "core-web-vitals": {
+      "productIdeas": [
+        {
+          "id": 1,
+          "title": "Core Web Vitals Speed Optimization Audit",
+          "description": "In-depth analysis and optimization recommendations for improving Core Web Vitals scores",
+          "monetizationType": "Service",
+          "estimatedPrice": "$300-$1500 per audit",
+          "targetAudience": "E-commerce sites, SaaS companies, publishers"
+        },
+        {
+          "id": 2,
+          "title": "PageSpeed Optimization Toolkit",
+          "description": "Collection of scripts, tools, and templates to improve LCP, INP, and CLS",
+          "monetizationType": "Digital Product",
+          "estimatedPrice": "$47-$97",
+          "targetAudience": "Web developers, agencies, site owners"
+        },
+        {
+          "id": 3,
+          "title": "Core Web Vitals Monitoring Dashboard",
+          "description": "SaaS tool for continuous monitoring and alerts for Core Web Vitals metrics",
+          "monetizationType": "SaaS/Subscription",
+          "estimatedPrice": "$29-$99/month",
+          "targetAudience": "Agencies, enterprises, performance-focused teams"
+        }
+      ],
+      "marketingStrategy": {
+        "hooks": [
+          "Your site is fast to you. But is it fast to your customers?",
+          "Core Web Vitals are tanking your rankings. Here's the fix.",
+          "One metric is costing you 30% of your traffic (and you don't know it)"
+        ],
+        "headlines": [
+          "The Complete Core Web Vitals Optimization Guide",
+          "How to Improve Your Core Web Vitals Score in 48 Hours",
+          "Core Web Vitals Mastery: The Technical SEO Playbook"
+        ],
+        "titles": [
+          "Core Web Vitals Success Blueprint",
+          "Speed Wins: Your Core Web Vitals Optimization Guide",
+          "Technical SEO Mastery: Core Web Vitals Edition"
+        ],
+        "contentIdeas": [
+          "The real cost of slow Core Web Vitals (data from 10,000+ sites)",
+          "LCP optimization: 7 quick wins that work immediately",
+          "INP vs FID: What changed and why it matters",
+          "CLS prevention: The definitive guide",
+          "Before/after: How we improved CWV from 25 to 95"
+        ],
+        "socialPosts": [
+          "⚡ Your Core Web Vitals are probably bad. Here's why: Most sites are optimized for desktop, not real users on mobile networks. The fix? Start measuring on 4G, not fiber. One change that moved our LCP from 3.2s to 1.8s 👇",
+          "Core Web Vitals update: If you haven't checked your scores in 30 days, you're behind. Google changed how they measure INP, and most sites got worse. Here's what to do...",
+          "The #1 Core Web Vitals mistake: Focusing on the wrong metric. Most teams obsess over LCP when CLS is actually costing them more traffic. Here's the data 📊"
+        ]
+      },
+      "seoStrategy": {
+        "monthlySearchVolume": "8900",
+        "volumeRange": "5k - 10k /mo",
+        "difficulty": "Medium",
+        "relatedKeywords": [
+          "Core Web Vitals optimization",
+          "Improve Core Web Vitals",
+          "LCP optimization",
+          "CLS fix",
+          "INP improvement"
+        ]
+      }
+    },
+    "schema-markup": {
+      "productIdeas": [
+        {
+          "id": 1,
+          "title": "Schema Markup Implementation Service",
+          "description": "Done-for-you schema markup implementation and validation for websites",
+          "monetizationType": "Service",
+          "estimatedPrice": "$400-$2000 per site",
+          "targetAudience": "E-commerce, local businesses, publishers"
+        },
+        {
+          "id": 2,
+          "title": "Schema Markup Template Library",
+          "description": "Pre-built JSON-LD templates for all common schema types",
+          "monetizationType": "Digital Product",
+          "estimatedPrice": "$37-$67",
+          "targetAudience": "Web developers, agencies, content managers"
+        },
+        {
+          "id": 3,
+          "title": "Schema Markup Validator & Monitoring Tool",
+          "description": "Continuous monitoring and validation of schema markup across your site",
+          "monetizationType": "SaaS/Subscription",
+          "estimatedPrice": "$19-$79/month",
+          "targetAudience": "Agencies, enterprises, SEO teams"
+        }
+      ],
+      "marketingStrategy": {
+        "hooks": [
+          "Google can't understand your content without this one thing.",
+          "Your competitors are using schema markup. Are you?",
+          "Rich snippets are worth 30% more clicks. Here's how to get them."
+        ],
+        "headlines": [
+          "The Complete Schema Markup Guide for SEO",
+          "How to Implement Schema Markup (Even If You're Not Technical)",
+          "Schema Markup Secrets: From Zero to Rich Snippets"
+        ],
+        "titles": [
+          "Schema Markup Mastery for SEO",
+          "Rich Snippets Blueprint: Schema Markup Edition",
+          "Technical SEO: The Schema Markup Playbook"
+        ],
+        "contentIdeas": [
+          "Schema markup types that actually move the needle (with data)",
+          "FAQ schema: The easiest way to get rich snippets",
+          "Product schema implementation: Step-by-step guide",
+          "How to validate schema markup (3 free tools)",
+          "Schema markup mistakes costing you rankings"
+        ],
+        "socialPosts": [
+          "📊 Schema markup is the difference between a plain link and a rich snippet. Rich snippets get 30% more clicks. Here's the 5-minute implementation that works for 90% of sites 👇",
+          "Your competitors are using schema markup. If you're not, you're leaving CTR on the table. The good news: it's not complicated. Here's the fastest way to get started...",
+          "One line of code. That's all it takes to enable rich snippets for your content. Most people don't know this exists. Here's what you need to know 🔍"
+        ]
+      },
+      "seoStrategy": {
+        "monthlySearchVolume": "3400",
+        "volumeRange": "1k - 5k /mo",
+        "difficulty": "Low",
+        "relatedKeywords": [
+          "Schema markup SEO",
+          "JSON-LD schema",
+          "Structured data markup",
+          "Rich snippets",
+          "Schema.org"
+        ]
+      }
+    },
+    "e-e-a-t": {
+      "productIdeas": [
+        {
+          "id": 1,
+          "title": "E-E-A-T Authority Building Program",
+          "description": "Comprehensive program to build expertise, experience, authority, and trustworthiness signals",
+          "monetizationType": "Digital Course",
+          "estimatedPrice": "$197-$497",
+          "targetAudience": "Content creators, agencies, thought leaders"
+        },
+        {
+          "id": 2,
+          "title": "Author Bio & Credentials Template Pack",
+          "description": "Ready-to-customize templates for building E-E-A-T signals on your site",
+          "monetizationType": "Digital Product",
+          "estimatedPrice": "$27-$47",
+          "targetAudience": "Bloggers, agencies, business owners"
+        },
+        {
+          "id": 3,
+          "title": "E-E-A-T Audit Service",
+          "description": "Professional audit of your E-E-A-T signals with actionable recommendations",
+          "monetizationType": "Service",
+          "estimatedPrice": "$300-$1000 per audit",
+          "targetAudience": "YMYL sites, publishers, professional services"
+        }
+      ],
+      "marketingStrategy": {
+        "hooks": [
+          "Google doesn't trust you. Here's how to fix it.",
+          "Your E-E-A-T signals are broken (and you don't know it)",
+          "The #1 reason your content ranks lower than your competitors"
+        ],
+        "headlines": [
+          "Build Unshakeable E-E-A-T Authority in 90 Days",
+          "The E-E-A-T Blueprint: From Unknown to Industry Authority",
+          "Google's E-E-A-T Framework: The Complete Implementation Guide"
+        ],
+        "titles": [
+          "E-E-A-T Mastery: The Authority Building Playbook",
+          "From Zero to Authority: Your E-E-A-T Success Guide",
+          "Building Trustworthiness: The E-E-A-T Blueprint"
+        ],
+        "contentIdeas": [
+          "How Google measures E-E-A-T (and what actually matters)",
+          "The 5 E-E-A-T signals that move rankings the most",
+          "YMYL sites: The E-E-A-T requirements you're missing",
+          "Building author authority: The step-by-step playbook",
+          "E-E-A-T audit: How we identified 12 ranking issues"
+        ],
+        "socialPosts": [
+          "🏆 Google's E-E-A-T update changed everything. If your site doesn't have clear author credentials, expertise signals, and trust indicators, you're losing rankings. Here's the fastest way to fix it 👇",
+          "E-E-A-T isn't just for YMYL sites anymore. Every niche needs to prove expertise now. Here are the 5 signals that matter most for your rankings...",
+          "Your author bio is costing you rankings. Most people write generic bios that don't signal expertise. Here's the formula that works 📝"
+        ]
+      },
+      "seoStrategy": {
+        "monthlySearchVolume": "2100",
+        "volumeRange": "1k - 5k /mo",
+        "difficulty": "High",
+        "relatedKeywords": [
+          "E-E-A-T SEO",
+          "Building authority",
+          "Expertise signals",
+          "YMYL content",
+          "Trustworthiness SEO"
+        ]
+      }
+    }
+  }
+}

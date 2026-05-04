@@ -215,4 +215,43 @@
       max-width: 1536px;
     }
   }
+
+  /* --- Ultimate Glossary Utilities --- */
+  .glossary-snapshot {
+    @apply text-sm italic text-primary mb-4 p-5 bg-primary/5 rounded-2xl border-l-4 border-primary;
+  }
+
+  .category-badge {
+    @apply inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary border border-primary/20;
+  }
+
+  .difficulty-badge {
+    @apply inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest;
+  }
+
+  .difficulty-beginner {
+    @apply bg-emerald-100 text-emerald-700 border border-emerald-200;
+  }
+
+  .difficulty-intermediate {
+    @apply bg-amber-100 text-amber-700 border border-amber-200;
+  }
+
+  .difficulty-advanced {
+    @apply bg-rose-100 text-rose-700 border border-rose-200;
+  }
+
+  .related-term-link {
+    @apply inline-block px-3 py-1 rounded-md bg-white/5 border border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 transition-all text-xs font-bold uppercase tracking-widest;
+  }
+
+  .monetization-section {
+    @apply bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent p-8 rounded-[2.5rem] border border-white/10 backdrop-blur-sm;
+  }
+
+  .hero-gradient-premium {
+    background: radial-gradient(circle at top right, rgba(124, 58, 237, 0.15), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.1), transparent 40%),
+                linear-gradient(to bottom, #0f1115, #181b22);
+  }
 }

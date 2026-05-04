@@ -8,7 +8,6 @@ import {
     Package, Smartphone, ShieldCheck
 } from 'lucide-react';
 import SimplePageBuilder from '@/components/admin/SimplePageBuilder';
-import GlossaryTable from '@/components/admin/GlossaryTable';
 import MediaLibrary from '@/components/admin/MediaLibrary';
 import AssetWarehouse from '@/components/admin/AssetWarehouse';
 import SiteSettings from '@/components/admin/SiteSettings';
@@ -21,6 +20,7 @@ import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
+import { deleteGlossaryTerm } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
 
 interface AdminDashboardProps {
@@ -30,12 +30,12 @@ interface AdminDashboardProps {
     messages: any[];
     offers: any[];
     subscribers: any[];
-    glossaryTerms?: any[];
+    glossaryTerms: any[];
     analytics?: any;
 }
 
-export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms = [], analytics }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'glossary' | 'media' | 'warehouse' | 'settings' | 'marketplace'>('overview');
+export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, analytics }: AdminDashboardProps) {
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary'>('overview');
     const router = useRouter();
 
     // Stats
@@ -69,6 +69,9 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             }
             if (type === 'subscriber' as any) {
                 await deleteSubscriber(id);
+            }
+            if (type === 'glossary' as any) {
+                await deleteGlossaryTerm(id);
             }
             alert('Deleted successfully');
             router.refresh();
@@ -222,11 +225,11 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'subscribers', label: 'Subscribers', icon: Users },
                             { id: 'pen_names', label: 'Pen Names', icon: Users },
                             { id: 'blog', label: 'Blog Posts', icon: FileText },
-                            { id: 'glossary', label: 'Glossary', icon: BookOpen },
                             { id: 'media', label: 'Media', icon: Image },
                             { id: 'warehouse', label: 'Warehouse', icon: Package },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
                             { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
+                            { id: 'glossary', label: 'Glossary', icon: BookOpen },
                             { id: 'settings', label: 'Site Config', icon: Settings },
                         ].map((tab) => (
                             <button
@@ -286,8 +289,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     offers: offers.length,
                                     subscribers: subscribers.length,
                                     messages: pendingMessages,
-                                    posts: totalPosts,
-                                    glossary: glossaryTerms.length
+                                    posts: totalPosts
                                 }}
                                 setActiveTab={setActiveTab}
                             />
@@ -654,22 +656,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                     </div>
                 )}
 
-                {activeTab === 'glossary' && (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                                <BookOpen className="text-blue-600" /> Glossary Management
-                            </h2>
-                            <button
-                                onClick={() => router.push('/admin/glossary/new')}
-                                className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-black flex items-center gap-2 transition-all"
-                            >
-                                <Plus size={16} /> New Term
-                            </button>
-                        </div>
-                        <GlossaryTable terms={glossaryTerms} />
-                    </div>
-                )}
+
                 {activeTab === 'messages' && (
                     <div className="max-w-5xl mx-auto space-y-6">
                         <div className="flex justify-between items-center mb-6">
@@ -839,6 +826,65 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
                 {activeTab === 'marketplace' && (
                     <MarketplaceManager />
+                )}
+
+                {/* GLOSSARY TAB */}
+                {activeTab === 'glossary' && (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                                <BookOpen className="text-indigo-600" /> Ultimate Glossary
+                            </h2>
+                            <button
+                                onClick={() => router.push('/admin/glossary/new')}
+                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:scale-105"
+                            >
+                                <Plus size={16} /> New Term
+                            </button>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                            <table className="min-w-full divide-y divide-slate-100">
+                                <thead className="bg-slate-50/50">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Term / Slug</th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Category</th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Stats</th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
+                                        <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {glossaryTerms.map((term: any) => (
+                                        <tr key={term._id} className="hover:bg-slate-50/80 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <div className="font-bold text-slate-900">{term.term}</div>
+                                                <div className="text-[10px] text-slate-400 font-mono mt-1">/glossary/{term.slug}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">{term.category}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-3 text-xs font-medium text-slate-500">
+                                                    <span className="flex items-center gap-1"><Eye size={12} /> {term.viewCount || 0}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${term.isPublished ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-yellow-50 text-yellow-600 border border-yellow-100'}`}>
+                                                    {term.isPublished ? 'Live' : 'Draft'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right space-x-2">
+                                                <a href={`/glossary/${term.slug}`} target="_blank" className="inline-block p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"><Eye size={16} /></a>
+                                                <button onClick={() => router.push(`/admin/glossary/${term._id}/edit`)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"><Edit size={16} /></button>
+                                                <button onClick={() => handleDelete('glossary' as any, term._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 )}
 
             </main>

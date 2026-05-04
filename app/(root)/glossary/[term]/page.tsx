@@ -1,0 +1,223 @@
+import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView } from "@/lib/actions/glossary";
+import { GlossaryTerm } from "@/lib/types";
+import { notFound } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { 
+    CheckCircle2, Play, Lightbulb, Target, TrendingUp, 
+    MessageSquare, ArrowRight, BookOpen
+} from "lucide-react";
+import ChecklistSection from "@/components/glossary/ChecklistSection";
+import ProductPipelineSection from "@/components/glossary/ProductPipelineSection";
+import MarketingStrategySection from "@/components/glossary/MarketingStrategySection";
+import SEOStrategySection from "@/components/glossary/SEOStrategySection";
+
+export async function generateMetadata({ params }: { params: Promise<{ term: string }> }) {
+    const { term: slug } = await params;
+    const term = await getGlossaryTermBySlug(slug);
+    
+    if (!term) return { title: 'Term Not Found' };
+
+    return {
+        title: `${term.term} | AI & SEO Glossary`,
+        description: term.snapshot,
+    };
+}
+
+export const dynamic = 'force-dynamic';
+
+export default async function GlossaryEntryPage({ params }: { params: Promise<{ term: string }> }) {
+    const { term: slug } = await params;
+    console.log('GlossaryEntryPage executed for slug:', slug);
+    const term = await getGlossaryTermBySlug(slug) as unknown as GlossaryTerm;
+
+    if (!term) {
+        notFound();
+    }
+
+    // Background increment view (no need to await)
+    incrementGlossaryView(term._id);
+
+    return (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+            {/* Context Header */}
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-900/80">
+                <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+                        <Link href="/glossary" className="hover:text-indigo-500 transition-colors">Glossary</Link>
+                        <span>/</span>
+                        <Link href="/glossary/directory" className="hover:text-indigo-500 transition-colors">{term.category}</Link>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="sm" className="text-xs font-bold uppercase tracking-wider">
+                            <MessageSquare size={14} className="mr-2" /> Share
+                        </Button>
+                        <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider px-6">
+                            Follow Term
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="container mx-auto px-4 mt-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Main Content */}
+                    <div className="lg:col-span-8 space-y-12">
+                        {/* Hero / Definition */}
+                        <section>
+                            <div className="mb-8">
+                                <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-tight font-serif italic tracking-tight">
+                                    {term.term}
+                                </h1>
+                                <div className="flex flex-wrap gap-3">
+                                    <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest border border-indigo-100 dark:border-indigo-800">
+                                        {term.category}
+                                    </span>
+                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                                        term.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                        term.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                        'bg-rose-50 text-rose-600 border-rose-100'
+                                    }`}>
+                                        {term.difficulty}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <Card className="p-8 md:p-12 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative group">
+                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                                    <BookOpen size={120} />
+                                </div>
+                                <div className="relative z-10">
+                                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 font-serif italic">Snapshot Intelligence</h2>
+                                    <p className="text-xl text-slate-700 dark:text-slate-300 leading-relaxed font-medium mb-10 border-l-4 border-indigo-500 pl-6 italic">
+                                        {term.snapshot}
+                                    </p>
+                                    <div className="prose prose-slate dark:prose-invert max-w-none prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-p:leading-loose">
+                                        {term.definition}
+                                    </div>
+                                </div>
+                            </Card>
+                        </section>
+
+                        {/* Video Section (if exists) */}
+                        {term.youtubeVideoId && (
+                            <section>
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3 font-serif italic">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-900 dark:text-white not-italic font-sans text-sm">2</div>
+                                    Expert Video Deep-Dive
+                                </h2>
+                                <Card className="overflow-hidden bg-black aspect-video relative group border-none shadow-2xl">
+                                    <iframe
+                                        className="w-full h-full"
+                                        src={`https://www.youtube.com/embed/${term.youtubeVideoId}`}
+                                        title={term.term}
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    ></iframe>
+                                </Card>
+                            </section>
+                        )}
+
+                        {/* Characteristics */}
+                        {term.characteristics && term.characteristics.length > 0 && (
+                            <section>
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3 font-serif italic">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-900 dark:text-white not-italic font-sans text-sm">3</div>
+                                    Key Attributes
+                                </h2>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    {term.characteristics.map((char: string, i: number) => (
+                                        <Card key={i} className="p-6 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-500 transition-colors group">
+                                            <div className="flex gap-4">
+                                                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                                    <CheckCircle2 size={18} />
+                                                </div>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300 pt-1 leading-relaxed">
+                                                    {char}
+                                                </p>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Implementation Checklist */}
+                        {term.checklist && (
+                            <ChecklistSection 
+                                title={term.checklist.title}
+                                description={term.checklist.description}
+                                items={term.checklist.items}
+                            />
+                        )}
+
+                        {/* FAQ Section */}
+                        {term.faqItems && term.faqItems.length > 0 && (
+                            <section className="bg-slate-900 rounded-3xl p-10 text-white overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                                <h2 className="text-2xl font-bold mb-10 font-serif italic relative z-10">Strategic FAQ</h2>
+                                <div className="space-y-8 relative z-10">
+                                    {term.faqItems.map((faq: { question: string, answer: string }, i: number) => (
+                                        <div key={i} className="space-y-3">
+                                            <h4 className="text-lg font-bold text-indigo-400">{faq.question}</h4>
+                                            <p className="text-slate-400 leading-relaxed text-sm">{faq.answer}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
+                    {/* Sidebar / Authority Intelligence */}
+                    <div className="lg:col-span-4 space-y-8">
+                        {/* SEO Strategy Section */}
+                        {term.seoStrategy && <SEOStrategySection strategy={term.seoStrategy} />}
+
+                        {/* Marketing Strategy Section */}
+                        {term.marketingStrategy && <MarketingStrategySection strategy={term.marketingStrategy} />}
+
+                        {/* Product Pipeline Section */}
+                        <ProductPipelineSection term={term.term} ideas={term.monetizationIdeas} />
+
+                        {/* Related Terms / Quick Nav */}
+                        <Card className="p-8 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white mb-6">
+                                Exploration Path
+                            </h3>
+                            <div className="space-y-4">
+                                <Link href="/glossary/directory" className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Back to Directory</span>
+                                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                                <Link href="/admin" className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Term Editor</span>
+                                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ChevronRight({ size, className }: { size: number, className?: string }) {
+    return (
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width={size} 
+            height={size} 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className={className}
+        >
+            <path d="m9 18 6-6-6-6"/>
+        </svg>
+    )
+}

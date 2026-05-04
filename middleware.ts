@@ -20,7 +20,9 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+    console.log('Proxy check:', request.nextUrl.pathname);
     if (!isPublicRoute(request)) {
+        console.log('Protecting route:', request.nextUrl.pathname);
         await auth.protect();
     }
 });

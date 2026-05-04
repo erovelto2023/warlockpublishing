@@ -1,28 +1,19 @@
-import { getGlossaryTermById } from '@/lib/actions/glossary';
-import GlossaryEntryForm from '@/components/admin/GlossaryEntryForm';
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import GlossaryEditor from "@/components/admin/GlossaryEditor";
+import { getGlossaryTermById } from "@/lib/actions/glossary";
+import { notFound } from "next/navigation";
 
-export const metadata: Metadata = {
-    title: 'Edit Glossary Entry | Warlock Admin',
-};
-
-interface EditPageProps {
-    params: Promise<{ id: string }>;
-}
-
-export default async function EditGlossaryPage({ params }: EditPageProps) {
+export default async function EditGlossaryTermPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const term: any = await getGlossaryTermById(id);
+    const term = await getGlossaryTermById(id);
 
     if (!term) {
         notFound();
     }
 
     return (
-        <div className="bg-slate-200 min-h-screen py-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <GlossaryEntryForm term={term} />
+        <div className="bg-slate-50 min-h-screen py-12">
+            <div className="container mx-auto px-4">
+                <GlossaryEditor initialData={term} />
             </div>
         </div>
     );

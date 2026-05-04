@@ -304,7 +304,7 @@ export function StepBasics({ data, updateData, penNames }: StepBasicsProps) {
                             />
                             <div className="space-y-0.5">
                                 <Label htmlFor="isFeaturedInRotation" className="text-sm font-bold text-slate-200 cursor-pointer">Include in Rotation Pool</Label>
-                                <p className="text-[10px] text-slate-500">When enabled, this product will randomly appear on glossary terms and other sales hubs.</p>
+                                <p className="text-[10px] text-slate-500">When enabled, this product will randomly appear on other sales hubs across the site.</p>
                             </div>
                         </div>
 
