@@ -132,6 +132,16 @@ SCHEMA FOR EACH OBJECT:
   "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
   "articleContent": "A long-form, comprehensive authority article (1000+ words) using this EXACT framework: 1. Magnetic H1 Headline, 2. APP Introduction (Agree, Promise, Preview), 3. Scannable Body with H2/H3 subheadings and bullet points, 4. Visuals placement markers, 5. Conclusion/Wrap, 6. Strong CTA. Format with standard HTML tags (<h1>, <h2>, <p>, <ul>, <li>).",
   "category": "${category}",
+  "monetizationIdeas": {
+    "affiliateProducts": ["Product 1", "Product 2"],
+    "courseTopics": ["Course Topic 1"],
+    "digitalDownloads": ["Asset 1"]
+  },
+  "seoStrategy": {
+    "volumeRange": "1K-5K",
+    "difficulty": "Low",
+    "relatedKeywords": ["keyword 1", "keyword 2"]
+  },
   "marketDemand": { 
     "demandScore": "X.X/10", 
     "passionScore": "X.X/10", 

@@ -10,6 +10,8 @@ interface SEOStrategySectionProps {
 }
 
 export default function SEOStrategySection({ strategy }: SEOStrategySectionProps) {
+    const keywords = strategy.relatedKeywords || [];
+    
     return (
         <Card className="p-6 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden relative">
             <div className="absolute top-0 right-0 p-4 opacity-5">
@@ -47,7 +49,7 @@ export default function SEOStrategySection({ strategy }: SEOStrategySectionProps
             <div className="relative z-10">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">LSI Targets</h4>
                 <div className="flex flex-wrap gap-2">
-                    {strategy.relatedKeywords?.slice(0, 5).map((kw, i) => (
+                    {keywords.slice(0, 5).map((kw, i) => (
                         <span key={i} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-bold">
                             {kw}
                         </span>
