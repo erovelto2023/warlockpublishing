@@ -48,3 +48,8 @@ review/platform6/
 /public/uploads/gallery/**
 !/public/uploads/gallery/.gitkeep
 !/public/uploads/gallery/thumbs/.gitkeep
+
+ai-seo-glossary-directory/
+
+docs/
+docs2/
