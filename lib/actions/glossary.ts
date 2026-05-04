@@ -176,3 +176,9 @@ export async function syncMarketplaceData() {
         return { success: false, error: error.message };
     }
 }
+
+export async function searchYouTubeForTerm(term: string) {
+    // This is a stub for future YouTube API integration
+    console.log("YouTube search requested for:", term);
+    return [];
+}
