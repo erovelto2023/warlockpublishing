@@ -70,6 +70,7 @@ export interface GlossaryTerm {
         relatedKeywords: string[];
     };
     isPublished: boolean;
+    articleContent?: string;
     viewCount: number;
     createdAt: string | Date;
     updatedAt: string | Date;

@@ -41,6 +41,7 @@ export interface IGlossaryTerm extends Document {
         relatedKeywords: string[];
     };
     isPublished: boolean;
+    articleContent?: string;
     viewCount: number;
     createdAt: Date;
     updatedAt: Date;
@@ -57,6 +58,7 @@ const GlossaryTermSchema: Schema = new Schema({
     },
     snapshot: { type: String, required: true },
     definition: { type: String, required: true },
+    articleContent: { type: String },
     characteristics: [{ type: String }],
     youtubeVideoId: { type: String },
     faqItems: [{

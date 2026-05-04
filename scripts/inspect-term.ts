@@ -5,8 +5,9 @@ import GlossaryTerm from '../lib/models/GlossaryTerm';
 
 async function check() {
     await connectToDatabase();
-    const terms = await GlossaryTerm.find({ slug: 'ai-overview' });
-    console.log('Results:', JSON.stringify(terms, null, 2));
+    const slug = process.argv[2] || 'ai-overview';
+    const terms = await GlossaryTerm.find({ slug });
+    console.log('Results for', slug, ':', JSON.stringify(terms, null, 2));
     process.exit(0);
 }
 

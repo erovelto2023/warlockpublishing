@@ -130,6 +130,7 @@ SCHEMA FOR EACH OBJECT:
   "slug": "main-term-slug",
   "shortDefinition": "1-sentence punchy summary for SEO snippets.",
   "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
+  "articleContent": "A long-form, comprehensive authority article (1000+ words) using this EXACT framework: 1. Magnetic H1 Headline, 2. APP Introduction (Agree, Promise, Preview), 3. Scannable Body with H2/H3 subheadings and bullet points, 4. Visuals placement markers, 5. Conclusion/Wrap, 6. Strong CTA. Format with standard HTML tags (<h1>, <h2>, <p>, <ul>, <li>).",
   "category": "${category}",
   "marketDemand": { 
     "demandScore": "X.X/10", 
@@ -185,6 +186,27 @@ SCHEMA FOR EACH OBJECT:
   "commonPitfalls": [ 
     { "pitfall": "The common mistake", "howToAvoid": "The expert solution." } 
   ],
+  "faqItems": [
+    { "question": "Question 1?", "answer": "Detailed answer 1." },
+    { "question": "Question 2?", "answer": "Detailed answer 2." },
+    { "question": "Question 3?", "answer": "Detailed answer 3." },
+    { "question": "Question 4?", "answer": "Detailed answer 4." },
+    { "question": "Question 5?", "answer": "Detailed answer 5." },
+    { "question": "Question 6?", "answer": "Detailed answer 6." },
+    { "question": "Question 7?", "answer": "Detailed answer 7." },
+    { "question": "Question 8?", "answer": "Detailed answer 8." },
+    { "question": "Question 9?", "answer": "Detailed answer 9." },
+    { "question": "Question 10?", "answer": "Detailed answer 10." }
+  ],
+  "checklist": {
+    "title": "Getting Started Checklist",
+    "description": "Step-by-step guide to implementing this concept.",
+    "items": [
+      { "task": "Task 1", "description": "What to do first." },
+      { "task": "Task 2", "description": "Next step." },
+      { "task": "Task 3", "description": "Final verification." }
+    ]
+  },
   "aiPromptCommandCenter": {
     "sceneGeneratorPrompt": "Full AI prompt to generate a high-tension scene or concept draft involving [term].",
     "marketingHookPrompt": "Full AI prompt to generate 5 viral TikTok/social hooks for [term].",

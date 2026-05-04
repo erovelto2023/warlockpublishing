@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { 
     ChevronLeft, Save, Plus, Trash2, 
-    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video
+    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen
 } from "lucide-react";
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary";
 import { GlossaryTerm } from "@/lib/types";
@@ -201,6 +201,23 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                 required
                             />
                         </div>
+                        <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                            <label className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400 mb-4 block flex items-center gap-2">
+                                <BookOpen size={16} /> Authority Article (Blog Content)
+                            </label>
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border-2 border-slate-100 dark:border-slate-800 space-y-4">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                                    Framework: Magnetic Headline (H1) → APP Intro → Scannable Body (H2/H3) → Visuals → Wrap → CTA
+                                </p>
+                                <Textarea 
+                                    name="articleContent" 
+                                    value={formData.articleContent} 
+                                    onChange={handleChange} 
+                                    placeholder="Write the ultimate guide using the framework..."
+                                    className="h-[600px] bg-white dark:bg-black border-2 border-slate-200 dark:border-slate-800 text-black dark:text-white font-serif text-lg leading-relaxed px-6 py-8 shadow-inner"
+                                />
+                            </div>
+                        </div>
                         <div>
                             <label className="text-xs font-bold uppercase tracking-wider mb-2 block">YouTube Video ID</label>
                             <Input 
@@ -250,30 +267,120 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                         </div>
                         <div className="space-y-6">
                             {formData.faqItems?.map((faq, idx) => (
-                                <div key={idx} className="p-4 border border-slate-100 rounded-xl space-y-3 relative">
+                                <div key={idx} className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl space-y-4 relative border border-slate-100 dark:border-slate-700">
                                     <Button 
                                         type="button" 
                                         variant="ghost" 
                                         size="icon" 
-                                        className="absolute top-2 right-2"
+                                        className="absolute top-4 right-4 h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
                                         onClick={() => setFormData(prev => ({ ...prev, faqItems: prev.faqItems?.filter((_, i) => i !== idx) }))}
                                     >
-                                        <Trash2 size={16} className="text-slate-400 hover:text-red-500" />
+                                        <Trash2 size={16} />
                                     </Button>
-                                    <Input 
-                                        value={faq.question} 
-                                        onChange={(e) => handleFaqChange(idx, 'question', e.target.value)} 
-                                        placeholder="Question..."
-                                        className="pr-10"
-                                    />
-                                    <Textarea 
-                                        value={faq.answer} 
-                                        onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)} 
-                                        placeholder="Answer..."
-                                        className="h-20"
-                                    />
+                                    
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Question</label>
+                                        <Input 
+                                            value={faq.question} 
+                                            onChange={(e) => handleFaqChange(idx, 'question', e.target.value)} 
+                                            placeholder="What is the common question?"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-white placeholder:text-slate-400"
+                                        />
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Answer</label>
+                                        <Textarea 
+                                            value={faq.answer} 
+                                            onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)} 
+                                            placeholder="Provide a detailed, strategic answer..."
+                                            className="h-24 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-sm leading-relaxed text-slate-900 dark:text-white placeholder:text-slate-400"
+                                        />
+                                    </div>
                                 </div>
                             ))}
+                        </div>
+                    </Card>
+
+                    {/* Implementation Checklist */}
+                    <Card className="p-8 space-y-8 border-2 border-indigo-100 dark:border-indigo-900/30 shadow-none bg-white dark:bg-slate-950">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-indigo-600 dark:text-indigo-400 mb-4">
+                            <ListChecks size={16} /> Getting Started Checklist
+                        </div>
+                        
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-black uppercase tracking-widest text-black dark:text-white">Checklist Title</label>
+                                <Input 
+                                    value={formData.checklist?.title} 
+                                    onChange={(e) => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, title: e.target.value } }))} 
+                                    placeholder="e.g. Implementation Guide"
+                                    className="h-12 bg-white dark:bg-black border-2 border-slate-200 dark:border-slate-800 text-black dark:text-white font-bold px-4 focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <label className="text-xs font-black uppercase tracking-widest text-black dark:text-white">Description</label>
+                                <Textarea 
+                                    value={formData.checklist?.description} 
+                                    onChange={(e) => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, description: e.target.value } }))} 
+                                    placeholder="Quick overview of the steps..."
+                                    className="h-24 bg-white dark:bg-black border-2 border-slate-200 dark:border-slate-800 text-black dark:text-white font-medium px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                            </div>
+                            
+                            <div className="pt-8 border-t-2 border-slate-100 dark:border-slate-800">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h4 className="text-sm font-black uppercase tracking-[0.2em] text-black dark:text-white">Task Breakdown</h4>
+                                    <Button type="button" variant="outline" size="sm" className="border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white font-bold" onClick={() => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, items: [...(prev.checklist?.items || []), { task: "", description: "" }] } }))}>
+                                        <Plus size={14} className="mr-2" /> Add Action Item
+                                    </Button>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    {formData.checklist?.items?.map((item, idx) => (
+                                        <div key={idx} className="p-8 bg-slate-50 dark:bg-slate-900 rounded-3xl space-y-6 relative border-2 border-slate-100 dark:border-slate-800 group hover:border-indigo-500 transition-all duration-300">
+                                            <Button 
+                                                type="button" 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="absolute top-4 right-4 h-10 w-10 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-full"
+                                                onClick={() => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, items: prev.checklist?.items?.filter((_, i) => i !== idx) || [] } }))}
+                                            >
+                                                <Trash2 size={20} />
+                                            </Button>
+                                            
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-600 dark:text-indigo-400">Step {idx + 1}: Task Name</label>
+                                                <Input 
+                                                    value={item.task} 
+                                                    onChange={(e) => {
+                                                        const newItems = [...(formData.checklist?.items || [])];
+                                                        newItems[idx] = { ...newItems[idx], task: e.target.value };
+                                                        setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, items: newItems } }));
+                                                    }} 
+                                                    placeholder="What needs to be done?"
+                                                    className="h-12 bg-white dark:bg-black border-2 border-slate-200 dark:border-slate-700 font-bold text-black dark:text-white px-4 focus:ring-indigo-500"
+                                                />
+                                            </div>
+                                            
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-600 dark:text-indigo-400">Actionable Detail</label>
+                                                <Textarea 
+                                                    value={item.description} 
+                                                    onChange={(e) => {
+                                                        const newItems = [...(formData.checklist?.items || [])];
+                                                        newItems[idx] = { ...newItems[idx], description: e.target.value };
+                                                        setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, items: newItems } }));
+                                                    }} 
+                                                    placeholder="Describe the steps to complete this task..."
+                                                    className="h-24 bg-white dark:bg-black border-2 border-slate-200 dark:border-slate-700 text-sm leading-relaxed text-black dark:text-white px-4 py-3 focus:ring-indigo-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </Card>
                 </div>
@@ -315,6 +422,135 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                         <p className="text-[10px] text-slate-400 uppercase font-bold italic leading-relaxed">
                             These will be automatically suggested in the public view based on the term category and difficulty level.
                         </p>
+                    </Card>
+
+                    {/* Marketing & Content Strategy */}
+                    <Card className="p-8 space-y-6 border-2 border-indigo-100 dark:border-indigo-900/30 bg-white dark:bg-slate-950">
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-indigo-600 dark:text-indigo-400 mb-4">
+                            <Target size={16} /> Marketing & Content Strategy
+                        </div>
+                        
+                        <div className="space-y-6">
+                            {/* Hooks */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Hooks</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, hooks: [...(prev.marketingStrategy?.hooks || []), ""] } }))}>+ Add Hook</Button>
+                                </div>
+                                {formData.marketingStrategy?.hooks?.map((hook, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Input 
+                                            value={hook} 
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.marketingStrategy?.hooks || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, hooks: newArr } }));
+                                            }}
+                                            className="bg-white dark:bg-black border-slate-200 dark:border-slate-800 text-black dark:text-white"
+                                        />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, hooks: prev.marketingStrategy?.hooks?.filter((_, i) => i !== idx) || [] } }))}>
+                                            <Trash2 size={14} className="text-slate-400 hover:text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Headlines */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Headlines</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, headlines: [...(prev.marketingStrategy?.headlines || []), ""] } }))}>+ Add Headline</Button>
+                                </div>
+                                {formData.marketingStrategy?.headlines?.map((item, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Input 
+                                            value={item} 
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.marketingStrategy?.headlines || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, headlines: newArr } }));
+                                            }}
+                                            className="bg-white dark:bg-black border-slate-200 dark:border-slate-800 text-black dark:text-white"
+                                        />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, headlines: prev.marketingStrategy?.headlines?.filter((_, i) => i !== idx) || [] } }))}>
+                                            <Trash2 size={14} className="text-slate-400 hover:text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Titles */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Searchable Titles</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, titles: [...(prev.marketingStrategy?.titles || []), ""] } }))}>+ Add Title</Button>
+                                </div>
+                                {formData.marketingStrategy?.titles?.map((item, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Input 
+                                            value={item} 
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.marketingStrategy?.titles || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, titles: newArr } }));
+                                            }}
+                                            className="bg-white dark:bg-black border-slate-200 dark:border-slate-800 text-black dark:text-white"
+                                        />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, titles: prev.marketingStrategy?.titles?.filter((_, i) => i !== idx) || [] } }))}>
+                                            <Trash2 size={14} className="text-slate-400 hover:text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Content Ideas */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Content Ideas</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, contentIdeas: [...(prev.marketingStrategy?.contentIdeas || []), ""] } }))}>+ Add Idea</Button>
+                                </div>
+                                {formData.marketingStrategy?.contentIdeas?.map((item, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Textarea 
+                                            value={item} 
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.marketingStrategy?.contentIdeas || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, contentIdeas: newArr } }));
+                                            }}
+                                            className="bg-white dark:bg-black border-slate-200 dark:border-slate-800 text-black dark:text-white h-20"
+                                        />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, contentIdeas: prev.marketingStrategy?.contentIdeas?.filter((_, i) => i !== idx) || [] } }))}>
+                                            <Trash2 size={14} className="text-slate-400 hover:text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Social Posts */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Social Media Posts</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, socialPosts: [...(prev.marketingStrategy?.socialPosts || []), ""] } }))}>+ Add Post</Button>
+                                </div>
+                                {formData.marketingStrategy?.socialPosts?.map((item, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Textarea 
+                                            value={item} 
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.marketingStrategy?.socialPosts || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, socialPosts: newArr } }));
+                                            }}
+                                            className="bg-white dark:bg-black border-slate-200 dark:border-slate-800 text-black dark:text-white h-32"
+                                        />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, socialPosts: prev.marketingStrategy?.socialPosts?.filter((_, i) => i !== idx) || [] } }))}>
+                                            <Trash2 size={14} className="text-slate-400 hover:text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </Card>
 
                     {/* Status */}

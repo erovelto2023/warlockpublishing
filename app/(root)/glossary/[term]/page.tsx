@@ -12,6 +12,14 @@ import ChecklistSection from "@/components/glossary/ChecklistSection";
 import ProductPipelineSection from "@/components/glossary/ProductPipelineSection";
 import MarketingStrategySection from "@/components/glossary/MarketingStrategySection";
 import SEOStrategySection from "@/components/glossary/SEOStrategySection";
+import StructuredData from "@/components/glossary/StructuredData";
+import AuthorityArticle from "@/components/glossary/AuthorityArticle";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export async function generateMetadata({ params }: { params: Promise<{ term: string }> }) {
     const { term: slug } = await params;
@@ -41,6 +49,7 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+            <StructuredData term={term} />
             {/* Context Header */}
             <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-900/80">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -119,6 +128,11 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                             </section>
                         )}
 
+                        {/* Authority Article / Blog Content */}
+                        {term.articleContent && (
+                            <AuthorityArticle content={term.articleContent} />
+                        )}
+
                         {/* Characteristics */}
                         {term.characteristics && term.characteristics.length > 0 && (
                             <section>
@@ -154,17 +168,24 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
 
                         {/* FAQ Section */}
                         {term.faqItems && term.faqItems.length > 0 && (
-                            <section className="bg-slate-900 rounded-3xl p-10 text-white overflow-hidden relative">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                                <h2 className="text-2xl font-bold mb-10 font-serif italic relative z-10">Strategic FAQ</h2>
-                                <div className="space-y-8 relative z-10">
+                            <section className="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 border border-slate-200 dark:border-slate-800 shadow-xl">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-10 font-serif italic flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 not-italic font-sans text-sm">5</div>
+                                    Strategic FAQ
+                                </h2>
+                                
+                                <Accordion type="single" collapsible className="w-full space-y-4">
                                     {term.faqItems.map((faq: { question: string, answer: string }, i: number) => (
-                                        <div key={i} className="space-y-3">
-                                            <h4 className="text-lg font-bold text-indigo-400">{faq.question}</h4>
-                                            <p className="text-slate-400 leading-relaxed text-sm">{faq.answer}</p>
-                                        </div>
+                                        <AccordionItem key={i} value={`faq-${i}`} className="border border-slate-100 dark:border-slate-800 rounded-2xl px-6 bg-slate-50/30 dark:bg-slate-800/20">
+                                            <AccordionTrigger className="text-left font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 py-6">
+                                                {faq.question}
+                                            </AccordionTrigger>
+                                            <AccordionContent className="text-slate-600 dark:text-slate-400 leading-relaxed pb-6 text-sm">
+                                                {faq.answer}
+                                            </AccordionContent>
+                                        </AccordionItem>
                                     ))}
-                                </div>
+                                </Accordion>
                             </section>
                         )}
                     </div>
