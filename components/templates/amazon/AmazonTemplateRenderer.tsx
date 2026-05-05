@@ -61,8 +61,6 @@ export function AmazonTemplateRenderer({
                 .sticky-buy-box { position: sticky; top: 20px; }
             `}} />
             
-            {/* FontAwesome */}
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
             {/* Breadcrumbs */}
             <div className="max-w-7xl mx-auto px-4 py-3 text-xs text-gray-600">

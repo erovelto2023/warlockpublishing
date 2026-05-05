@@ -63,3 +63,15 @@ export function formatAmazonLink(url: string, affiliateId: string = AMAZON_AFFIL
         return trimUrl;
     }
 }
+
+/**
+ * Forces a URL to use HTTPS protocol.
+ */
+export function forceHttps(url: string | undefined | null): string {
+    if (!url) return "";
+    if (typeof url !== 'string') return String(url);
+    if (url.startsWith('http://')) {
+        return url.replace('http://', 'https://');
+    }
+    return url;
+}

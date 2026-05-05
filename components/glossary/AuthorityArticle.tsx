@@ -22,7 +22,7 @@ export default function AuthorityArticle({ content }: { content: string }) {
                     prose-th:bg-slate-50 dark:prose-th:bg-slate-800/50 prose-th:p-4
                     prose-td:p-4 prose-td:border-t prose-td:border-slate-100 dark:prose-td:border-slate-800
                     "
-                    dangerouslySetInnerHTML={{ __html: content }}
+                    dangerouslySetInnerHTML={{ __html: content.replace(/src="http:\/\//g, 'src="https://') }}
                 />
 
                 <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { forceHttps } from '@/lib/utils';
 
 interface CallToActionBlockProps {
     cta: {
@@ -75,7 +76,7 @@ export default function CallToActionBlock({ cta }: CallToActionBlockProps) {
                     </p>
                     <div className="pt-4">
                         <Link 
-                            href={cta.buttonUrl} 
+                            href={forceHttps(cta.buttonUrl)} 
                             className={`inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 ${theme.button}`}
                         >
                             {cta.buttonText}
@@ -86,7 +87,7 @@ export default function CallToActionBlock({ cta }: CallToActionBlockProps) {
                 {cta.imageUrl && (
                     <div className="flex-shrink-0 w-full md:w-1/3">
                         <img 
-                            src={cta.imageUrl} 
+                            src={forceHttps(cta.imageUrl)} 
                             alt={cta.headline} 
                             className="w-full h-auto rounded-xl shadow-2xl object-cover border-4 border-white/20"
                         />

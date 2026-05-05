@@ -58,6 +58,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${outfit.variable} ${inter.variable} ${playfair.variable} ${spaceGrotesk.variable}`}>
         <head>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         </head>
         <body className={`${outfit.className} antialiased bg-background text-foreground`} suppressHydrationWarning>
           <TrafficTracker />

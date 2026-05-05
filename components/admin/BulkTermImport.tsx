@@ -164,9 +164,7 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
         const affiliateCatalogStr = unifiedCatalog.length > 0 
             ? unifiedCatalog.map(o => `- [${o.name}](${o.url}) (Niche/Category: ${o.category}) [Source: ${o.source}]`).join('\n')
             : "No affiliate products available.";
-
-        const prompt = `Act as an Expert UX/UI Data Architect, Literary Analyst, and E-Commerce SEO Strategist. Your task is to design the "Ultimate JSON Data" for these keywords. 
-
+        const prompt = `Act as an Expert AI & SEO Content Architect for Warlock Publishing.
 You are a master architect designing the "Ultimate Authority Pipeline" for ${category}. 
 
 ${categorySpecificInstructions}
@@ -179,8 +177,9 @@ For EACH keyword provided below, you must generate a high-ranking, high-converti
 3. CRITICAL: Tropes are "cognitive shortcuts". Explain the reader psychology in depth.
 4. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
 5. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
-6. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
-7. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (e.g., https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
+6. CRITICAL: ALL URLs (YouTube, Affiliate links, Image links) MUST use 'https://'. Never use 'http://'.
+7. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
+8. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (starting with https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
 
 AVAILABLE AFFILIATE CATALOG:
 ${affiliateCatalogStr}
@@ -244,14 +243,14 @@ SCHEMA FOR EACH OBJECT:
       "vibe": "Yellow",
       "vibeDescription": "For readers seeking passion and catharsis.",
       "books": [
-        { "title": "Example Book 1", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "#" }
+        { "title": "Example Book 1", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "https://amazon.com/..." }
       ]
     },
     {
       "vibe": "Blue",
       "vibeDescription": "For readers seeking depth and atmosphere.",
       "books": [
-        { "title": "Example Book 2", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "#" }
+        { "title": "Example Book 2", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "https://amazon.com/..." }
       ]
     }
   ],

@@ -10,7 +10,7 @@ import { auth } from "@clerk/nextjs/server";
 import mongoose from "mongoose";
 
 import { isAdmin } from "@/lib/admin";
-import { parseData, formatAmazonLink } from "@/lib/utils";
+import { parseData, formatAmazonLink, forceHttps } from "@/lib/utils";
 import { Product as ProductType, MarketplaceItem } from "@/lib/types";
 
 function slugify(text: string) {
@@ -183,10 +183,10 @@ export async function getMarketplaceItems() {
             description: p.description,
             price: p.price,
             slug: p.slug,
-            imageUrl: p.imageUrl,
+            imageUrl: forceHttps(p.imageUrl),
             type: 'product' as const,
             category: p.category,
-            externalUrl: p.externalUrl,
+            externalUrl: forceHttps(p.externalUrl),
             licenseType: p.licenseType
         }));
 
@@ -196,7 +196,7 @@ export async function getMarketplaceItems() {
             description: s.marketplaceDescription || s.description,
             price: s.price,
             slug: s.slug,
-            imageUrl: s.marketplaceImage || s.ogImage,
+            imageUrl: forceHttps(s.marketplaceImage || s.ogImage),
             type: 'offer' as const,
             category: 'Offers',
             externalUrl: `/offers/${s.slug}`
@@ -239,10 +239,10 @@ export async function getFeaturedItems() {
             description: p.description,
             price: p.price,
             slug: p.slug,
-            imageUrl: p.imageUrl,
+            imageUrl: forceHttps(p.imageUrl),
             type: 'product' as const,
             category: p.category,
-            externalUrl: p.externalUrl,
+            externalUrl: forceHttps(p.externalUrl),
             licenseType: p.licenseType
         }));
 
@@ -252,7 +252,7 @@ export async function getFeaturedItems() {
             description: s.marketplaceDescription || s.description,
             price: s.price,
             slug: s.slug,
-            imageUrl: s.marketplaceImage || s.ogImage,
+            imageUrl: forceHttps(s.marketplaceImage || s.ogImage),
             type: 'offer' as const,
             category: 'Premium Offer',
             externalUrl: `/offers/${s.slug}`
@@ -264,10 +264,10 @@ export async function getFeaturedItems() {
             description: `Marketplace Asset: ${n.asin}`,
             price: parseFloat(n.price?.replace(/[^0-9.]/g, '') || '0'),
             slug: n.asin,
-            imageUrl: n.imageUrl,
+            imageUrl: forceHttps(n.imageUrl),
             type: 'product' as const,
             category: n.category || 'Marketplace Nexus',
-            externalUrl: n.fullUrl || n.shortUrl
+            externalUrl: forceHttps(n.fullUrl || n.shortUrl)
         }));
 
         // Fisher-Yates shuffle over the full combined pool, then take 8 random items.
