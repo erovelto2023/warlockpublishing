@@ -176,7 +176,7 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                     name="category"
                                     value={formData.category}
                                     onChange={handleChange}
-                                    className="w-full h-12 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full h-12 rounded-md border border-slate-800 bg-slate-900 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 >
                                     <option value="AI & Search">AI & Search</option>
                                     <option value="Technical SEO">Technical SEO</option>
@@ -191,7 +191,7 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                     name="difficulty"
                                     value={formData.difficulty}
                                     onChange={handleChange}
-                                    className="w-full h-12 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full h-12 rounded-md border border-slate-800 bg-slate-900 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 >
                                     <option value="Beginner">Beginner</option>
                                     <option value="Intermediate">Intermediate</option>
