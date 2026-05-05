@@ -8,9 +8,10 @@ import { useRouter } from 'next/navigation';
 interface BulkTermImportProps {
     isOpen: boolean;
     onClose: () => void;
+    isInline?: boolean;
 }
 
-export default function BulkTermImport({ isOpen, onClose }: BulkTermImportProps) {
+export default function BulkTermImport({ isOpen, onClose, isInline = false }: BulkTermImportProps) {
     const router = useRouter();
     const [rawList, setRawList] = useState('');
     const [jsonContent, setJsonContent] = useState('');
@@ -231,13 +232,13 @@ ${rawList || "Please paste keywords in the first column"}`;
         setStatus({ type: 'success', message: 'Research Prompt copied to clipboard!' });
     };
 
-    if (!isOpen) return null;
+    if (!isOpen && !isInline) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+        <div className={isInline ? "w-full" : "fixed inset-0 z-[100] flex items-center justify-center p-4"}>
+            {!isInline && <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />}
             
-            <div className="relative w-full max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
+            <div className={`relative w-full ${isInline ? "" : "max-w-6xl"} bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200`}>
                 {/* Header */}
                 <div className="bg-slate-900 p-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">

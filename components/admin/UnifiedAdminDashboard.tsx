@@ -14,6 +14,7 @@ import SiteSettings from '@/components/admin/SiteSettings';
 import AdminModuleGrid from '@/components/admin/AdminModuleGrid';
 import MarketplaceManager from '@/components/admin/MarketplaceManager';
 import TrafficIntelligence from '@/components/admin/TrafficIntelligence';
+import BulkTermImport from '@/components/admin/BulkTermImport';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -46,6 +47,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
     // View State for Sub-Tabs
     const [offerView, setOfferView] = useState<'list' | 'create'>('list');
+    const [glossaryView, setGlossaryView] = useState<'list' | 'import'>('list');
 
     // Message View State
     const [viewingMessage, setViewingMessage] = useState<any | null>(null);
@@ -835,15 +837,38 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                                 <BookOpen className="text-indigo-600" /> Ultimate Glossary
                             </h2>
-                            <button
-                                onClick={() => router.push('/admin/glossary/new')}
-                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:scale-105"
-                            >
-                                <Plus size={16} /> New Term
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setGlossaryView('import')}
+                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${glossaryView === 'import' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}
+                                >
+                                    <Plus size={16} /> Bulk Import
+                                </button>
+                                <button
+                                    onClick={() => router.push('/admin/glossary/new')}
+                                    className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-black flex items-center gap-2 shadow-lg shadow-slate-200 transition-all hover:scale-105"
+                                >
+                                    <Plus size={16} /> New Term
+                                </button>
+                                {glossaryView === 'import' && (
+                                    <button
+                                        onClick={() => setGlossaryView('list')}
+                                        className="px-4 py-2 rounded-lg text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                    >
+                                        Back to List
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        {glossaryView === 'import' ? (
+                            <BulkTermImport 
+                                isOpen={true} 
+                                onClose={() => setGlossaryView('list')} 
+                                isInline={true} 
+                            />
+                        ) : (
+                            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                             <table className="min-w-full divide-y divide-slate-100">
                                 <thead className="bg-slate-50/50">
                                     <tr>
@@ -883,7 +908,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
