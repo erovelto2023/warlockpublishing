@@ -260,29 +260,42 @@ export async function importDetailedJson(data: any[]) {
 export async function healGlossaryVideos() {
     try {
         await connectToDatabase();
-        const terms = await GlossaryTerm.find({ youtubeVideoId: { $exists: true, $ne: "" } });
+        // Find ALL terms to ensure 100% video coverage
+        const terms = await GlossaryTerm.find({});
         let healedCount = 0;
+        let addedCount = 0;
 
-        console.log(`[Healer] Auditing ${terms.length} terms for dead video links...`);
+        console.log(`[Healer] Auditing ${terms.length} terms for video coverage...`);
 
         for (const term of terms) {
-            const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
-            if (!isActive) {
-                console.log(`[Healer] Replacing dead link for: ${term.term}`);
-                const replacement = await searchYouTubeVideo(term.term);
-                if (replacement) {
-                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: replacement });
-                    healedCount++;
-                } else {
-                    // If no replacement found, just clear it to avoid broken player
-                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
-                    healedCount++;
+            const hasExisting = term.youtubeVideoId && term.youtubeVideoId.trim().length > 0;
+            
+            if (hasExisting) {
+                const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
+                if (!isActive) {
+                    console.log(`[Healer] Replacing dead link for: ${term.term}`);
+                    const replacement = await searchYouTubeVideo(term.term);
+                    if (replacement) {
+                        await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: replacement });
+                        healedCount++;
+                    } else {
+                        await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
+                        healedCount++;
+                    }
+                }
+            } else {
+                // Term has NO video, try to add one
+                console.log(`[Healer] Finding new video for: ${term.term}`);
+                const newVideo = await searchYouTubeVideo(term.term);
+                if (newVideo) {
+                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: newVideo });
+                    addedCount++;
                 }
             }
         }
 
         revalidatePath('/glossary');
-        return { success: true, healedCount };
+        return { success: true, healedCount, addedCount };
     } catch (error: any) {
         console.error("Healer failed:", error);
         return { success: false, error: error.message };
