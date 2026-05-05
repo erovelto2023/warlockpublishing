@@ -260,50 +260,63 @@ export async function importDetailedJson(data: any[]) {
 export async function healGlossaryVideos() {
     try {
         await connectToDatabase();
-        // Find ALL terms to ensure 100% video coverage
         const terms = await GlossaryTerm.find({});
         let healedCount = 0;
         let addedCount = 0;
 
-        console.log(`[Healer] Auditing ${terms.length} terms for video coverage...`);
+        console.log(`[Healer] Phase 1: Rapid audit of ${terms.length} terms...`);
 
-        // Process in batches to avoid timeout and rate limiting
-        const BATCH_SIZE = 10;
-        for (let i = 0; i < terms.length; i += BATCH_SIZE) {
-            const batch = terms.slice(i, i + BATCH_SIZE);
-            
+        // Phase 1: Check which terms actually NEED attention (Fast parallel check)
+        const needsFixing: any[] = [];
+        const CHECK_BATCH = 50;
+        
+        for (let i = 0; i < terms.length; i += CHECK_BATCH) {
+            const batch = terms.slice(i, i + CHECK_BATCH);
             await Promise.all(batch.map(async (term) => {
                 const hasExisting = term.youtubeVideoId && term.youtubeVideoId.trim().length > 0;
-                
-                if (hasExisting) {
-                    const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
-                    if (!isActive) {
-                        console.log(`[Healer] Replacing dead link for: ${term.term}`);
-                        const replacement = await searchYouTubeVideo(term.term);
-                        if (replacement) {
-                            await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: replacement });
-                            healedCount++;
-                        } else {
-                            await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
-                            healedCount++;
-                        }
-                    }
+                if (!hasExisting) {
+                    needsFixing.push(term);
                 } else {
-                    // Term has NO video, try to add one
-                    console.log(`[Healer] Finding new video for: ${term.term}`);
-                    const newVideo = await searchYouTubeVideo(term.term);
-                    if (newVideo) {
-                        await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: newVideo });
-                        addedCount++;
-                    }
+                    const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
+                    if (!isActive) needsFixing.push(term);
                 }
             }));
-            
-            console.log(`[Healer] Processed ${Math.min(i + BATCH_SIZE, terms.length)}/${terms.length} terms...`);
+        }
+
+        console.log(`[Healer] Phase 2: Fixing ${needsFixing.length} terms...`);
+
+        // Phase 2: Only search for terms that need it (Slower search)
+        // We limit this to 30 terms per request to guarantee we stay under the 30s timeout
+        const WORK_LIMIT = 30;
+        const toProcess = needsFixing.slice(0, WORK_LIMIT);
+        const SEARCH_BATCH = 5; // Search is slower/heavier, keep batch smaller
+
+        for (let i = 0; i < toProcess.length; i += SEARCH_BATCH) {
+            const batch = toProcess.slice(i, i + SEARCH_BATCH);
+            await Promise.all(batch.map(async (term) => {
+                const replacement = await searchYouTubeVideo(term.term);
+                if (replacement) {
+                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: replacement });
+                    if (term.youtubeVideoId) healedCount++;
+                    else addedCount++;
+                } else if (term.youtubeVideoId) {
+                    // If it was dead and we couldn't find a replacement, clear it
+                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
+                    healedCount++;
+                }
+            }));
         }
 
         revalidatePath('/glossary');
-        return { success: true, healedCount, addedCount };
+        const remaining = needsFixing.length - toProcess.length;
+        
+        return { 
+            success: true, 
+            healedCount, 
+            addedCount, 
+            remaining,
+            message: remaining > 0 ? `Processed ${toProcess.length} items. ${remaining} more items need healing. Run again to continue.` : "All items healed!"
+        };
     } catch (error: any) {
         console.error("Healer failed:", error);
         return { success: false, error: error.message };

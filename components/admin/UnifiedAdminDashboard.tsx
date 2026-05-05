@@ -122,7 +122,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             setIsHealing(true);
             const result = await healGlossaryVideos();
             if (result.success) {
-                alert(`Audit complete!\n- Fixed ${result.healedCount} dead links\n- Added ${result.addedCount} new videos to missing terms`);
+                alert(`${result.message}\n\nSummary:\n- Fixed ${result.healedCount} dead links\n- Added ${result.addedCount} new videos\n- Remaining to audit: ${result.remaining}`);
                 router.refresh();
             } else {
                 alert(`Healer failed: ${result.error}`);
