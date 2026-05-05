@@ -21,7 +21,7 @@ import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
-import { deleteGlossaryTerm } from '@/lib/actions/glossary';
+import { deleteGlossaryTerm, bulkDeleteGlossaryTerms } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
 
 interface AdminDashboardProps {
@@ -54,6 +54,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const [isEditingMessage, setIsEditingMessage] = useState(false);
     const [editMessageContent, setEditMessageContent] = useState('');
     const [selectedSubscribers, setSelectedSubscribers] = useState<string[]>([]);
+    const [selectedGlossaryTerms, setSelectedGlossaryTerms] = useState<string[]>([]);
     const [editingSubscriber, setEditingSubscriber] = useState<any | null>(null);
     const [editSubEmail, setEditSubEmail] = useState('');
 
@@ -91,6 +92,18 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             router.refresh();
         } catch (e) {
             alert('Error deleting subscribers');
+        }
+    };
+
+    const handleBulkDeleteGlossaryTerms = async () => {
+        if (!confirm(`Are you sure you want to delete ${selectedGlossaryTerms.length} terms?`)) return;
+        try {
+            await bulkDeleteGlossaryTerms(selectedGlossaryTerms);
+            setSelectedGlossaryTerms([]);
+            alert('Bulk deletion successful');
+            router.refresh();
+        } catch (e) {
+            alert('Error deleting terms');
         }
     };
 
@@ -837,7 +850,14 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                                 <BookOpen className="text-indigo-600" /> Ultimate Glossary
                             </h2>
-                            <div className="flex gap-2">
+                                {selectedGlossaryTerms.length > 0 && (
+                                    <button
+                                        onClick={handleBulkDeleteGlossaryTerms}
+                                        className="bg-red-50 text-red-600 border border-red-100 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-500 hover:text-white transition-all flex items-center gap-2"
+                                    >
+                                        <Trash2 size={14} /> Delete Selected ({selectedGlossaryTerms.length})
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => setGlossaryView('import')}
                                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${glossaryView === 'import' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}
@@ -859,8 +879,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     </button>
                                 )}
                             </div>
-                        </div>
-
+                        
                         {glossaryView === 'import' ? (
                             <BulkTermImport 
                                 isOpen={true} 
@@ -872,6 +891,17 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             <table className="min-w-full divide-y divide-slate-100">
                                 <thead className="bg-slate-50/50">
                                     <tr>
+                                        <th className="px-6 py-4 text-left w-10">
+                                            <input 
+                                                type="checkbox" 
+                                                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                checked={selectedGlossaryTerms.length === glossaryTerms.length && glossaryTerms.length > 0}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) setSelectedGlossaryTerms(glossaryTerms.map(t => t._id));
+                                                    else setSelectedGlossaryTerms([]);
+                                                }}
+                                            />
+                                        </th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Term / Slug</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Category</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Stats</th>
@@ -881,7 +911,18 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {glossaryTerms.map((term: any) => (
-                                        <tr key={term._id} className="hover:bg-slate-50/80 transition-colors group">
+                                        <tr key={term._id} className={`hover:bg-slate-50/80 transition-colors group ${selectedGlossaryTerms.includes(term._id) ? 'bg-indigo-50/30' : ''}`}>
+                                            <td className="px-6 py-4">
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                    checked={selectedGlossaryTerms.includes(term._id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setSelectedGlossaryTerms([...selectedGlossaryTerms, term._id]);
+                                                        else setSelectedGlossaryTerms(selectedGlossaryTerms.filter(id => id !== term._id));
+                                                    }}
+                                                />
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <div className="font-bold text-slate-900">{term.term}</div>
                                                 <div className="text-[10px] text-slate-400 font-mono mt-1">/glossary/{term.slug}</div>

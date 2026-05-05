@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, ChevronRight, X } from "lucide-react";
+import { Search, Filter, ChevronLeft, ChevronRight, X, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { GlossaryTerm } from "@/lib/types";
 
@@ -16,6 +16,8 @@ export default function GlossaryDirectoryClient({ initialTerms }: GlossaryDirect
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 12;
 
     const categories = useMemo(() => {
         const cats = new Set<string>();
@@ -24,7 +26,7 @@ export default function GlossaryDirectoryClient({ initialTerms }: GlossaryDirect
     }, [initialTerms]);
 
     const filteredTerms = useMemo(() => {
-        return initialTerms.filter(term => {
+        const filtered = initialTerms.filter(term => {
             const matchesSearch = !searchQuery || 
                 term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 term.definition.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -35,7 +37,23 @@ export default function GlossaryDirectoryClient({ initialTerms }: GlossaryDirect
             
             return matchesSearch && matchesCategory && matchesDifficulty;
         });
+        
+        // Reset page to 1 when filters change
+        // We do this in a useEffect to avoid side-effects in useMemo
+        return filtered;
     }, [initialTerms, searchQuery, selectedCategory, selectedDifficulty]);
+
+    // Effect to reset page when filtering
+    useMemo(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedCategory, selectedDifficulty]);
+
+    const paginatedTerms = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return filteredTerms.slice(start, start + pageSize);
+    }, [filteredTerms, currentPage, pageSize]);
+
+    const totalPages = Math.ceil(filteredTerms.length / pageSize);
 
     const clearFilters = () => {
         setSearchQuery("");
@@ -102,8 +120,8 @@ export default function GlossaryDirectoryClient({ initialTerms }: GlossaryDirect
 
             {/* Results */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredTerms.length > 0 ? (
-                    filteredTerms.map((term) => (
+                {paginatedTerms.length > 0 ? (
+                    paginatedTerms.map((term) => (
                         <Link key={term._id} href={`/glossary/${term.slug}`}>
                             <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all cursor-pointer h-full flex flex-col group">
                                 <div className="flex items-start justify-between mb-4">
@@ -141,6 +159,41 @@ export default function GlossaryDirectoryClient({ initialTerms }: GlossaryDirect
                     </div>
                 )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 pt-12 border-t border-slate-100 dark:border-slate-800">
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={currentPage === 1}
+                        onClick={() => {
+                            setCurrentPage(p => Math.max(1, p - 1));
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                    >
+                        <ArrowLeft size={16} className="mr-2" /> Previous
+                    </Button>
+                    
+                    <div className="text-xs font-black uppercase tracking-widest text-slate-500">
+                        Page <span className="text-indigo-600">{currentPage}</span> of {totalPages}
+                    </div>
+
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={currentPage === totalPages}
+                        onClick={() => {
+                            setCurrentPage(p => Math.min(totalPages, p + 1));
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                    >
+                        Next <ArrowRight size={16} className="ml-2" />
+                    </Button>
+                </div>
+            )}
 
             {/* Results Count */}
             <div className="text-sm text-slate-500 dark:text-slate-400 text-center pt-8">

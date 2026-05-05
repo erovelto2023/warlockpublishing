@@ -119,6 +119,16 @@ export async function deleteGlossaryTerm(id: string) {
     return { success: true };
 }
 
+export async function bulkDeleteGlossaryTerms(ids: string[]) {
+    await connectToDatabase();
+    await GlossaryTerm.deleteMany({ _id: { $in: ids } });
+
+    revalidatePath('/glossary');
+    revalidatePath('/glossary/directory');
+    revalidatePath('/admin');
+    return { success: true, count: ids.length };
+}
+
 export async function incrementGlossaryView(id: string) {
     await connectToDatabase();
     await GlossaryTerm.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
