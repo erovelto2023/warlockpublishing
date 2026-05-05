@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import Product from "../models/Product";
 import SalesPage from "../models/SalesPage";
+import MarketplaceProduct from "../models/MarketplaceProduct";
 import "../models/PenName"; // Import to ensure model is registered for populate
 import { connectToDatabase } from "../db";
 import { auth } from "@clerk/nextjs/server";
@@ -227,6 +228,11 @@ export async function getFeaturedItems() {
             showInMarketplace: true
         }).lean();
 
+        // Pull a random sample of external Amazon (MarketplaceProduct) items.
+        const nexusProducts = await MarketplaceProduct.aggregate([
+            { $sample: { size: 20 } }
+        ]);
+
         const normalizedProducts: MarketplaceItem[] = products.map((p: any) => ({
             id: p._id.toString(),
             title: p.title,
@@ -252,9 +258,21 @@ export async function getFeaturedItems() {
             externalUrl: `/offers/${s.slug}`
         }));
 
+        const normalizedNexus = nexusProducts.map((n: any) => ({
+            id: n._id.toString(),
+            title: n.title,
+            description: `Marketplace Asset: ${n.asin}`,
+            price: parseFloat(n.price?.replace(/[^0-9.]/g, '') || '0'),
+            slug: n.asin,
+            imageUrl: n.imageUrl,
+            type: 'product' as const,
+            category: n.category || 'Marketplace Nexus',
+            externalUrl: n.fullUrl || n.shortUrl
+        }));
+
         // Fisher-Yates shuffle over the full combined pool, then take 8 random items.
         // A fresh random selection is chosen each revalidation cycle (every hour).
-        const combined = [...normalizedProducts, ...normalizedSalesPages];
+        const combined = [...normalizedProducts, ...normalizedSalesPages, ...normalizedNexus];
         for (let i = combined.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [combined[i], combined[j]] = [combined[j], combined[i]];

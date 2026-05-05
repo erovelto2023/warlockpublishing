@@ -14,6 +14,8 @@ import MarketingStrategySection from "@/components/glossary/MarketingStrategySec
 import SEOStrategySection from "@/components/glossary/SEOStrategySection";
 import StructuredData from "@/components/glossary/StructuredData";
 import AuthorityArticle from "@/components/glossary/AuthorityArticle";
+import RandomProducts from "@/components/glossary/RandomProducts";
+import { getFeaturedItems } from "@/lib/actions/product.actions";
 import {
     Accordion,
     AccordionContent,
@@ -46,6 +48,9 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
 
     // Background increment view (no need to await)
     incrementGlossaryView(term._id);
+
+    // Fetch random products for showcase
+    const randomProducts = await getFeaturedItems();
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
@@ -219,6 +224,11 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                         </Card>
                     </div>
                 </div>
+            </div>
+
+            {/* Random Products Showcase */}
+            <div className="mt-24">
+                <RandomProducts products={randomProducts} />
             </div>
         </div>
     );

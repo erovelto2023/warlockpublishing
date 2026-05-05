@@ -90,6 +90,22 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
         });
     };
 
+    const handleChecklistItemChange = (index: number, field: 'task' | 'description', value: string) => {
+        setFormData(prev => {
+            const items = [...(prev.checklist?.items || [])];
+            items[index] = { ...items[index], [field]: value };
+            return { ...prev, checklist: { ...prev.checklist!, items } };
+        });
+    };
+
+    const handleSeoKeywordChange = (index: number, value: string) => {
+        setFormData(prev => {
+            const keywords = [...(prev.seoStrategy?.relatedKeywords || [])];
+            keywords[index] = value;
+            return { ...prev, seoStrategy: { ...prev.seoStrategy!, relatedKeywords: keywords } };
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -228,8 +244,61 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                 value={formData.youtubeVideoId} 
                                 onChange={handleChange} 
                                 placeholder="e.g. dQw4w9WgXcQ"
-                                className="bg-white text-black border-2 border-slate-100"
+                                className="bg-white text-black border-2 border-slate-100 h-11"
                             />
+                        </div>
+                    </Card>
+
+                    {/* Implementation Checklist */}
+                    <Card className="p-8 space-y-6 bg-emerald-50/50 border-2 border-emerald-100 shadow-xl">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                                <ListChecks size={16} /> Implementation Checklist
+                            </div>
+                            <Button type="button" variant="outline" size="sm" className="h-7 text-[10px] border-emerald-200 text-emerald-700 hover:bg-emerald-100" onClick={() => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, items: [...(prev.checklist?.items || []), { task: "", description: "" }] } }))}>
+                                <Plus size={12} className="mr-1" /> Add Step
+                            </Button>
+                        </div>
+                        <div className="space-y-4">
+                            <Input 
+                                value={formData.checklist?.title} 
+                                onChange={(e) => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, title: e.target.value } }))}
+                                placeholder="Checklist Title (e.g. Getting Started with AI Overviews)"
+                                className="bg-white border-2 border-emerald-100 font-bold text-slate-900 h-11"
+                            />
+                            <Textarea 
+                                value={formData.checklist?.description} 
+                                onChange={(e) => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, description: e.target.value } }))}
+                                placeholder="Brief description of the goals..."
+                                className="bg-white border-2 border-emerald-100 text-slate-900 h-20"
+                            />
+                            <div className="space-y-4 pt-4">
+                                {formData.checklist?.items?.map((item, idx) => (
+                                    <div key={idx} className="p-4 bg-white rounded-xl border border-emerald-100 space-y-3 relative shadow-sm">
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="absolute top-2 right-2 text-slate-300 hover:text-red-500"
+                                            onClick={() => setFormData(prev => ({ ...prev, checklist: { ...prev.checklist!, items: prev.checklist?.items?.filter((_, i) => i !== idx) || [] } }))}
+                                        >
+                                            <Trash2 size={14} />
+                                        </Button>
+                                        <Input 
+                                            value={item.task} 
+                                            onChange={(e) => handleChecklistItemChange(idx, 'task', e.target.value)}
+                                            placeholder="Task name..."
+                                            className="bg-slate-50 border-none font-bold text-slate-900 h-9"
+                                        />
+                                        <Input 
+                                            value={item.description} 
+                                            onChange={(e) => handleChecklistItemChange(idx, 'description', e.target.value)}
+                                            placeholder="Quick instructions..."
+                                            className="bg-slate-50 border-none text-slate-600 text-xs h-9"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </Card>
 
@@ -337,6 +406,27 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                     placeholder="e.g. 10k - 50k"
                                     className="bg-slate-800 border-slate-700 text-white text-xs h-10"
                                 />
+                            </div>
+                            <div className="pt-4 border-t border-slate-800">
+                                <div className="flex items-center justify-between mb-3">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Related Keywords</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-indigo-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, seoStrategy: { ...prev.seoStrategy!, relatedKeywords: [...(prev.seoStrategy?.relatedKeywords || []), ""] } }))}>+ Add</Button>
+                                </div>
+                                <div className="space-y-2">
+                                    {formData.seoStrategy?.relatedKeywords?.map((kw, idx) => (
+                                        <div key={idx} className="flex gap-2">
+                                            <Input 
+                                                value={kw}
+                                                onChange={(e) => handleSeoKeywordChange(idx, e.target.value)}
+                                                className="bg-slate-800 border-slate-700 text-white text-[10px] h-8"
+                                                placeholder="Keyword..."
+                                            />
+                                            <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-red-400" onClick={() => setFormData(prev => ({ ...prev, seoStrategy: { ...prev.seoStrategy!, relatedKeywords: prev.seoStrategy?.relatedKeywords?.filter((_, i) => i !== idx) || [] } }))}>
+                                                <Trash2 size={12} />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </Card>
