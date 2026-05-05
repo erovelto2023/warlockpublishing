@@ -852,7 +852,12 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 {/* CTA BUILDER TAB */}
                 {activeTab === 'cta_builder' && (
                     <div className="space-y-6">
-                        <CTAManager initialCtas={ctas} />
+                        <CTAManager 
+                            initialCtas={ctas} 
+                            products={products}
+                            offers={offers}
+                            affiliateOffers={affiliateOffers}
+                        />
                     </div>
                 )}
 

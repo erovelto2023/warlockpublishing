@@ -6,13 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createCallToAction, updateCallToAction, deleteCallToAction } from "@/lib/actions/cta.actions";
-import { Plus, Trash2, Edit2, CheckCircle2, Save, Target } from "lucide-react";
+import { Plus, Trash2, Edit2, CheckCircle2, Save, Target, Image as ImageIcon, X } from "lucide-react";
 import CallToActionBlock from "@/components/shared/CallToActionBlock";
+import MediaLibrary from "@/components/admin/MediaLibrary";
 
-export default function CTAManager({ initialCtas }: { initialCtas: any[] }) {
+export default function CTAManager({ 
+    initialCtas,
+    products = [],
+    offers = [],
+    affiliateOffers = []
+}: { 
+    initialCtas: any[],
+    products?: any[],
+    offers?: any[],
+    affiliateOffers?: any[]
+}) {
     const [ctas, setCtas] = useState(initialCtas);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [showMediaLibrary, setShowMediaLibrary] = useState(false);
     
     const [formData, setFormData] = useState({
         internalName: "",
@@ -148,23 +160,61 @@ export default function CTAManager({ initialCtas }: { initialCtas: any[] }) {
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Button URL</label>
-                            <Input 
-                                value={formData.buttonUrl} 
-                                onChange={e => setFormData(prev => ({ ...prev, buttonUrl: e.target.value }))}
-                                className="bg-slate-950 border-slate-800 text-white font-bold h-11"
-                                placeholder="https://..."
-                            />
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Image URL (Optional)</label>
-                            <Input 
-                                value={formData.imageUrl} 
-                                onChange={e => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                                className="bg-slate-950 border-slate-800 text-white font-bold h-11"
-                                placeholder="/images/my-book.png"
-                            />
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Button URL</label>
+                                <div className="flex gap-2">
+                                    <select 
+                                        className="w-1/3 bg-slate-950 border border-slate-800 text-white font-bold h-11 rounded-md px-3"
+                                        onChange={(e) => {
+                                            if (e.target.value) setFormData(prev => ({ ...prev, buttonUrl: e.target.value }));
+                                        }}
+                                        value=""
+                                    >
+                                        <option value="">Select Marketplace Item...</option>
+                                        <optgroup label="Internal Tools (Products)">
+                                            {products.map(p => (
+                                                <option key={`p-${p._id}`} value={`/products/${p.slug}`}>{p.title}</option>
+                                            ))}
+                                        </optgroup>
+                                        <optgroup label="Sales Pages (Offers)">
+                                            {offers.map(o => (
+                                                <option key={`o-${o._id}`} value={`/offers/${o.slug}`}>{o.title}</option>
+                                            ))}
+                                        </optgroup>
+                                        <optgroup label="Affiliate Offers">
+                                            {affiliateOffers.map(a => (
+                                                <option key={`a-${a._id}`} value={a.affiliateLink}>{a.title}</option>
+                                            ))}
+                                        </optgroup>
+                                    </select>
+                                    <Input 
+                                        value={formData.buttonUrl} 
+                                        onChange={e => setFormData(prev => ({ ...prev, buttonUrl: e.target.value }))}
+                                        className="flex-1 bg-slate-950 border-slate-800 text-white font-bold h-11"
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Image URL (Optional)</label>
+                                <div className="flex gap-2">
+                                    <Button 
+                                        onClick={() => setShowMediaLibrary(true)}
+                                        variant="outline"
+                                        className="h-11 bg-slate-800 border-slate-700 text-white hover:bg-slate-700 flex-shrink-0"
+                                    >
+                                        <ImageIcon size={16} className="mr-2" /> Browse Media
+                                    </Button>
+                                    <Input 
+                                        value={formData.imageUrl} 
+                                        onChange={e => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                                        className="flex-1 bg-slate-950 border-slate-800 text-white font-bold h-11"
+                                        placeholder="/images/my-book.png"
+                                    />
+                                </div>
+                            </div>
                         </div>
                         
                         <div className="pt-4 flex gap-4">
@@ -241,6 +291,28 @@ export default function CTAManager({ initialCtas }: { initialCtas: any[] }) {
                     ))
                 )}
             </div>
+
+            {/* Media Library Modal */}
+            {showMediaLibrary && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] overflow-hidden flex flex-col">
+                        <div className="flex justify-between items-center p-6 border-b border-slate-100">
+                            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Select Image</h3>
+                            <button onClick={() => setShowMediaLibrary(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+                            <MediaLibrary 
+                                onSelect={(url) => {
+                                    setFormData(prev => ({ ...prev, imageUrl: url }));
+                                    setShowMediaLibrary(false);
+                                }} 
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
