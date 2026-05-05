@@ -188,7 +188,7 @@ SCHEMA FOR EACH OBJECT:
 {
   "term": "Main Term",
   "slug": "main-term-slug",
-  "shortDefinition": "1-sentence punchy summary for SEO snippets.",
+  "snapshot": "1-sentence punchy summary for SEO snippets. This is MANDATORY.",
   "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
   "articleContent": "A long-form, comprehensive authority article (1000+ words) using this EXACT framework: 1. Magnetic H1 Headline, 2. APP Introduction (Agree, Promise, Preview), 3. Scannable Body with H2/H3 subheadings and bullet points, 4. Visuals placement markers, 5. Conclusion/Wrap, 6. Strong CTA. Format with standard HTML tags (<h1>, <h2>, <p>, <ul>, <li>).",
   "category": "${category}",

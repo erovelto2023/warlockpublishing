@@ -280,7 +280,6 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                 onChange={handleChange} 
                                 placeholder="A concise summary for Google AI Overviews..."
                                 className="h-24 resize-none"
-                                required
                             />
                         </div>
                         <div>

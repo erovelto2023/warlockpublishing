@@ -1,0 +1,178 @@
+﻿Γùç injected env (5) from .env.local // tip: Γîÿ enable debugging { debug: true }
+Terms in DB: [
+  {
+    "_id": "69f8ed16c5601cb212242f3a",
+    "slug": "binoid-brand-overview",
+    "term": "binoid"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f3b",
+    "slug": "binoid-cbd-overview",
+    "term": "binoid cbd"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f3c",
+    "slug": "binoid-gummies-catalog",
+    "term": "binoid gummies"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f3d",
+    "slug": "binoid-discount-code-strategy",
+    "term": "binoid discount code"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f3e",
+    "slug": "delta-9-thc-overview",
+    "term": "delta 9 thc"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f3f",
+    "slug": "binoid-coupon-code-optimization",
+    "term": "binoid coupon code"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f40",
+    "slug": "thca-vape-cartridges",
+    "term": "thca carts"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f41",
+    "slug": "disposable-vape-category",
+    "term": "disposable"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f42",
+    "slug": "thcp-cannabinoid-overview",
+    "term": "thcp"
+  },
+  {
+    "_id": "69f8ed16c5601cb212242f43",
+    "slug": "thcp-vape-category",
+    "term": "thcp vape"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f44",
+    "slug": "ai-overview",
+    "term": "AI Overview"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f45",
+    "slug": "generative-engine-optimization",
+    "term": "Generative Engine Optimization (GEO)"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f46",
+    "slug": "core-web-vitals",
+    "term": "Core Web Vitals"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f47",
+    "slug": "schema-markup",
+    "term": "Schema Markup"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f48",
+    "slug": "e-e-a-t",
+    "term": "E-E-A-T"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f49",
+    "slug": "topical-authority",
+    "term": "Topical Authority"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f4a",
+    "slug": "backlinks",
+    "term": "Backlinks"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f4b",
+    "slug": "mobile-first-indexing",
+    "term": "Mobile-First Indexing"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f4c",
+    "slug": "featured-snippet",
+    "term": "Featured Snippet"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f4d",
+    "slug": "long-tail-keywords",
+    "term": "Long-Tail Keywords"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f4e",
+    "slug": "search-intent",
+    "term": "Search Intent"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f4f",
+    "slug": "canonical-tag",
+    "term": "Canonical Tag"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f50",
+    "slug": "internal-linking",
+    "term": "Internal Linking"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f51",
+    "slug": "meta-description",
+    "term": "Meta Description"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f52",
+    "slug": "title-tag",
+    "term": "Title Tag"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f53",
+    "slug": "h1-tag",
+    "term": "H1 Tag"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f54",
+    "slug": "alt-text",
+    "term": "Alt Text"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f55",
+    "slug": "robots-txt",
+    "term": "Robots.txt"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f56",
+    "slug": "xml-sitemap",
+    "term": "XML Sitemap"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f57",
+    "slug": "noindex",
+    "term": "Noindex"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f58",
+    "slug": "domain-authority",
+    "term": "Domain Authority"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f59",
+    "slug": "page-authority",
+    "term": "Page Authority"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f5a",
+    "slug": "keyword-research",
+    "term": "Keyword Research"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f5b",
+    "slug": "competitor-analysis",
+    "term": "Competitor Analysis"
+  },
+  {
+    "_id": "69f9187fc5601cb212242f5c",
+    "slug": "content-gap-analysis",
+    "term": "Content Gap Analysis"
+  }
+]

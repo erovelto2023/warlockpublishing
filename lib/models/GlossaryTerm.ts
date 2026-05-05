@@ -57,7 +57,7 @@ const GlossaryTermSchema: Schema = new Schema({
         enum: ['Beginner', 'Intermediate', 'Advanced'], 
         default: 'Beginner' 
     },
-    snapshot: { type: String, required: true },
+    snapshot: { type: String },
     definition: { type: String, required: true },
     callToActionId: { type: Schema.Types.ObjectId, ref: 'CallToAction' },
     articleContent: { type: String },
