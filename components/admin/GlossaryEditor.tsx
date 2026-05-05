@@ -489,51 +489,6 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                 </div>
                             ))}
                         </div>
-
-                        {/* High Value Assets */}
-                        <div className="space-y-4 pt-4 border-t border-slate-800">
-                            <div className="flex items-center justify-between">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-300">High-Value Assets (Digital Downloads)</label>
-                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-indigo-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: [...(prev.monetizationIdeas?.digitalDownloads || []), ""] } }))}>+ Add Asset</Button>
-                            </div>
-                            
-                            {formData.monetizationIdeas?.digitalDownloads?.map((asset, idx) => (
-                                <div key={idx} className="flex gap-2">
-                                    <div className="flex-1 flex gap-2">
-                                        <select 
-                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 rounded-md px-2 flex-1 max-w-[200px]"
-                                            onChange={(e) => {
-                                                const prod = localProducts.find(p => p._id === e.target.value);
-                                                if (prod) {
-                                                    const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
-                                                    const url = prod.slug ? `/products/${prod.slug}` : `/products/${prod._id}`;
-                                                    newArr[idx] = `[${prod.title}](${url})`;
-                                                    setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
-                                                }
-                                            }}
-                                        >
-                                            <option value="">Select Local Product...</option>
-                                            {localProducts.map(prod => (
-                                                <option key={prod._id} value={prod._id}>{prod.title}</option>
-                                            ))}
-                                        </select>
-                                        <Input 
-                                            value={asset}
-                                            onChange={(e) => {
-                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
-                                                newArr[idx] = e.target.value;
-                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
-                                            }}
-                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 flex-1"
-                                            placeholder="Markdown format: [Name](/products/slug)"
-                                        />
-                                    </div>
-                                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: prev.monetizationIdeas?.digitalDownloads?.filter((_, i) => i !== idx) || [] } }))}>
-                                        <Trash2 size={12} />
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
                     </Card>
 
                     {/* Marketing & Content Strategy */}

@@ -44,19 +44,6 @@ export default function ProductPipelineSection({ term, ideas = {} }: ProductPipe
                     </div>
                 )}
                 
-                {digitalDownloads.length > 0 && (
-                    <div>
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">High-Value Assets</h4>
-                        <div className="space-y-2">
-                            {digitalDownloads.map((asset, i) => (
-                                <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    <ArrowRight size={12} className="text-indigo-400" />
-                                    {parseMarkdownLink(asset)}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
             
             <div className="mt-8 pt-6 border-t border-slate-50 dark:border-slate-800">
