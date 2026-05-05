@@ -13,6 +13,14 @@ interface ProductPipelineSectionProps {
 export default function ProductPipelineSection({ term, ideas = {} }: ProductPipelineSectionProps) {
     const { affiliateProducts = [], digitalDownloads = [] } = ideas || {};
     
+    const parseMarkdownLink = (text: string) => {
+        const match = text.match(/\[(.*?)\]\((.*?)\)/);
+        if (match) {
+            return <a href={match[2]} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-600 font-bold hover:underline">{match[1]}</a>;
+        }
+        return text;
+    };
+    
     return (
         <Card className="p-6 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-50 dark:border-slate-800">
@@ -30,7 +38,7 @@ export default function ProductPipelineSection({ term, ideas = {} }: ProductPipe
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Recommended Products</h4>
                         <ul className="list-disc list-inside space-y-1 text-sm text-slate-700 dark:text-slate-300 marker:text-indigo-400">
                             {affiliateProducts.map((prod, i) => (
-                                <li key={i}>{prod}</li>
+                                <li key={i}>{parseMarkdownLink(prod)}</li>
                             ))}
                         </ul>
                     </div>

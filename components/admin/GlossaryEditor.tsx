@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { 
     ChevronLeft, Save, Plus, Trash2, 
-    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen, MessageSquare
+    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen, MessageSquare, Link as LinkIcon
 } from "lucide-react";
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary";
+import { getAffiliateOffers } from "@/lib/actions/affiliate.actions";
 import { GlossaryTerm } from "@/lib/types";
 import { Switch } from "@/components/ui/switch";
 
@@ -53,6 +54,12 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
         },
         isPublished: true
     });
+
+    const [affiliateOffers, setAffiliateOffers] = useState<any[]>([]);
+
+    useEffect(() => {
+        getAffiliateOffers().then(setAffiliateOffers).catch(console.error);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -433,11 +440,78 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
 
                     <Card className="p-6 space-y-6 bg-slate-900/95 border-none shadow-2xl">
                         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400">
-                            <Lightbulb size={14} /> Monetization Ideas
+                            <Lightbulb size={14} /> Market Opportunities
                         </div>
-                        <p className="text-[10px] text-slate-500 uppercase font-bold italic leading-relaxed">
-                            Suggestions will be automatically generated based on niche analysis and consumer intent data.
-                        </p>
+                        
+                        {/* Affiliate Products */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-300">Recommended Products (Affiliate Links)</label>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-indigo-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, affiliateProducts: [...(prev.monetizationIdeas?.affiliateProducts || []), ""] } }))}>+ Add Product</Button>
+                            </div>
+                            
+                            {formData.monetizationIdeas?.affiliateProducts?.map((prod, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                    <div className="flex-1 flex gap-2">
+                                        <select 
+                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 rounded-md px-2 flex-1 max-w-[200px]"
+                                            onChange={(e) => {
+                                                const offer = affiliateOffers.find(o => o._id === e.target.value);
+                                                if (offer) {
+                                                    const newArr = [...(formData.monetizationIdeas?.affiliateProducts || [])];
+                                                    newArr[idx] = `[${offer.name}](${offer.affiliateLink})`;
+                                                    setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, affiliateProducts: newArr } }));
+                                                }
+                                            }}
+                                        >
+                                            <option value="">Select from Hub...</option>
+                                            {affiliateOffers.map(offer => (
+                                                <option key={offer._id} value={offer._id}>{offer.name}</option>
+                                            ))}
+                                        </select>
+                                        <Input 
+                                            value={prod}
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.monetizationIdeas?.affiliateProducts || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, affiliateProducts: newArr } }));
+                                            }}
+                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 flex-1"
+                                            placeholder="Markdown format: [Name](URL)"
+                                        />
+                                    </div>
+                                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, affiliateProducts: prev.monetizationIdeas?.affiliateProducts?.filter((_, i) => i !== idx) || [] } }))}>
+                                        <Trash2 size={12} />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* High Value Assets */}
+                        <div className="space-y-4 pt-4 border-t border-slate-800">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-300">High-Value Assets (Digital Downloads)</label>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-indigo-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: [...(prev.monetizationIdeas?.digitalDownloads || []), ""] } }))}>+ Add Asset</Button>
+                            </div>
+                            
+                            {formData.monetizationIdeas?.digitalDownloads?.map((asset, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                    <Input 
+                                        value={asset}
+                                        onChange={(e) => {
+                                            const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                            newArr[idx] = e.target.value;
+                                            setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
+                                        }}
+                                        className="bg-slate-800 border-slate-700 text-white text-[10px] h-9"
+                                        placeholder="e.g. Procreate Brush Pack"
+                                    />
+                                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: prev.monetizationIdeas?.digitalDownloads?.filter((_, i) => i !== idx) || [] } }))}>
+                                        <Trash2 size={12} />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
                     </Card>
 
                     {/* Marketing & Content Strategy */}
@@ -450,7 +524,7 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                             {/* Hooks */}
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-900">Hooks (Short & Punchy)</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-900">Viral Hooks</label>
                                     <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold text-indigo-600 hover:bg-indigo-50" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, hooks: [...(prev.marketingStrategy?.hooks || []), ""] } }))}>+ Add Hook</Button>
                                 </div>
                                 {formData.marketingStrategy?.hooks?.map((hook, idx) => (
@@ -466,6 +540,31 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                             placeholder="e.g. Why most people fail at..."
                                         />
                                         <Button type="button" variant="ghost" size="icon" className="h-11 w-11 text-slate-300 hover:text-red-500 hover:bg-red-50" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, hooks: prev.marketingStrategy?.hooks?.filter((_, i) => i !== idx) || [] } }))}>
+                                            <Trash2 size={16} />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Content Pillars */}
+                            <div className="space-y-3 pt-4 border-t border-slate-100">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-900">Top Content Pillars</label>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] font-bold text-indigo-600 hover:bg-indigo-50" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, contentIdeas: [...(prev.marketingStrategy?.contentIdeas || []), ""] } }))}>+ Add Pillar</Button>
+                                </div>
+                                {formData.marketingStrategy?.contentIdeas?.map((idea, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Input 
+                                            value={idea} 
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.marketingStrategy?.contentIdeas || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, contentIdeas: newArr } }));
+                                            }}
+                                            className="bg-white border-2 border-slate-100 text-black font-bold text-xs h-11"
+                                            placeholder="e.g. 5-step beginner guide"
+                                        />
+                                        <Button type="button" variant="ghost" size="icon" className="h-11 w-11 text-slate-300 hover:text-red-500 hover:bg-red-50" onClick={() => setFormData(prev => ({ ...prev, marketingStrategy: { ...prev.marketingStrategy!, contentIdeas: prev.marketingStrategy?.contentIdeas?.filter((_, i) => i !== idx) || [] } }))}>
                                             <Trash2 size={16} />
                                         </Button>
                                     </div>
