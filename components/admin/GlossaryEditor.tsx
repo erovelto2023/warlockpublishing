@@ -329,13 +329,13 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                         </div>
                         <div className="space-y-4">
                             <label className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600 flex items-center gap-2">
-                                <Video size={16} /> YouTube Video ID
+                                <Video size={16} /> YouTube Video URL or ID
                             </label>
                             <Input 
                                 name="youtubeVideoId" 
                                 value={formData.youtubeVideoId} 
                                 onChange={handleChange} 
-                                placeholder="e.g. dQw4w9WgXcQ"
+                                placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                                 className="bg-white text-black border-2 border-slate-100 h-11"
                             />
                         </div>

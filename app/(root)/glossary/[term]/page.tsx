@@ -131,7 +131,7 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                                 <Card className="overflow-hidden bg-black aspect-video relative group border-none shadow-2xl">
                                     <iframe
                                         className="w-full h-full"
-                                        src={`https://www.youtube.com/embed/${term.youtubeVideoId}`}
+                                        src={`https://www.youtube.com/embed/${extractYouTubeId(term.youtubeVideoId)}`}
                                         title={term.term}
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
@@ -265,4 +265,11 @@ function ChevronRight({ size, className }: { size: number, className?: string })
             <path d="m9 18 6-6-6-6"/>
         </svg>
     )
+}
+
+function extractYouTubeId(urlOrId: string) {
+    if (!urlOrId) return '';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = urlOrId.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : urlOrId;
 }
