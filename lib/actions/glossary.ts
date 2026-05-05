@@ -10,6 +10,32 @@ function serializeTerm(term: any) {
     return JSON.parse(JSON.stringify(term));
 }
 
+/**
+ * Validates if a YouTube video is active using the oEmbed endpoint.
+ * Returns true if the video is public and accessible, false otherwise.
+ */
+export async function isYouTubeVideoActive(urlOrId: string): Promise<boolean> {
+    if (!urlOrId) return false;
+    
+    // Extract ID
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = urlOrId.match(regExp);
+    const id = (match && match[2].length === 11) ? match[2] : urlOrId;
+    
+    if (id.length !== 11) return false;
+
+    try {
+        const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`, {
+            method: 'GET',
+            next: { revalidate: 3600 } // Cache results for an hour
+        });
+        return response.ok;
+    } catch (error) {
+        console.error("YouTube validation failed:", error);
+        return false;
+    }
+}
+
 export async function getGlossaryTerms(options: { 
     category?: string; 
     difficulty?: string; 
@@ -147,11 +173,22 @@ export async function importDetailedJson(data: any[]) {
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '');
 
+            // Validate YouTube Video if present
+            let activeVideoId = item.youtubeVideoId;
+            if (activeVideoId) {
+                const isActive = await isYouTubeVideoActive(activeVideoId);
+                if (!isActive) {
+                    console.warn(`[BulkImport] Deactivating invalid YouTube video for term: ${item.term} (${activeVideoId})`);
+                    activeVideoId = ""; // Clear invalid video
+                }
+            }
+
             await GlossaryTerm.findOneAndUpdate(
                 { term: item.term },
                 { 
                     ...item, 
                     slug,
+                    youtubeVideoId: activeVideoId,
                     isPublished: true 
                 },
                 { upsert: true, new: true }
@@ -167,6 +204,34 @@ export async function importDetailedJson(data: any[]) {
     } catch (error: any) {
         console.error("Import error:", error);
         return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Audit all glossary terms and clear any dead YouTube links.
+ */
+export async function healGlossaryVideos() {
+    try {
+        await connectToDatabase();
+        const terms = await GlossaryTerm.find({ youtubeVideoId: { $exists: true, $ne: "" } });
+        let healedCount = 0;
+
+        console.log(`[Healer] Auditing ${terms.length} terms for dead video links...`);
+
+        for (const term of terms) {
+            const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
+            if (!isActive) {
+                console.log(`[Healer] Cleaning dead link for: ${term.term}`);
+                await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
+                healedCount++;
+            }
+        }
+
+        revalidatePath('/glossary');
+        return { success: true, healedCount };
+    } catch (error: any) {
+        console.error("Healer failed:", error);
+        return { success: false, error: error.message };
     }
 }
 

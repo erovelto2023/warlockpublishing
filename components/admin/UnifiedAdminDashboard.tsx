@@ -22,7 +22,7 @@ import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
-import { deleteGlossaryTerm, bulkDeleteGlossaryTerms } from '@/lib/actions/glossary';
+import { deleteGlossaryTerm, bulkDeleteGlossaryTerms, healGlossaryVideos } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
 import CTAManager from '@/components/admin/CTAManager';
 
@@ -61,6 +61,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const [selectedGlossaryTerms, setSelectedGlossaryTerms] = useState<string[]>([]);
     const [editingSubscriber, setEditingSubscriber] = useState<any | null>(null);
     const [editSubEmail, setEditSubEmail] = useState('');
+    const [isHealing, setIsHealing] = useState(false);
     
     // Pagination State
     const [glossaryPage, setGlossaryPage] = useState(1);
@@ -112,6 +113,24 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             router.refresh();
         } catch (e) {
             alert('Error deleting terms');
+        }
+    };
+
+    const handleHealVideos = async () => {
+        if (!confirm('This will audit ALL glossary terms and remove dead YouTube links. This may take a minute. Continue?')) return;
+        try {
+            setIsHealing(true);
+            const result = await healGlossaryVideos();
+            if (result.success) {
+                alert(`Audit complete. Removed ${result.healedCount} dead links.`);
+                router.refresh();
+            } else {
+                alert(`Healer failed: ${result.error}`);
+            }
+        } catch (e: any) {
+            alert(`Error: ${e.message}`);
+        } finally {
+            setIsHealing(false);
         }
     };
 
@@ -885,6 +904,14 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${glossaryView === 'import' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}
                                 >
                                     <Plus size={16} /> Bulk Import
+                                </button>
+                                <button
+                                    onClick={handleHealVideos}
+                                    disabled={isHealing}
+                                    className="px-4 py-2 rounded-lg text-sm font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 flex items-center gap-2 transition-all disabled:opacity-50"
+                                >
+                                    {isHealing ? <RefreshCw size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+                                    {isHealing ? 'Auditing...' : 'Heal Dead Links'}
                                 </button>
                                 <button
                                     onClick={() => router.push('/admin/glossary/new')}
