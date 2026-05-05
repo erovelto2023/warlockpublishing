@@ -119,7 +119,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
         }
     };
 
-    const handleHealVideos = async (isAuto = false) => {
+    const handleHealVideos = async (isAuto = false, currentFixed = 0, currentAdded = 0) => {
         if (!isAuto && !confirm('This will audit terms and fix YouTube links. It works in small batches to prevent timeouts. Continue?')) return;
         
         try {
@@ -127,21 +127,21 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
             const result = await healGlossaryVideos();
             
             if (result.success) {
-                const newFixed = (healProgress?.fixed || 0) + result.healedCount;
-                const newAdded = (healProgress?.added || 0) + result.addedCount;
+                const newFixed = currentFixed + (result.healedCount || 0);
+                const newAdded = currentAdded + (result.addedCount || 0);
                 setHealProgress({ 
-                    total: result.remaining + result.healedCount + result.addedCount,
+                    total: (result.remaining || 0) + newFixed + newAdded,
                     fixed: newFixed,
                     added: newAdded
                 });
 
-                if (result.remaining > 0) {
+                if (result.remaining && result.remaining > 0) {
                     toast({
                         title: "Healing in Progress",
                         description: `Fixed ${result.healedCount} more. ${result.remaining} remaining. Continuing...`,
                     });
-                    // Auto-continue to the next batch
-                    await handleHealVideos(true);
+                    // Auto-continue with updated counts
+                    await handleHealVideos(true, newFixed, newAdded);
                 } else {
                     toast({
                         title: "Audit Complete!",
