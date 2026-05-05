@@ -5,7 +5,7 @@ import {
     Plus, Search, Copy, ExternalLink, Trash2, 
     Star, StarOff, MoreVertical, Edit3, 
     TrendingUp, LayoutGrid, List, Filter,
-    Check, ArrowUpRight
+    Check, ArrowUpRight, ArrowLeft, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +53,8 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
     const [editingOffer, setEditingOffer] = useState<any>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [importing, setImporting] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 12;
 
     const [formData, setFormData] = useState({
         name: "",
@@ -169,6 +171,13 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
         o.network?.toLowerCase().includes(search.toLowerCase()) ||
         o.category?.toLowerCase().includes(search.toLowerCase())
     );
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search]);
+
+    const totalPages = Math.ceil(filteredOffers.length / pageSize);
+    const paginatedOffers = filteredOffers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -358,12 +367,12 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredOffers.length === 0 ? (
+                            {paginatedOffers.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={6} className="h-64 text-center text-slate-500">No offers found matching your criteria.</TableCell>
                                 </TableRow>
                             ) : (
-                                filteredOffers.map((offer) => (
+                                paginatedOffers.map((offer) => (
                                     <TableRow key={offer._id} className="border-slate-800 hover:bg-slate-800/30 transition-colors group">
                                         <TableCell>
                                             <Button 
@@ -432,7 +441,7 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredOffers.map((offer) => (
+                    {paginatedOffers.map((offer) => (
                         <Card key={offer._id} className="p-6 bg-slate-900 border-slate-800 hover:border-cyan-500/50 transition-all shadow-xl group relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Button 
@@ -489,6 +498,46 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                     ))}
                 </div>
             )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 pt-8 border-t border-slate-800">
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={currentPage === 1}
+                        onClick={() => {
+                            setCurrentPage(p => Math.max(1, p - 1));
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white"
+                    >
+                        <ArrowLeft size={16} className="mr-2" /> Previous
+                    </Button>
+                    
+                    <div className="text-xs font-black uppercase tracking-widest text-slate-500">
+                        Page <span className="text-cyan-500">{currentPage}</span> of {totalPages}
+                    </div>
+
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={currentPage === totalPages}
+                        onClick={() => {
+                            setCurrentPage(p => Math.min(totalPages, p + 1));
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white"
+                    >
+                        Next <ArrowRight size={16} className="ml-2" />
+                    </Button>
+                </div>
+            )}
+
+            {/* Results Count */}
+            <div className="text-sm text-slate-500 text-center pt-4">
+                Showing {paginatedOffers.length} of {filteredOffers.length} offers
+            </div>
         </div>
     );
 }

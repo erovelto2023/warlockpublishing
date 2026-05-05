@@ -28,14 +28,11 @@ export default function ProductPipelineSection({ term, ideas = {} }: ProductPipe
                 {affiliateProducts.length > 0 && (
                     <div>
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Recommended Products</h4>
-                        <div className="space-y-2">
+                        <ul className="list-disc list-inside space-y-1 text-sm text-slate-700 dark:text-slate-300 marker:text-indigo-400">
                             {affiliateProducts.map((prod, i) => (
-                                <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                                    {prod}
-                                </div>
+                                <li key={i}>{prod}</li>
                             ))}
-                        </div>
+                        </ul>
                     </div>
                 )}
                 
