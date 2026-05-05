@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight } from 'lucide-react';
 import { importDetailedJson, syncMarketplaceData } from '@/lib/actions/glossary';
 import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
+import { getMarketplaceItems } from '@/lib/actions/product.actions';
+import { getAmazonCsvContent } from '@/lib/actions/marketplace';
 import { useRouter } from 'next/navigation';
 
 interface BulkTermImportProps {
@@ -20,10 +22,53 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
      const [isHydrating, setIsHydrating] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-    const [affiliateOffers, setAffiliateOffers] = useState<any[]>([]);
+    const [unifiedCatalog, setUnifiedCatalog] = useState<{name: string, url: string, category: string, source: string}[]>([]);
 
     useEffect(() => {
-        getAffiliateOffers().then(setAffiliateOffers).catch(console.error);
+        const loadCatalogs = async () => {
+            try {
+                const results: {name: string, url: string, category: string, source: string}[] = [];
+                
+                // 1. Affiliate Hub Offers
+                const offers = await getAffiliateOffers();
+                offers.forEach((o: any) => {
+                    if (o.name && o.affiliateLink) {
+                        results.push({ name: o.name, url: o.affiliateLink, category: o.category || 'Hub', source: 'Affiliate Hub' });
+                    }
+                });
+
+                // 2. Local Products & Offers
+                const localItems = await getMarketplaceItems();
+                localItems.forEach((i: any) => {
+                    if (i.title && (i.externalUrl || i.slug)) {
+                        results.push({ name: i.title, url: i.externalUrl || `/products/${i.slug}`, category: i.category || 'Product', source: 'Local Store' });
+                    }
+                });
+
+                // 3. Amazon Nexus CSV
+                const csvContent = await getAmazonCsvContent();
+                if (csvContent) {
+                    const lines = csvContent.split('\n').filter(l => l.trim());
+                    lines.forEach(line => {
+                        const parts = line.split('","').map(p => p.replace(/^"|"$/g, ''));
+                        const keyword = parts[1] || 'Amazon';
+                        const sUrl = (parts[2] || '').trim();
+                        const fUrl = (parts[3] || '').trim();
+                        const preferredUrl = (fUrl.includes('javascript:void') && sUrl.startsWith('http')) ? sUrl : (fUrl || sUrl);
+                        const title = parts[9] || 'Untitled';
+                        
+                        if (preferredUrl && preferredUrl.startsWith('http')) {
+                            results.push({ name: title, url: preferredUrl, category: keyword, source: 'Marketplace Nexus' });
+                        }
+                    });
+                }
+                
+                setUnifiedCatalog(results);
+            } catch (err) {
+                console.error("Failed to load catalogs:", err);
+            }
+        };
+        loadCatalogs();
     }, []);
 
     const handleHydrate = async () => {
@@ -116,8 +161,8 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
 - For "visualAsset", create prompts for thematic cover art or Pinterest-style coloring page previews.`;
         }
 
-        const affiliateCatalogStr = affiliateOffers.length > 0 
-            ? affiliateOffers.map(o => `- [${o.name}](${o.affiliateLink}) (Niche/Category: ${o.category || 'General'})`).join('\n')
+        const affiliateCatalogStr = unifiedCatalog.length > 0 
+            ? unifiedCatalog.map(o => `- [${o.name}](${o.url}) (Niche/Category: ${o.category}) [Source: ${o.source}]`).join('\n')
             : "No affiliate products available.";
 
         const prompt = `Act as an Expert UX/UI Data Architect, Literary Analyst, and E-Commerce SEO Strategist. Your task is to design the "Ultimate JSON Data" for these keywords. 
