@@ -148,7 +148,7 @@ export async function importDetailedJson(data: any[]) {
                 .replace(/(^-|-$)+/g, '');
 
             await GlossaryTerm.findOneAndUpdate(
-                { slug },
+                { term: item.term },
                 { 
                     ...item, 
                     slug,
