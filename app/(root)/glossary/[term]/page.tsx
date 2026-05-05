@@ -16,6 +16,8 @@ import StructuredData from "@/components/glossary/StructuredData";
 import AuthorityArticle from "@/components/glossary/AuthorityArticle";
 import RandomProducts from "@/components/glossary/RandomProducts";
 import { getFeaturedItems } from "@/lib/actions/product.actions";
+import CallToActionBlock from "@/components/shared/CallToActionBlock";
+import { getCallToActionById } from "@/lib/actions/cta.actions";
 import {
     Accordion,
     AccordionContent,
@@ -44,6 +46,11 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
 
     if (!term) {
         notFound();
+    }
+
+    let cta = null;
+    if (term.callToActionId) {
+        cta = await getCallToActionById(term.callToActionId);
     }
 
     // Background increment view (no need to await)
@@ -134,8 +141,15 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                         )}
 
                         {/* Authority Article / Blog Content */}
-                        {term.articleContent && (
-                            <AuthorityArticle content={term.articleContent} />
+                        {(term.articleContent || cta) && (
+                            <div>
+                                {term.articleContent && <AuthorityArticle content={term.articleContent} />}
+                                {cta && (
+                                    <div className="mt-8">
+                                        <CallToActionBlock cta={cta} />
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {/* Characteristics */}

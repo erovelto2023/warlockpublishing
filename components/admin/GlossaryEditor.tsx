@@ -13,6 +13,7 @@ import {
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary";
 import { getAffiliateOffers } from "@/lib/actions/affiliate.actions";
 import { getPublishedProducts } from "@/lib/actions/product.actions";
+import { getCallToActions } from "@/lib/actions/cta.actions";
 import { GlossaryTerm } from "@/lib/types";
 import { Switch } from "@/components/ui/switch";
 
@@ -58,10 +59,12 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
 
     const [affiliateOffers, setAffiliateOffers] = useState<any[]>([]);
     const [localProducts, setLocalProducts] = useState<any[]>([]);
+    const [ctas, setCtas] = useState<any[]>([]);
 
     useEffect(() => {
         getAffiliateOffers().then(setAffiliateOffers).catch(console.error);
         getPublishedProducts().then(setLocalProducts).catch(console.error);
+        getCallToActions().then(setCtas).catch(console.error);
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -243,6 +246,22 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                     placeholder="Write the ultimate guide using the framework..."
                                     className="h-[600px] bg-white border-2 border-slate-200 text-black font-serif text-lg leading-relaxed px-6 py-8 shadow-inner placeholder:text-slate-300"
                                 />
+                            </div>
+                            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                                <label className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <Target size={14} className="text-indigo-500" /> Attach Call-To-Action (CTA)
+                                </label>
+                                <select 
+                                    name="callToActionId"
+                                    value={formData.callToActionId as string || ""}
+                                    onChange={handleChange}
+                                    className="w-full h-12 rounded-md border border-slate-800 bg-slate-900 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                >
+                                    <option value="">No CTA Attached</option>
+                                    {ctas.map(cta => (
+                                        <option key={cta._id} value={cta._id}>{cta.internalName} ({cta.headline})</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <div className="space-y-4">

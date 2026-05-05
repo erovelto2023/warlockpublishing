@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare, BookOpen, Image,
+    Users, FileText, ShoppingBag, LayoutDashboard, Megaphone, MessageSquare, BookOpen, Image, Target,
     Search, Plus, Eye, Edit, Trash2, Copy, BarChart3, Settings, ExternalLink, Link as LinkIcon, Download, RefreshCw, Send, Check, X, Mail,
     Package, Smartphone, ShieldCheck
 } from 'lucide-react';
@@ -24,6 +24,7 @@ import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/m
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
 import { deleteGlossaryTerm, bulkDeleteGlossaryTerms } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
+import CTAManager from '@/components/admin/CTAManager';
 
 interface AdminDashboardProps {
     products: any[];
@@ -35,10 +36,11 @@ interface AdminDashboardProps {
     glossaryTerms: any[];
     affiliateOffers: any[];
     analytics?: any;
+    ctas?: any[];
 }
 
-export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, affiliateOffers, analytics }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary' | 'affiliate'>('overview');
+export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, affiliateOffers, analytics, ctas = [] }: AdminDashboardProps) {
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary' | 'affiliate' | 'cta_builder'>('overview');
     const router = useRouter();
 
     // Stats
@@ -248,6 +250,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
                             { id: 'glossary', label: 'Glossary', icon: BookOpen },
                             { id: 'affiliate', label: 'Affiliate Hub', icon: LinkIcon },
+                            { id: 'cta_builder', label: 'CTA Builder', icon: Target },
                             { id: 'settings', label: 'Site Config', icon: Settings },
                         ].map((tab) => (
                             <button
@@ -844,6 +847,13 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
                 {activeTab === 'marketplace' && (
                     <MarketplaceManager />
+                )}
+
+                {/* CTA BUILDER TAB */}
+                {activeTab === 'cta_builder' && (
+                    <div className="space-y-6">
+                        <CTAManager initialCtas={ctas} />
+                    </div>
                 )}
 
                 {/* GLOSSARY TAB */}

@@ -41,6 +41,7 @@ export interface IGlossaryTerm extends Document {
         relatedKeywords: string[];
     };
     isPublished: boolean;
+    callToActionId?: mongoose.Types.ObjectId | string;
     articleContent?: string;
     viewCount: number;
     createdAt: Date;
@@ -58,6 +59,7 @@ const GlossaryTermSchema: Schema = new Schema({
     },
     snapshot: { type: String, required: true },
     definition: { type: String, required: true },
+    callToActionId: { type: Schema.Types.ObjectId, ref: 'CallToAction' },
     articleContent: { type: String },
     characteristics: [{ type: String }],
     youtubeVideoId: { type: String },
