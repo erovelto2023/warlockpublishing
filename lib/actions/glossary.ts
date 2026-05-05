@@ -36,6 +36,39 @@ export async function isYouTubeVideoActive(urlOrId: string): Promise<boolean> {
     }
 }
 
+/**
+ * Searches YouTube for a video related to the keyword and returns the first result URL.
+ * Uses a lightweight scraping method that doesn't require an API key.
+ */
+export async function searchYouTubeVideo(keyword: string): Promise<string | null> {
+    if (!keyword) return null;
+    
+    // Add category/context if needed, but the keyword is usually the term name
+    const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(keyword + " guide")}&sp=EgIQAQ%253D%253D`;
+    
+    try {
+        const res = await fetch(searchUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9'
+            },
+            next: { revalidate: 3600 }
+        });
+        
+        const html = await res.text();
+        
+        // Find the first videoId pattern in the YouTube embedded JSON data
+        const match = html.match(/"videoId":"([^"]{11})"/);
+        if (match && match[1]) {
+            return `https://www.youtube.com/watch?v=${match[1]}`;
+        }
+        return null;
+    } catch (e) {
+        console.error(`[YouTubeSearch] Failed for keyword "${keyword}":`, e);
+        return null;
+    }
+}
+
 export async function getGlossaryTerms(options: { 
     category?: string; 
     difficulty?: string; 
@@ -179,7 +212,21 @@ export async function importDetailedJson(data: any[]) {
                 const isActive = await isYouTubeVideoActive(activeVideoId);
                 if (!isActive) {
                     console.warn(`[BulkImport] Deactivating invalid YouTube video for term: ${item.term} (${activeVideoId})`);
-                    activeVideoId = ""; // Clear invalid video
+                    // Try to find a replacement
+                    const replacement = await searchYouTubeVideo(item.term);
+                    if (replacement) {
+                        console.log(`[BulkImport] Found replacement for ${item.term}: ${replacement}`);
+                        activeVideoId = replacement;
+                    } else {
+                        activeVideoId = ""; // Clear if no replacement found
+                    }
+                }
+            } else {
+                // If no video ID was provided at all, try to find one
+                const autoVideo = await searchYouTubeVideo(item.term);
+                if (autoVideo) {
+                    console.log(`[BulkImport] Auto-populated video for ${item.term}: ${autoVideo}`);
+                    activeVideoId = autoVideo;
                 }
             }
 
@@ -221,9 +268,16 @@ export async function healGlossaryVideos() {
         for (const term of terms) {
             const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
             if (!isActive) {
-                console.log(`[Healer] Cleaning dead link for: ${term.term}`);
-                await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
-                healedCount++;
+                console.log(`[Healer] Replacing dead link for: ${term.term}`);
+                const replacement = await searchYouTubeVideo(term.term);
+                if (replacement) {
+                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: replacement });
+                    healedCount++;
+                } else {
+                    // If no replacement found, just clear it to avoid broken player
+                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: "" });
+                    healedCount++;
+                }
             }
         }
 
