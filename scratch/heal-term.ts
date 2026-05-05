@@ -22,8 +22,9 @@ async function healBillionaireBoss() {
     }
 
     // 2. Fix YouTube Video
-    const newVideo = await searchYouTubeForTerm(term.term, term.category);
-    if (newVideo) {
+    const videos = await searchYouTubeForTerm(term.term);
+    if (videos && videos.length > 0) {
+        const newVideo = videos[0] as any;
         term.youtubeVideo = newVideo;
         term.videoUrl = newVideo.url;
     }

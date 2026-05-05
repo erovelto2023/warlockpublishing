@@ -959,7 +959,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
 
                 {/* AFFILIATE HUB TAB */}
                 {activeTab === 'affiliate' && (
-                    <AffiliateHub />
+                    <AffiliateHub initialOffers={affiliateOffers} />
                 )}
 
             </main>

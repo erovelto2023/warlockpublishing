@@ -38,15 +38,21 @@ import {
     deleteAffiliateOffer,
     toggleFavorite
 } from "@/lib/actions/affiliate.actions";
+import { importFromPlatform6, importFromNexus } from "@/lib/actions/import.actions";
 
-export default function AffiliateHub() {
-    const [offers, setOffers] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+interface AffiliateHubProps {
+    initialOffers: any[];
+}
+
+export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
+    const [offers, setOffers] = useState<any[]>(initialOffers || []);
+    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [view, setView] = useState<"grid" | "list">("list");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingOffer, setEditingOffer] = useState<any>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [importing, setImporting] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -65,10 +71,16 @@ export default function AffiliateHub() {
     }, []);
 
     const loadOffers = async () => {
-        setLoading(true);
-        const data = await getAffiliateOffers();
-        setOffers(data);
-        setLoading(false);
+        try {
+            setLoading(true);
+            const data = await getAffiliateOffers();
+            console.log("Loaded offers:", data);
+            setOffers(data);
+        } catch (error) {
+            console.error("Error loading offers:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleCopy = (text: string, id: string) => {
@@ -128,6 +140,30 @@ export default function AffiliateHub() {
         loadOffers();
     };
 
+    const handleImport = async () => {
+        setImporting(true);
+        const res = await importFromPlatform6();
+        if (res.success) {
+            alert(`Successfully imported ${res.count} offers from Platform6!`);
+            loadOffers();
+        } else {
+            alert(`Import failed: ${res.error}`);
+        }
+        setImporting(false);
+    };
+
+    const handleImportNexus = async () => {
+        setImporting(true);
+        const res = await importFromNexus();
+        if (res.success) {
+            alert(`Successfully imported ${res.count} products from Marketplace Nexus!`);
+            loadOffers();
+        } else {
+            alert(`Import failed: ${res.error}`);
+        }
+        setImporting(false);
+    };
+
     const filteredOffers = offers.filter(o => 
         o.name.toLowerCase().includes(search.toLowerCase()) || 
         o.network?.toLowerCase().includes(search.toLowerCase()) ||
@@ -177,6 +213,20 @@ export default function AffiliateHub() {
                             <Plus className="mr-2" size={20} /> Create New Master Offer
                         </Button>
                     </DialogTrigger>
+                    <Button 
+                        onClick={handleImport}
+                        disabled={importing}
+                        className="h-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-slate-700"
+                    >
+                        {importing ? "Importing..." : "Sync from Platform6"}
+                    </Button>
+                    <Button 
+                        onClick={handleImportNexus}
+                        disabled={importing}
+                        className="h-full bg-indigo-900 hover:bg-indigo-800 text-indigo-100 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-indigo-700"
+                    >
+                        {importing ? "Importing..." : "Pull from Nexus"}
+                    </Button>
                     <DialogContent className="max-w-2xl bg-slate-950 border-slate-800 text-white">
                         <DialogHeader>
                             <DialogTitle className="text-2xl font-black uppercase tracking-tight">

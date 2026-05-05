@@ -11,6 +11,7 @@ function serialize(data: any) {
 export async function getAffiliateOffers() {
     await connectToDatabase();
     const offers = await AffiliateOffer.find().sort({ isFavorite: -1, createdAt: -1 });
+    console.log(`[Affiliate Action] Fetched ${offers.length} offers`);
     return serialize(offers);
 }
 

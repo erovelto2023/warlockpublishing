@@ -187,7 +187,7 @@ export async function syncMarketplaceData() {
     }
 }
 
-export async function searchYouTubeForTerm(term: string) {
+export async function searchYouTubeForTerm(term: string): Promise<any[]> {
     // This is a stub for future YouTube API integration
     console.log("YouTube search requested for:", term);
     return [];
