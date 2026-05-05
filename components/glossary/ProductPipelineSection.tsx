@@ -51,7 +51,7 @@ export default function ProductPipelineSection({ term, ideas = {} }: ProductPipe
                             {digitalDownloads.map((asset, i) => (
                                 <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                                     <ArrowRight size={12} className="text-indigo-400" />
-                                    {asset}
+                                    {parseMarkdownLink(asset)}
                                 </div>
                             ))}
                         </div>

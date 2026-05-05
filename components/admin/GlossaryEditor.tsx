@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary";
 import { getAffiliateOffers } from "@/lib/actions/affiliate.actions";
+import { getPublishedProducts } from "@/lib/actions/product.actions";
 import { GlossaryTerm } from "@/lib/types";
 import { Switch } from "@/components/ui/switch";
 
@@ -56,9 +57,11 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
     });
 
     const [affiliateOffers, setAffiliateOffers] = useState<any[]>([]);
+    const [localProducts, setLocalProducts] = useState<any[]>([]);
 
     useEffect(() => {
         getAffiliateOffers().then(setAffiliateOffers).catch(console.error);
+        getPublishedProducts().then(setLocalProducts).catch(console.error);
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -496,16 +499,35 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                             
                             {formData.monetizationIdeas?.digitalDownloads?.map((asset, idx) => (
                                 <div key={idx} className="flex gap-2">
-                                    <Input 
-                                        value={asset}
-                                        onChange={(e) => {
-                                            const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
-                                            newArr[idx] = e.target.value;
-                                            setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
-                                        }}
-                                        className="bg-slate-800 border-slate-700 text-white text-[10px] h-9"
-                                        placeholder="e.g. Procreate Brush Pack"
-                                    />
+                                    <div className="flex-1 flex gap-2">
+                                        <select 
+                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 rounded-md px-2 flex-1 max-w-[200px]"
+                                            onChange={(e) => {
+                                                const prod = localProducts.find(p => p._id === e.target.value);
+                                                if (prod) {
+                                                    const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                    const url = prod.slug ? `/products/${prod.slug}` : `/products/${prod._id}`;
+                                                    newArr[idx] = `[${prod.title}](${url})`;
+                                                    setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
+                                                }
+                                            }}
+                                        >
+                                            <option value="">Select Local Product...</option>
+                                            {localProducts.map(prod => (
+                                                <option key={prod._id} value={prod._id}>{prod.title}</option>
+                                            ))}
+                                        </select>
+                                        <Input 
+                                            value={asset}
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
+                                            }}
+                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 flex-1"
+                                            placeholder="Markdown format: [Name](/products/slug)"
+                                        />
+                                    </div>
                                     <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: prev.monetizationIdeas?.digitalDownloads?.filter((_, i) => i !== idx) || [] } }))}>
                                         <Trash2 size={12} />
                                     </Button>
