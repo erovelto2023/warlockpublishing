@@ -22,6 +22,7 @@ import { deletePenName } from '@/lib/actions/pen-name.actions';
 import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-page.actions';
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
+import { useToast } from '@/components/ui/use-toast';
 import { deleteGlossaryTerm, bulkDeleteGlossaryTerms, healGlossaryVideos } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
 import CTAManager from '@/components/admin/CTAManager';
@@ -40,6 +41,7 @@ interface AdminDashboardProps {
 }
 
 export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, affiliateOffers, analytics, ctas = [] }: AdminDashboardProps) {
+    const { toast } = useToast();
     const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary' | 'affiliate' | 'cta_builder'>('overview');
     const router = useRouter();
 
@@ -62,6 +64,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const [editingSubscriber, setEditingSubscriber] = useState<any | null>(null);
     const [editSubEmail, setEditSubEmail] = useState('');
     const [isHealing, setIsHealing] = useState(false);
+    const [healProgress, setHealProgress] = useState<{ total: number, fixed: number, added: number } | null>(null);
     
     // Pagination State
     const [glossaryPage, setGlossaryPage] = useState(1);
@@ -116,20 +119,53 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
         }
     };
 
-    const handleHealVideos = async () => {
-        if (!confirm('This will audit ALL glossary terms and remove dead YouTube links. This may take a minute. Continue?')) return;
+    const handleHealVideos = async (isAuto = false) => {
+        if (!isAuto && !confirm('This will audit terms and fix YouTube links. It works in small batches to prevent timeouts. Continue?')) return;
+        
         try {
             setIsHealing(true);
             const result = await healGlossaryVideos();
+            
             if (result.success) {
-                alert(`${result.message}\n\nSummary:\n- Fixed ${result.healedCount} dead links\n- Added ${result.addedCount} new videos\n- Remaining to audit: ${result.remaining}`);
-                router.refresh();
+                const newFixed = (healProgress?.fixed || 0) + result.healedCount;
+                const newAdded = (healProgress?.added || 0) + result.addedCount;
+                setHealProgress({ 
+                    total: result.remaining + result.healedCount + result.addedCount,
+                    fixed: newFixed,
+                    added: newAdded
+                });
+
+                if (result.remaining > 0) {
+                    toast({
+                        title: "Healing in Progress",
+                        description: `Fixed ${result.healedCount} more. ${result.remaining} remaining. Continuing...`,
+                    });
+                    // Auto-continue to the next batch
+                    await handleHealVideos(true);
+                } else {
+                    toast({
+                        title: "Audit Complete!",
+                        description: `All items healed. Total: ${newFixed} fixed, ${newAdded} added.`,
+                        variant: "default",
+                    });
+                    setHealProgress(null);
+                    setIsHealing(false);
+                    router.refresh();
+                }
             } else {
-                alert(`Healer failed: ${result.error}`);
+                toast({
+                    title: "Healer failed",
+                    description: result.error,
+                    variant: "destructive",
+                });
+                setIsHealing(false);
             }
         } catch (e: any) {
-            alert(`Error: ${e.message}`);
-        } finally {
+            toast({
+                title: "Error",
+                description: e.message,
+                variant: "destructive",
+            });
             setIsHealing(false);
         }
     };
@@ -906,12 +942,12 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     <Plus size={16} /> Bulk Import
                                 </button>
                                 <button
-                                    onClick={handleHealVideos}
+                                    onClick={() => handleHealVideos(false)}
                                     disabled={isHealing}
                                     className="px-4 py-2 rounded-lg text-sm font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 flex items-center gap-2 transition-all disabled:opacity-50"
                                 >
                                     {isHealing ? <RefreshCw size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-                                    {isHealing ? 'Auditing...' : 'Heal Dead Links'}
+                                    {isHealing ? `Healing (${healProgress?.fixed || 0 + (healProgress?.added || 0)} done)...` : 'Heal All Videos'}
                                 </button>
                                 <button
                                     onClick={() => router.push('/admin/glossary/new')}

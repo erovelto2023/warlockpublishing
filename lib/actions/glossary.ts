@@ -286,8 +286,8 @@ export async function healGlossaryVideos() {
         console.log(`[Healer] Phase 2: Fixing ${needsFixing.length} terms...`);
 
         // Phase 2: Only search for terms that need it (Slower search)
-        // We limit this to 30 terms per request to guarantee we stay under the 30s timeout
-        const WORK_LIMIT = 30;
+        // We limit this to 15 terms per request to guarantee we stay under the 30s timeout
+        const WORK_LIMIT = 15;
         const toProcess = needsFixing.slice(0, WORK_LIMIT);
         const SEARCH_BATCH = 5; // Search is slower/heavier, keep batch smaller
 
