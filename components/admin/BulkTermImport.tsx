@@ -180,6 +180,7 @@ For EACH keyword provided below, you must generate a high-ranking, high-converti
 4. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
 5. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
 6. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
+7. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (e.g., https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
 
 AVAILABLE AFFILIATE CATALOG:
 ${affiliateCatalogStr}
@@ -192,6 +193,7 @@ SCHEMA FOR EACH OBJECT:
   "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
   "articleContent": "A long-form, comprehensive authority article (1000+ words) using this EXACT framework: 1. Magnetic H1 Headline, 2. APP Introduction (Agree, Promise, Preview), 3. Scannable Body with H2/H3 subheadings and bullet points, 4. Visuals placement markers, 5. Conclusion/Wrap, 6. Strong CTA. Format with standard HTML tags (<h1>, <h2>, <p>, <ul>, <li>).",
   "category": "${category}",
+  "youtubeVideoId": "https://www.youtube.com/watch?v=REAL_VIDEO_ID_HERE",
   "monetizationIdeas": {
     "affiliateProducts": ["[Chosen Product 1](URL 1)", "[Chosen Product 2](URL 2)"],
     "courseTopics": ["Course Topic 1"],
@@ -344,9 +346,16 @@ ${rawList || "Please paste keywords in the first column"}`;
                 <div className="p-8 grid grid-cols-1 md:grid-cols-11 gap-8 items-stretch">
                     {/* COLUMN 1: KEYWORDS */}
                     <div className="md:col-span-4 flex flex-col space-y-4">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">1</span>
-                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Keyword Source</h3>
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">1</span>
+                                <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Keyword Source</h3>
+                            </div>
+                            {rawList && (
+                                <button onClick={() => setRawList('')} className="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center gap-1">
+                                    <X size={12} /> Clear
+                                </button>
+                            )}
                         </div>
                         <textarea 
                             className="flex-1 w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-mono focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none min-h-[300px]"
@@ -388,9 +397,16 @@ ${rawList || "Please paste keywords in the first column"}`;
 
                     {/* COLUMN 3: HYDRATE */}
                     <div className="md:col-span-4 flex flex-col space-y-4">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">3</span>
-                            <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Injection Portal</h3>
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">3</span>
+                                <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Injection Portal</h3>
+                            </div>
+                            {jsonContent && (
+                                <button onClick={() => setJsonContent('')} className="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center gap-1">
+                                    <X size={12} /> Clear
+                                </button>
+                            )}
                         </div>
                         <textarea 
                             className="flex-1 w-full bg-slate-900 border border-slate-800 text-emerald-400 rounded-2xl px-4 py-4 text-[10px] font-mono focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all resize-none min-h-[300px]"
