@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { currentUser } from '@clerk/nextjs/server';
 import { 
     CheckCircle2, Play, Lightbulb, Target, TrendingUp, 
     MessageSquare, ArrowRight, BookOpen
@@ -43,6 +44,9 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
     const { term: slug } = await params;
     console.log('GlossaryEntryPage executed for slug:', slug);
     const term = await getGlossaryTermBySlug(slug) as unknown as GlossaryTerm;
+    
+    const user = await currentUser();
+    const isAdmin = user?.publicMetadata?.role === 'admin';
 
     if (!term) {
         notFound();
@@ -230,10 +234,12 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                                     <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Back to Directory</span>
                                     <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
-                                <Link href="/admin" className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Term Editor</span>
-                                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </Link>
+                                {isAdmin && (
+                                    <Link href="/admin" className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Term Editor</span>
+                                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                )}
                             </div>
                         </Card>
                     </div>
