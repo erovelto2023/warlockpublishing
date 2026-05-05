@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { 
     ChevronLeft, Save, Plus, Trash2, 
-    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen, MessageSquare, Link as LinkIcon
+    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen, MessageSquare, Link as LinkIcon, ChevronDown, Search
 } from "lucide-react";
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary";
 import { getAffiliateOffers } from "@/lib/actions/affiliate.actions";
@@ -20,6 +20,69 @@ import { Switch } from "@/components/ui/switch";
 interface GlossaryEditorProps {
     initialData?: GlossaryTerm;
 }
+
+const SearchableOfferSelect = ({ offers, onSelect }: { offers: any[], onSelect: (offer: any) => void }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const filtered = offers.filter(o => o.name?.toLowerCase().includes(search.toLowerCase()));
+
+    return (
+        <div className="relative flex-1 max-w-[200px]" ref={wrapperRef}>
+            <div 
+                className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 rounded-md px-3 flex items-center justify-between border hover:bg-slate-700/50 transition-colors cursor-pointer"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span className="truncate">Select from Hub...</span>
+                <ChevronDown size={12} className={`text-slate-400 transform transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </div>
+            {isOpen && (
+                <div className="absolute z-50 w-[250px] mt-1 bg-slate-800 border border-slate-700 rounded-md shadow-xl flex flex-col overflow-hidden">
+                    <div className="p-2 border-b border-slate-700 bg-slate-800 flex items-center gap-2">
+                        <Search size={12} className="text-slate-400 shrink-0" />
+                        <Input 
+                            autoFocus
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Search products..."
+                            className="h-7 text-[10px] bg-slate-900 border-slate-700 text-white flex-1 px-2"
+                        />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                        {filtered.map(offer => (
+                            <div 
+                                key={offer._id} 
+                                className="px-3 py-2 text-[10px] text-white hover:bg-slate-700 cursor-pointer border-b border-slate-700/50 last:border-0 truncate"
+                                onClick={() => {
+                                    onSelect(offer);
+                                    setIsOpen(false);
+                                    setSearch("");
+                                }}
+                                title={offer.name}
+                            >
+                                {offer.name}
+                            </div>
+                        ))}
+                        {filtered.length === 0 && (
+                            <div className="p-4 text-[10px] text-slate-400 text-center">No matches</div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
     const router = useRouter();
@@ -475,22 +538,14 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                             {formData.monetizationIdeas?.affiliateProducts?.map((prod, idx) => (
                                 <div key={idx} className="flex gap-2">
                                     <div className="flex-1 flex gap-2">
-                                        <select 
-                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 rounded-md px-2 flex-1 max-w-[200px]"
-                                            onChange={(e) => {
-                                                const offer = affiliateOffers.find(o => o._id === e.target.value);
-                                                if (offer) {
-                                                    const newArr = [...(formData.monetizationIdeas?.affiliateProducts || [])];
-                                                    newArr[idx] = `[${offer.name}](${offer.affiliateLink})`;
-                                                    setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, affiliateProducts: newArr } }));
-                                                }
-                                            }}
-                                        >
-                                            <option value="">Select from Hub...</option>
-                                            {affiliateOffers.map(offer => (
-                                                <option key={offer._id} value={offer._id}>{offer.name}</option>
-                                            ))}
-                                        </select>
+                                        <SearchableOfferSelect 
+                                            offers={affiliateOffers} 
+                                            onSelect={(offer) => {
+                                                const newArr = [...(formData.monetizationIdeas?.affiliateProducts || [])];
+                                                newArr[idx] = `[${offer.name}](${offer.affiliateLink})`;
+                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, affiliateProducts: newArr } }));
+                                            }} 
+                                        />
                                         <Input 
                                             value={prod}
                                             onChange={(e) => {
