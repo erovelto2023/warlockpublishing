@@ -61,6 +61,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const [selectedGlossaryTerms, setSelectedGlossaryTerms] = useState<string[]>([]);
     const [editingSubscriber, setEditingSubscriber] = useState<any | null>(null);
     const [editSubEmail, setEditSubEmail] = useState('');
+    
+    // Pagination State
+    const [glossaryPage, setGlossaryPage] = useState(1);
+    const GLOSSARY_PAGE_SIZE = 25;
 
     const handleDelete = async (type: 'product' | 'post' | 'pen_name' | 'offer' | 'message' | 'subscriber', id: string) => {
         if (!confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) return;
@@ -928,7 +932,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
-                                    {glossaryTerms.map((term: any) => (
+                                    {glossaryTerms.slice((glossaryPage - 1) * GLOSSARY_PAGE_SIZE, glossaryPage * GLOSSARY_PAGE_SIZE).map((term: any) => (
                                         <tr key={term._id} className={`hover:bg-slate-50/80 transition-colors group ${selectedGlossaryTerms.includes(term._id) ? 'bg-indigo-50/30' : ''}`}>
                                             <td className="px-6 py-4">
                                                 <input 
@@ -967,6 +971,42 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     ))}
                                 </tbody>
                             </table>
+                            
+                            {/* Pagination Controls */}
+                            {glossaryTerms.length > GLOSSARY_PAGE_SIZE && (
+                                <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                                    <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                        Showing {(glossaryPage - 1) * GLOSSARY_PAGE_SIZE + 1} to {Math.min(glossaryPage * GLOSSARY_PAGE_SIZE, glossaryTerms.length)} of {glossaryTerms.length} terms
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button 
+                                            disabled={glossaryPage === 1}
+                                            onClick={() => setGlossaryPage(prev => Math.max(1, prev - 1))}
+                                            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-all"
+                                        >
+                                            Prev
+                                        </button>
+                                        <div className="flex gap-1">
+                                            {[...Array(Math.ceil(glossaryTerms.length / GLOSSARY_PAGE_SIZE))].map((_, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => setGlossaryPage(i + 1)}
+                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all ${glossaryPage === i + 1 ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-50'}`}
+                                                >
+                                                    {i + 1}
+                                                </button>
+                                            )).slice(Math.max(0, glossaryPage - 3), Math.min(Math.ceil(glossaryTerms.length / GLOSSARY_PAGE_SIZE), glossaryPage + 2))}
+                                        </div>
+                                        <button 
+                                            disabled={glossaryPage >= Math.ceil(glossaryTerms.length / GLOSSARY_PAGE_SIZE)}
+                                            onClick={() => setGlossaryPage(prev => prev + 1)}
+                                            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-all"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                             </div>
                         )}
                     </div>

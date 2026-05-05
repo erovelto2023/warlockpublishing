@@ -351,7 +351,7 @@ ${rawList || "Please paste keywords in the first column"}`;
                                 <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">1</span>
                                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Keyword Source</h3>
                             </div>
-                            {rawList && (
+                            {rawList !== undefined && (
                                 <button onClick={() => setRawList('')} className="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center gap-1">
                                     <X size={12} /> Clear
                                 </button>
@@ -402,7 +402,7 @@ ${rawList || "Please paste keywords in the first column"}`;
                                 <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center text-xs font-black">3</span>
                                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Injection Portal</h3>
                             </div>
-                            {jsonContent && (
+                            {jsonContent !== undefined && (
                                 <button onClick={() => setJsonContent('')} className="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center gap-1">
                                     <X size={12} /> Clear
                                 </button>
