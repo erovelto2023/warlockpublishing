@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight } from 'lucide-react';
 import { importDetailedJson, syncMarketplaceData } from '@/lib/actions/glossary';
+import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
 import { useRouter } from 'next/navigation';
 
 interface BulkTermImportProps {
@@ -19,6 +20,11 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
      const [isHydrating, setIsHydrating] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [affiliateOffers, setAffiliateOffers] = useState<any[]>([]);
+
+    useEffect(() => {
+        getAffiliateOffers().then(setAffiliateOffers).catch(console.error);
+    }, []);
 
     const handleHydrate = async () => {
         try {
@@ -110,6 +116,10 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
 - For "visualAsset", create prompts for thematic cover art or Pinterest-style coloring page previews.`;
         }
 
+        const affiliateCatalogStr = affiliateOffers.length > 0 
+            ? affiliateOffers.map(o => `- [${o.name}](${o.affiliateLink}) (Niche/Category: ${o.category || 'General'})`).join('\n')
+            : "No affiliate products available.";
+
         const prompt = `Act as an Expert UX/UI Data Architect, Literary Analyst, and E-Commerce SEO Strategist. Your task is to design the "Ultimate JSON Data" for these keywords. 
 
 You are a master architect designing the "Ultimate Authority Pipeline" for ${category}. 
@@ -124,6 +134,10 @@ For EACH keyword provided below, you must generate a high-ranking, high-converti
 3. CRITICAL: Tropes are "cognitive shortcuts". Explain the reader psychology in depth.
 4. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
 5. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
+6. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
+
+AVAILABLE AFFILIATE CATALOG:
+${affiliateCatalogStr}
 
 SCHEMA FOR EACH OBJECT:
 {
@@ -134,7 +148,7 @@ SCHEMA FOR EACH OBJECT:
   "articleContent": "A long-form, comprehensive authority article (1000+ words) using this EXACT framework: 1. Magnetic H1 Headline, 2. APP Introduction (Agree, Promise, Preview), 3. Scannable Body with H2/H3 subheadings and bullet points, 4. Visuals placement markers, 5. Conclusion/Wrap, 6. Strong CTA. Format with standard HTML tags (<h1>, <h2>, <p>, <ul>, <li>).",
   "category": "${category}",
   "monetizationIdeas": {
-    "affiliateProducts": ["Product 1", "Product 2"],
+    "affiliateProducts": ["[Chosen Product 1](URL 1)", "[Chosen Product 2](URL 2)"],
     "courseTopics": ["Course Topic 1"],
     "digitalDownloads": ["Asset 1"]
   },
