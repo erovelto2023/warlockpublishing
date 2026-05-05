@@ -137,6 +137,13 @@ export default function AdminModuleGrid({ stats, setActiveTab }: AdminModuleGrid
             description: 'Amazon product CSV, external inventory, and reference library.',
             icon: ShoppingBag,
             color: 'bg-violet-600',
+        },
+        {
+            id: 'affiliate',
+            title: 'Affiliate Hub',
+            description: 'Unified master catalog for cross-app links and tracking.',
+            icon: Megaphone,
+            color: 'bg-cyan-600',
         }
     ];
 

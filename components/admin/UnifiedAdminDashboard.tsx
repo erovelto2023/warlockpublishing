@@ -15,6 +15,7 @@ import AdminModuleGrid from '@/components/admin/AdminModuleGrid';
 import MarketplaceManager from '@/components/admin/MarketplaceManager';
 import TrafficIntelligence from '@/components/admin/TrafficIntelligence';
 import BulkTermImport from '@/components/admin/BulkTermImport';
+import AffiliateHub from '@/components/admin/AffiliateHub';
 import { deleteProduct, updateProduct } from '@/lib/actions/product.actions';
 import { deletePost } from '@/lib/actions/blog';
 import { deletePenName } from '@/lib/actions/pen-name.actions';
@@ -32,11 +33,12 @@ interface AdminDashboardProps {
     offers: any[];
     subscribers: any[];
     glossaryTerms: any[];
+    affiliateOffers: any[];
     analytics?: any;
 }
 
-export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, analytics }: AdminDashboardProps) {
-    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary'>('overview');
+export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, affiliateOffers, analytics }: AdminDashboardProps) {
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary' | 'affiliate'>('overview');
     const router = useRouter();
 
     // Stats
@@ -245,6 +247,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
                             { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
                             { id: 'glossary', label: 'Glossary', icon: BookOpen },
+                            { id: 'affiliate', label: 'Affiliate Hub', icon: LinkIcon },
                             { id: 'settings', label: 'Site Config', icon: Settings },
                         ].map((tab) => (
                             <button
@@ -952,6 +955,11 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </div>
                         )}
                     </div>
+                )}
+
+                {/* AFFILIATE HUB TAB */}
+                {activeTab === 'affiliate' && (
+                    <AffiliateHub />
                 )}
 
             </main>

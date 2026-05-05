@@ -8,6 +8,7 @@ import { getPosts } from '@/lib/actions/blog';
 import { getAllMessagesForAdmin } from '@/lib/actions/message';
 import { getGlossaryTerms } from '@/lib/actions/glossary';
 import { getAnalyticsSummary } from '@/lib/actions/analytics.actions';
+import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
 import { connectToDatabase } from '@/lib/db';
 import Subscriber from '@/lib/models/Subscriber';
 import { Metadata } from 'next';
@@ -31,7 +32,7 @@ export default async function AdminPage() {
     }
 
     // Fetch All Data in parallel
-    const [products, penNames, offers, blogResult, messagesResult, subscribers, glossaryResult, analytics] = await Promise.all([
+    const [products, penNames, offers, blogResult, messagesResult, subscribers, glossaryResult, affiliateOffers, analytics] = await Promise.all([
         getAllProducts(),
         getPenNames(),
         getSalesPages(),
@@ -43,6 +44,7 @@ export default async function AdminPage() {
             return Subscriber.find({}).sort({ createdAt: -1 }).lean();
         })(),
         getGlossaryTerms({ limit: 1000, publishedOnly: false }),
+        getAffiliateOffers(),
         getAnalyticsSummary()
     ]);
 
@@ -56,6 +58,7 @@ export default async function AdminPage() {
 
             subscribers={JSON.parse(JSON.stringify(subscribers))}
             glossaryTerms={JSON.parse(JSON.stringify(glossaryResult.terms))}
+            affiliateOffers={JSON.parse(JSON.stringify(affiliateOffers))}
             analytics={JSON.parse(JSON.stringify(analytics))}
         />
     );
