@@ -3,29 +3,33 @@ import { GlossaryTerm } from "@/lib/types";
 export default function StructuredData({ term }: { term: GlossaryTerm }) {
     const faqSchema = term.faqItems && term.faqItems.length > 0 ? {
         "@type": "FAQPage",
-        "mainEntity": term.faqItems.map(faq => ({
-            "@type": "Question",
-            "name": faq.question,
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": faq.answer
-            }
-        }))
+        "mainEntity": term.faqItems
+            .filter(faq => faq && faq.question && faq.answer)
+            .map(faq => ({
+                "@type": "Question",
+                "name": faq.question,
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faq.answer
+                }
+            }))
     } : null;
 
-    const howToSchema = term.checklist && term.checklist.items.length > 0 ? {
+    const howToSchema = term.checklist && term.checklist.items && term.checklist.items.length > 0 ? {
         "@type": "HowTo",
-        "name": term.checklist.title,
-        "description": term.checklist.description,
-        "step": term.checklist.items.map((item, idx) => ({
-            "@type": "HowToStep",
-            "position": idx + 1,
-            "name": item.task,
-            "itemListElement": [{
-                "@type": "HowToDirection",
-                "text": item.description
-            }]
-        }))
+        "name": term.checklist.title || term.term,
+        "description": term.checklist.description || term.snapshot,
+        "step": term.checklist.items
+            .filter(item => item && item.task)
+            .map((item, idx) => ({
+                "@type": "HowToStep",
+                "position": idx + 1,
+                "name": item.task,
+                "itemListElement": [{
+                    "@type": "HowToDirection",
+                    "text": item.description || ""
+                }]
+            }))
     } : null;
 
     const jsonLd = {
