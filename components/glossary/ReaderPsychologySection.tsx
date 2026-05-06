@@ -12,6 +12,8 @@ interface ReaderPsychologyProps {
 }
 
 const ReaderPsychologySection: React.FC<ReaderPsychologyProps> = ({ psychology }) => {
+  if (!psychology) return null;
+
   return (
     <section className="space-y-8">
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3 font-serif italic">

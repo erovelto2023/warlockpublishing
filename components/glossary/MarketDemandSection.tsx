@@ -13,7 +13,8 @@ interface MarketDemandProps {
 
 const MarketDemandSection: React.FC<MarketDemandProps> = ({ demand }) => {
   const getScoreValue = (score: string) => {
-    return parseFloat(score.split('/')[0]) * 10;
+    if (!score || typeof score !== 'string') return 0;
+    return (parseFloat(score.split('/')[0]) || 0) * 10;
   };
 
   return (

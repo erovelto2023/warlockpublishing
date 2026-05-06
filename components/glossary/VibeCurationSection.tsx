@@ -17,6 +17,8 @@ interface VibeCurationProps {
 }
 
 const VibeCurationSection: React.FC<VibeCurationProps> = ({ curation }) => {
+  if (!curation || !Array.isArray(curation)) return null;
+
   return (
     <section className="space-y-8">
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3 font-serif italic">
@@ -41,7 +43,7 @@ const VibeCurationSection: React.FC<VibeCurationProps> = ({ curation }) => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {item.books.map((book, bookIndex) => (
+              {(item.books || []).map((book, bookIndex) => (
                 <Card key={bookIndex} className="p-6 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-xl transition-all group overflow-hidden relative">
                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <Book size={64} />

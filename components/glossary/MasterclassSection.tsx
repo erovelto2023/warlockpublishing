@@ -29,6 +29,16 @@ interface MasterclassProps {
 }
 
 const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
+  if (!masterclass) return null;
+  
+  const { 
+    threeActStructure = { act1: '', act2: '', act3: '' }, 
+    profitBeats = [], 
+    characterArchetypes = [], 
+    technicalComponents = { powerTitle: '', tropes: [], hook: '' }, 
+    profitabilityChecklist = [] 
+  } = masterclass;
+
   return (
     <section className="space-y-10">
       <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
@@ -51,7 +61,7 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
                 <Layout size={18} /> Narrative Architecture
               </h3>
               <div className="space-y-4">
-                {Object.entries(masterclass.threeActStructure).map(([act, content], i) => (
+                {Object.entries(threeActStructure).map(([act, content], i) => (
                   <div key={act} className="flex gap-4">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold">
                       {i + 1}
@@ -71,7 +81,7 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
                 <PlayCircle size={18} /> Profit Beats
               </h3>
               <div className="space-y-4">
-                {masterclass.profitBeats.map((beat, i) => (
+                {profitBeats.map((beat, i) => (
                   <div key={i} className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-bold text-sm text-white">{beat.title}</h4>
@@ -92,7 +102,7 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
               <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                 <Users size={14} /> Archetypes
               </h3>
-              {masterclass.characterArchetypes.map((arch, i) => (
+              {characterArchetypes.map((arch, i) => (
                 <div key={i}>
                   <div className="text-sm font-bold text-white mb-1">{arch.role}</div>
                   <p className="text-xs text-slate-400">{arch.description}</p>
@@ -108,12 +118,12 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
               <div className="space-y-3">
                 <div>
                   <div className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Power Title</div>
-                  <div className="text-sm text-white">{masterclass.technicalComponents.powerTitle}</div>
+                  <div className="text-sm text-white">{technicalComponents.powerTitle}</div>
                 </div>
                 <div>
                   <div className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Key Tropes</div>
                   <div className="flex flex-wrap gap-2">
-                    {masterclass.technicalComponents.tropes.map((trope, i) => (
+                    {(technicalComponents.tropes || []).map((trope, i) => (
                       <span key={i} className="text-[10px] bg-slate-800 px-2 py-0.5 rounded border border-slate-700">{trope}</span>
                     ))}
                   </div>
@@ -127,7 +137,7 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
                 <ClipboardCheck size={14} /> Profitability
               </h3>
               <div className="space-y-2">
-                {masterclass.profitabilityChecklist.map((item, i) => (
+                {profitabilityChecklist.map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs text-slate-300">
                     <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
                     {item}

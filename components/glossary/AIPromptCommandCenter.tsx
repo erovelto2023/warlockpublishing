@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Terminal, Copy, Image as ImageIcon, Megaphone, Send } from "lucide-react";
