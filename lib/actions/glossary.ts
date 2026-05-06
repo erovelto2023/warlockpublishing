@@ -215,6 +215,21 @@ export async function importDetailedJson(data: any[]) {
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '');
 
+            // AUTO-FIX: Convert legacy string digitalDownloads to new object structure
+            if (item.monetizationIdeas?.digitalDownloads && Array.isArray(item.monetizationIdeas.digitalDownloads)) {
+                item.monetizationIdeas.digitalDownloads = item.monetizationIdeas.digitalDownloads.map((dl: any) => {
+                    if (typeof dl === 'string') {
+                        return { 
+                            title: dl, 
+                            imageUrl: '/images/placeholder-product.png', 
+                            downloadUrl: '#', 
+                            learnMoreUrl: '#' 
+                        };
+                    }
+                    return dl;
+                });
+            }
+
             // Validate YouTube Video if present
             let activeVideoId = item.youtubeVideoId;
             if (activeVideoId) {
