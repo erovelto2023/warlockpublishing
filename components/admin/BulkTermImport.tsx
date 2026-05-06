@@ -190,7 +190,7 @@ SCHEMA FOR EACH OBJECT:
   "slug": "main-term-slug",
   "snapshot": "1-sentence punchy summary for SEO snippets. This is MANDATORY.",
   "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
-  "articleContent": "A long-form, comprehensive authority article (1000+ words) using this EXACT framework: 1. Magnetic H1 Headline, 2. APP Introduction (Agree, Promise, Preview), 3. Scannable Body with H2/H3 subheadings and bullet points, 4. Visuals placement markers, 5. Conclusion/Wrap, 6. Strong CTA. Format with standard HTML tags (<h1>, <h2>, <p>, <ul>, <li>).",
+  "articleContent": "A high-fidelity news article using the CNN 'Inverted Pyramid+' model. Structure: 1. Digital Headline (SEO-focused, present tense), 2. Fast Facts Box (HTML: <div class='cnn-fast-facts'><h3>Key Points</h3><ul>...</ul></div>), 3. Hard Lede (25-35 words), 4. Institutional Lead (mention authorities), 5. Nut Graf (The 'Why it Matters' context), 6. Development (punchy 2-3 sentence paragraphs), 7. Direct Attribution (blockquotes with 'said'), 8. Deep-Dive Subheadings, 9. Forward-Looking Statement, 10. Contributor Footer. Format with standard HTML tags.",
   "category": "${category}",
   "youtubeVideoId": "https://www.youtube.com/watch?v=REAL_VIDEO_ID_HERE",
   "monetizationIdeas": {
@@ -218,24 +218,27 @@ SCHEMA FOR EACH OBJECT:
     "catharticRelease": "Exploration of the psychological release or wish fulfillment provided."
   },
   "masterclass": {
-    "masterclassDesc": "A high-level summary of how to master this concept for commercial success.",
+    "masterclassDesc": "A high-level, 1-2 sentence strategic summary of how a creator can commercially dominate this specific concept.",
     "threeActStructure": { 
-        "act1": "Phase I instructions...", 
-        "act2": "Phase II instructions...", 
-        "act3": "Phase III instructions..." 
+        "act1": "Setup & Hook: How to introduce the concept and trap the reader's attention within the first 10% of the asset.", 
+        "act2": "Escalation & Complexity: The middle 60% where tension is built, variables are introduced, and the 'Value' is delivered.", 
+        "act3": "Resolution & Payoff: The final 30% where the emotional or practical promise is fulfilled and the user is converted into a fan." 
     },
     "profitBeats": [ 
-        { "title": "Beat Title", "description": "Strategic implementation detail", "timing": "e.g. 25% or Step 2" } 
+        { "title": "Strategic Beat Title", "description": "Specific tactical instruction for this moment in the content lifecycle.", "timing": "e.g. 15% (The Inciting Incident) or Step 3" } 
     ],
     "characterArchetypes": [
-        { "role": "The Alpha/Specialist", "description": "Role in this trope/concept." }
+        { "role": "The Catalyst/Alpha/Specialist", "description": "How this specific persona drives the value or narrative of the term." }
     ],
     "technicalComponents": { 
-        "powerTitle": "Strategic Title Idea", 
-        "tropes": ["Related Trope 1", "Related Trope 2"], 
-        "hook": "The high-converting blurb hook." 
+        "powerTitle": "A high-CTR, curiosity-gap title for a book, course, or video about this term.", 
+        "tropes": ["Specific Trope 1", "Specific Trope 2"], 
+        "hook": "A 1-sentence magnetic hook that uses the 'Open Loop' technique." 
     },
-    "profitabilityChecklist": ["Specific Checklist Item 1", "Specific Checklist Item 2"]
+    "profitabilityChecklist": [
+        "Checklist item for ensuring maximum commercial viability (e.g., 'Is the high-concept hook present?')",
+        "Checklist item for user retention/engagement."
+    ]
   },
   "subGenreVariations": [
     { "genre": "Sub-Genre A", "variation": "How the concept shifts in this sub-genre." }

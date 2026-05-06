@@ -40,91 +40,122 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
   } = masterclass;
 
   return (
-    <section className="space-y-10">
-      <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+    <section className="space-y-12">
+      <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-16 text-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] relative overflow-hidden border border-slate-800">
+        {/* Animated Background Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-600/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
+        
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-indigo-600 rounded-2xl">
-              <GraduationCap size={32} />
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+            <div className="flex items-start gap-6">
+              <div className="p-5 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-[1.5rem] shadow-xl shadow-indigo-500/20">
+                <GraduationCap size={40} className="text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="px-3 py-0.5 bg-indigo-500/20 text-indigo-400 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border border-indigo-500/30">
+                    Authority Level: Master
+                  </span>
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-1 rounded-full bg-indigo-500/40"></div>)}
+                  </div>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold font-serif italic tracking-tight">Creator Masterclass</h2>
+                <p className="text-slate-400 text-lg mt-3 max-w-2xl leading-relaxed">{masterclass.masterclassDesc}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-3xl font-bold font-serif italic">Creator Masterclass</h2>
-              <p className="text-slate-400 text-sm mt-1">{masterclass.masterclassDesc}</p>
-            </div>
-          </div>
+          </header>
 
-          <div className="grid md:grid-cols-2 gap-12 mt-12">
-            {/* 3-Act Structure */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-bold flex items-center gap-2 text-indigo-400 uppercase tracking-widest text-xs">
-                <Layout size={18} /> Narrative Architecture
-              </h3>
-              <div className="space-y-4">
-                {Object.entries(threeActStructure).map(([act, content], i) => (
-                  <div key={act} className="flex gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold">
-                      {i + 1}
+          <div className="grid lg:grid-cols-12 gap-16">
+            {/* Narrative Architecture Timeline */}
+            <div className="lg:col-span-7 space-y-10">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-indigo-400 flex items-center gap-3">
+                  <Layout size={18} /> Narrative Architecture
+                </h3>
+              </div>
+              
+              <div className="relative pl-8 space-y-12 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gradient-to-b before:from-indigo-500 before:via-indigo-500/30 before:to-transparent">
+                {[
+                  { act: 'Act 1', content: threeActStructure.act1, label: 'The Hook & Inciting Incident' },
+                  { act: 'Act 2', content: threeActStructure.act2, label: 'The Escalation & Midpoint' },
+                  { act: 'Act 3', content: threeActStructure.act3, label: 'The Climax & Resolution' }
+                ].map((item, i) => (
+                  <div key={i} className="relative group">
+                    <div className="absolute -left-[31px] top-1 w-6 h-6 rounded-full bg-slate-900 border-2 border-indigo-500 flex items-center justify-center z-10 group-hover:scale-125 transition-transform shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+                      <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
                     </div>
-                    <div>
-                      <span className="text-[10px] font-black uppercase text-slate-500 mb-1 block">Act {i + 1}</span>
-                      <p className="text-sm text-slate-300">{content}</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">{item.act}</span>
+                        <span className="h-[1px] w-8 bg-slate-800"></span>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{item.label}</span>
+                      </div>
+                      <p className="text-slate-300 leading-relaxed text-base">{item.content}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Profit Beats */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-bold flex items-center gap-2 text-emerald-400 uppercase tracking-widest text-xs">
-                <PlayCircle size={18} /> Profit Beats
+            {/* Profit Beats Sidebar */}
+            <div className="lg:col-span-5 space-y-8">
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-400 flex items-center gap-3">
+                <PlayCircle size={18} /> Strategic Profit Beats
               </h3>
-              <div className="space-y-4">
+              <div className="grid gap-4">
                 {profitBeats.map((beat, i) => (
-                  <div key={i} className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-bold text-sm text-white">{beat.title}</h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-900/30 text-emerald-400 border border-emerald-900/50">
+                  <div key={i} className="p-6 rounded-[1.5rem] bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 hover:border-emerald-500/30 transition-all group shadow-lg">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-bold text-base text-white group-hover:text-emerald-400 transition-colors">{beat.title}</h4>
+                      <span className="text-[10px] font-black px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
                         {beat.timing}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">{beat.description}</p>
+                    <p className="text-sm text-slate-400 leading-relaxed">{beat.description}</p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mt-12 pt-12 border-t border-slate-800">
+          <div className="grid md:grid-cols-3 gap-12 mt-20 pt-16 border-t border-slate-800/50">
             {/* Character Archetypes */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <Users size={14} /> Archetypes
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-3">
+                <Users size={16} /> Narrative Archetypes
               </h3>
-              {characterArchetypes.map((arch, i) => (
-                <div key={i}>
-                  <div className="text-sm font-bold text-white mb-1">{arch.role}</div>
-                  <p className="text-xs text-slate-400">{arch.description}</p>
-                </div>
-              ))}
+              <div className="space-y-6">
+                {characterArchetypes.map((arch, i) => (
+                  <div key={i} className="group">
+                    <div className="text-sm font-black text-white mb-2 uppercase tracking-wider flex items-center gap-2">
+                      <div className="w-1 h-3 bg-indigo-500 rounded-full group-hover:h-5 transition-all"></div>
+                      {arch.role}
+                    </div>
+                    <p className="text-sm text-slate-400 leading-relaxed pl-3 border-l border-slate-800">{arch.description}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Technical Components */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <Settings size={14} /> Components
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-3">
+                <Settings size={16} /> Asset Components
               </h3>
-              <div className="space-y-3">
-                <div>
-                  <div className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Power Title</div>
-                  <div className="text-sm text-white">{technicalComponents.powerTitle}</div>
+              <div className="space-y-6 bg-slate-800/30 p-6 rounded-2xl border border-slate-800">
+                <div className="space-y-2">
+                  <div className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Power Title Strategy</div>
+                  <div className="text-base font-bold text-white italic">"{technicalComponents.powerTitle}"</div>
                 </div>
-                <div>
-                  <div className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Key Tropes</div>
+                <div className="space-y-3">
+                  <div className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Mandatory Tropes</div>
                   <div className="flex flex-wrap gap-2">
                     {(technicalComponents.tropes || []).map((trope, i) => (
-                      <span key={i} className="text-[10px] bg-slate-800 px-2 py-0.5 rounded border border-slate-700">{trope}</span>
+                      <span key={i} className="text-[10px] font-bold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300">
+                        {trope}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -132,15 +163,17 @@ const MasterclassSection: React.FC<MasterclassProps> = ({ masterclass }) => {
             </div>
 
             {/* Profitability Checklist */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                <ClipboardCheck size={14} /> Profitability
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-3">
+                <ClipboardCheck size={16} /> Profitability Checklist
               </h3>
-              <div className="space-y-2">
+              <div className="grid gap-3">
                 {profitabilityChecklist.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs text-slate-300">
-                    <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-                    {item}
+                  <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 group hover:bg-emerald-500/10 transition-colors">
+                    <div className="mt-1 w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                    </div>
+                    <span className="text-sm text-slate-300 leading-tight group-hover:text-white transition-colors">{item}</span>
                   </div>
                 ))}
               </div>
