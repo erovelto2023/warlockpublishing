@@ -31,7 +31,6 @@ export default function ProductPipelineSection({ term, ideas = {} }: ProductPipe
                     Market Opportunities
                 </h3>
             </div>
-
             <div className="space-y-6">
                 {affiliateProducts.length > 0 && (
                     <div>
@@ -43,7 +42,28 @@ export default function ProductPipelineSection({ term, ideas = {} }: ProductPipe
                         </ul>
                     </div>
                 )}
-                
+
+                {digitalDownloads.length > 0 && (
+                    <div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Digital Downloads</h4>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-slate-700 dark:text-slate-300 marker:text-emerald-400">
+                            {digitalDownloads.map((dl, i) => (
+                                <li key={i}>{dl}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {ideas.courseTopics && ideas.courseTopics.length > 0 && (
+                    <div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3">Course Topics</h4>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-slate-700 dark:text-slate-300 marker:text-amber-400">
+                            {ideas.courseTopics.map((topic, i) => (
+                                <li key={i}>{topic}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
             
             <div className="mt-8 pt-6 border-t border-slate-50 dark:border-slate-800">

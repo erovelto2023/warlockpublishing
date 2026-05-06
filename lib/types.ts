@@ -72,6 +72,64 @@ export interface GlossaryTerm {
     isPublished: boolean;
     callToActionId?: string;
     articleContent?: string;
+    marketDemand?: {
+        demandScore: string;
+        passionScore: string;
+        saturationScore: string;
+        trendStatus: string;
+    };
+    readerPsychology?: {
+        whyWeCraveIt: string;
+        cognitiveShortcut: string;
+        emotionalPayoff: string;
+        catharticRelease: string;
+    };
+    masterclass?: {
+        masterclassDesc: string;
+        threeActStructure: {
+            act1: string;
+            act2: string;
+            act3: string;
+        };
+        profitBeats: {
+            title: string;
+            description: string;
+            timing: string;
+        }[];
+        characterArchetypes: {
+            role: string;
+            description: string;
+        }[];
+        technicalComponents: {
+            powerTitle: string;
+            tropes: string[];
+            hook: string;
+        };
+        profitabilityChecklist: string[];
+    };
+    subGenreVariations?: {
+        genre: string;
+        variation: string;
+    }[];
+    vibeCuration?: {
+        vibe: string;
+        vibeDescription?: string;
+        books: {
+            title: string;
+            author: string;
+            salesHook: string;
+            buyUrl: string;
+        }[];
+    }[];
+    commonPitfalls?: {
+        pitfall: string;
+        howToAvoid: string;
+    }[];
+    aiPromptCommandCenter?: {
+        sceneGeneratorPrompt: string;
+        marketingHookPrompt: string;
+        aiImagePrompt: string;
+    };
     viewCount: number;
     createdAt: string | Date;
     updatedAt: string | Date;

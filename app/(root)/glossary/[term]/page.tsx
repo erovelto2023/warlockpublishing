@@ -19,6 +19,13 @@ import RandomProducts from "@/components/glossary/RandomProducts";
 import { getFeaturedItems } from "@/lib/actions/product.actions";
 import CallToActionBlock from "@/components/shared/CallToActionBlock";
 import { getCallToActionById } from "@/lib/actions/cta.actions";
+import ReaderPsychologySection from "@/components/glossary/ReaderPsychologySection";
+import MasterclassSection from "@/components/glossary/MasterclassSection";
+import AIPromptCommandCenter from "@/components/glossary/AIPromptCommandCenter";
+import VibeCurationSection from "@/components/glossary/VibeCurationSection";
+import SubGenreVariationsSection from "@/components/glossary/SubGenreVariationsSection";
+import CommonPitfallsSection from "@/components/glossary/CommonPitfallsSection";
+import MarketDemandSection from "@/components/glossary/MarketDemandSection";
 import {
     Accordion,
     AccordionContent,
@@ -180,6 +187,11 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                             </section>
                         )}
 
+                        {/* Reader Psychology */}
+                        {term.readerPsychology && (
+                            <ReaderPsychologySection psychology={term.readerPsychology} />
+                        )}
+
                         {/* Implementation Checklist */}
                         {term.checklist && (
                             <ChecklistSection 
@@ -211,10 +223,38 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                                 </Accordion>
                             </section>
                         )}
+
+                        {/* Masterclass Section */}
+                        {term.masterclass && (
+                            <MasterclassSection masterclass={term.masterclass} />
+                        )}
+
+                        {/* Sub-Genre Variations */}
+                        {term.subGenreVariations && term.subGenreVariations.length > 0 && (
+                            <SubGenreVariationsSection variations={term.subGenreVariations} />
+                        )}
+
+                        {/* Vibe Curation */}
+                        {term.vibeCuration && term.vibeCuration.length > 0 && (
+                            <VibeCurationSection curation={term.vibeCuration} />
+                        )}
+
+                        {/* Common Pitfalls */}
+                        {term.commonPitfalls && term.commonPitfalls.length > 0 && (
+                            <CommonPitfallsSection pitfalls={term.commonPitfalls} />
+                        )}
+
+                        {/* AI Prompt Command Center */}
+                        {term.aiPromptCommandCenter && (
+                            <AIPromptCommandCenter prompts={term.aiPromptCommandCenter} />
+                        )}
                     </div>
 
                     {/* Sidebar / Authority Intelligence */}
                     <div className="lg:col-span-4 space-y-8">
+                        {/* Market Demand Section */}
+                        {term.marketDemand && <MarketDemandSection demand={term.marketDemand} />}
+
                         {/* SEO Strategy Section */}
                         {term.seoStrategy && <SEOStrategySection strategy={term.seoStrategy} />}
 

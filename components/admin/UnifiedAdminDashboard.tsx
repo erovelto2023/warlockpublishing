@@ -989,7 +989,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                         </th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Term / Slug</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Category</th>
-                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Stats</th>
+                                        <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Views (Popularity Sort)</th>
                                         <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
                                         <th className="px-6 py-4 text-right text-xs font-black text-slate-400 uppercase tracking-widest">Actions</th>
                                     </tr>

@@ -76,6 +76,7 @@ export async function getGlossaryTerms(options: {
     limit?: number;
     page?: number;
     publishedOnly?: boolean;
+    sortBy?: 'term' | 'viewCount';
 } = {}) {
     await connectToDatabase();
 
@@ -85,7 +86,8 @@ export async function getGlossaryTerms(options: {
         search, 
         limit = 50, 
         page = 1,
-        publishedOnly = true 
+        publishedOnly = true,
+        sortBy = 'term'
     } = options;
 
     const query: any = {};
@@ -103,8 +105,15 @@ export async function getGlossaryTerms(options: {
 
     const skip = (page - 1) * limit;
 
+    const sortObj: any = {};
+    if (sortBy === 'viewCount') {
+        sortObj.viewCount = -1;
+    } else {
+        sortObj.term = 1;
+    }
+
     const terms = await GlossaryTerm.find(query)
-        .sort({ term: 1 })
+        .sort(sortObj)
         .skip(skip)
         .limit(limit);
 
