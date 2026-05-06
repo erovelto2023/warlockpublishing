@@ -17,7 +17,12 @@ export interface IGlossaryTerm extends Document {
     monetizationIdeas: {
         affiliateProducts: string[];
         courseTopics: string[];
-        digitalDownloads: string[];
+        digitalDownloads: {
+            title: string;
+            imageUrl: string;
+            downloadUrl: string;
+            learnMoreUrl: string;
+        }[];
     };
     checklist?: {
         title: string;
@@ -129,7 +134,12 @@ const GlossaryTermSchema: Schema = new Schema({
     monetizationIdeas: {
         affiliateProducts: [{ type: String }],
         courseTopics: [{ type: String }],
-        digitalDownloads: [{ type: String }]
+        digitalDownloads: [{
+            title: { type: String },
+            imageUrl: { type: String },
+            downloadUrl: { type: String },
+            learnMoreUrl: { type: String }
+        }]
     },
     checklist: {
         title: { type: String },

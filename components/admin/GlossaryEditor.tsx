@@ -99,7 +99,7 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
         monetizationIdeas: {
             affiliateProducts: [""],
             courseTopics: [""],
-            digitalDownloads: [""]
+            digitalDownloads: []
         },
         checklist: {
             title: "Implementation Checklist",
@@ -640,39 +640,108 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                         </div>
 
                         {/* Digital Downloads */}
-                        <div className="space-y-4 pt-6 border-t border-slate-800">
+                        <div className="space-y-6 pt-6 border-t border-slate-800">
                             <div className="flex items-center justify-between">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-300">Digital Downloads (Warehouse)</label>
-                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-emerald-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: [...(prev.monetizationIdeas?.digitalDownloads || []), ""] } }))}>+ Add Download</Button>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-emerald-400 hover:bg-slate-800" onClick={() => addNestedArrayItem('monetizationIdeas.digitalDownloads', { title: "", imageUrl: "", downloadUrl: "", learnMoreUrl: "" })}>+ Add Download</Button>
                             </div>
                             
-                            {formData.monetizationIdeas?.digitalDownloads?.map((dl, idx) => (
-                                <div key={idx} className="flex gap-2">
-                                    <div className="flex-1 flex gap-2">
-                                        <SearchableOfferSelect 
-                                            offers={localProducts.map(p => ({ ...p, name: p.title, affiliateLink: `/products/${p.slug}` }))} 
-                                            onSelect={(prod) => {
-                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
-                                                newArr[idx] = `[${prod.name}](${prod.affiliateLink})`;
-                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
-                                            }} 
-                                        />
-                                        <Input 
-                                            value={dl}
-                                            onChange={(e) => {
-                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
-                                                newArr[idx] = e.target.value;
-                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
-                                            }}
-                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 flex-1"
-                                            placeholder="Markdown format: [Name](URL)"
-                                        />
+                            <div className="space-y-4">
+                                {formData.monetizationIdeas?.digitalDownloads?.map((dl, idx) => (
+                                    <div key={idx} className="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50 space-y-4 relative">
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="absolute top-2 right-2 h-7 w-7 text-slate-500 hover:text-red-400" 
+                                            onClick={() => removeNestedArrayItem('monetizationIdeas.digitalDownloads', idx)}
+                                        >
+                                            <Trash2 size={12} />
+                                        </Button>
+
+                                        <div className="flex gap-4">
+                                            {/* Image Preview / Input */}
+                                            <div className="w-20 h-20 bg-slate-900 rounded-lg border border-slate-700 flex flex-col items-center justify-center overflow-hidden shrink-0 group relative">
+                                                {dl.imageUrl ? (
+                                                    <img src={dl.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <LinkIcon size={20} className="text-slate-600" />
+                                                )}
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <SearchableOfferSelect 
+                                                        offers={localProducts.map(p => ({ ...p, name: p.title, affiliateLink: p.imageUrl }))} 
+                                                        onSelect={(prod) => {
+                                                            const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                            newArr[idx] = { 
+                                                                ...newArr[idx], 
+                                                                title: prod.title,
+                                                                imageUrl: prod.imageUrl,
+                                                                downloadUrl: `/products/${prod.slug}`,
+                                                                learnMoreUrl: prod.externalUrl || `/products/${prod.slug}`
+                                                            };
+                                                            updateNestedField('monetizationIdeas.digitalDownloads', newArr);
+                                                        }} 
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="flex-1 space-y-3">
+                                                <Input 
+                                                    value={dl.title}
+                                                    onChange={(e) => {
+                                                        const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                        newArr[idx] = { ...newArr[idx], title: e.target.value };
+                                                        updateNestedField('monetizationIdeas.digitalDownloads', newArr);
+                                                    }}
+                                                    className="bg-slate-900 border-slate-700 text-white text-xs h-8 font-bold"
+                                                    placeholder="Download Title (e.g. Dark Romance Trope Guide)"
+                                                />
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-bold text-slate-500 uppercase ml-1">Download URL</label>
+                                                        <Input 
+                                                            value={dl.downloadUrl}
+                                                            onChange={(e) => {
+                                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                                newArr[idx] = { ...newArr[idx], downloadUrl: e.target.value };
+                                                                updateNestedField('monetizationIdeas.digitalDownloads', newArr);
+                                                            }}
+                                                            className="bg-slate-900 border-slate-700 text-slate-300 text-[10px] h-7"
+                                                            placeholder="/products/slug or external link"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[8px] font-bold text-slate-500 uppercase ml-1">Learn More URL</label>
+                                                        <Input 
+                                                            value={dl.learnMoreUrl}
+                                                            onChange={(e) => {
+                                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                                newArr[idx] = { ...newArr[idx], learnMoreUrl: e.target.value };
+                                                                updateNestedField('monetizationIdeas.digitalDownloads', newArr);
+                                                            }}
+                                                            className="bg-slate-900 border-slate-700 text-slate-300 text-[10px] h-7"
+                                                            placeholder="Product page URL"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[8px] font-bold text-slate-500 uppercase ml-1">Image URL</label>
+                                                    <Input 
+                                                        value={dl.imageUrl}
+                                                        onChange={(e) => {
+                                                            const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                            newArr[idx] = { ...newArr[idx], imageUrl: e.target.value };
+                                                            updateNestedField('monetizationIdeas.digitalDownloads', newArr);
+                                                        }}
+                                                        className="bg-slate-900 border-slate-700 text-slate-300 text-[10px] h-7"
+                                                        placeholder="https://..."
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: prev.monetizationIdeas?.digitalDownloads?.filter((_, i) => i !== idx) || [] } }))}>
-                                        <Trash2 size={12} />
-                                    </Button>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
 
                         {/* Course Topics */}

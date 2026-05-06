@@ -46,7 +46,12 @@ export interface GlossaryTerm {
     monetizationIdeas: {
         affiliateProducts: string[];
         courseTopics: string[];
-        digitalDownloads: string[];
+        digitalDownloads: {
+            title: string;
+            imageUrl: string;
+            downloadUrl: string;
+            learnMoreUrl: string;
+        }[];
     };
     checklist?: {
         title: string;
