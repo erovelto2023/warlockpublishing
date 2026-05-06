@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { 
     ChevronLeft, Save, Plus, Trash2, 
-    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen, MessageSquare, Link as LinkIcon, ChevronDown, Search
+    Zap, ListChecks, Target, TrendingUp, Lightbulb, Video, BookOpen, MessageSquare, Link as LinkIcon, ChevronDown, Search,
+    GraduationCap, Terminal
 } from "lucide-react";
 import { createGlossaryTerm, updateGlossaryTerm } from "@/lib/actions/glossary";
 import { getAffiliateOffers } from "@/lib/actions/affiliate.actions";
@@ -117,7 +118,35 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
             difficulty: "Low",
             relatedKeywords: [""]
         },
-        isPublished: true
+        isPublished: true,
+        marketDemand: {
+            demandScore: "5.0/10",
+            passionScore: "5.0/10",
+            saturationScore: "5.0/10",
+            trendStatus: "Stable"
+        },
+        readerPsychology: {
+            whyWeCraveIt: "",
+            cognitiveShortcut: "",
+            emotionalPayoff: "",
+            catharticRelease: ""
+        },
+        masterclass: {
+            masterclassDesc: "",
+            threeActStructure: { act1: "", act2: "", act3: "" },
+            profitBeats: [],
+            characterArchetypes: [],
+            technicalComponents: { powerTitle: "", tropes: [], hook: "" },
+            profitabilityChecklist: []
+        },
+        subGenreVariations: [],
+        vibeCuration: [],
+        commonPitfalls: [],
+        aiPromptCommandCenter: {
+            sceneGeneratorPrompt: "",
+            marketingHookPrompt: "",
+            aiImagePrompt: ""
+        }
     });
 
     const [affiliateOffers, setAffiliateOffers] = useState<any[]>([]);
@@ -179,6 +208,53 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
             const keywords = [...(prev.seoStrategy?.relatedKeywords || [])];
             keywords[index] = value;
             return { ...prev, seoStrategy: { ...prev.seoStrategy!, relatedKeywords: keywords } };
+        });
+    };
+
+    const updateNestedField = (path: string, value: any) => {
+        setFormData(prev => {
+            const newData = { ...prev };
+            const parts = path.split('.');
+            let current: any = newData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!current[parts[i]]) current[parts[i]] = {};
+                current[parts[i]] = { ...current[parts[i]] };
+                current = current[parts[i]];
+            }
+            current[parts[parts.length - 1]] = value;
+            return newData;
+        });
+    };
+
+    const addNestedArrayItem = (path: string, defaultValue: any) => {
+        setFormData(prev => {
+            const newData = { ...prev };
+            const parts = path.split('.');
+            let current: any = newData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!current[parts[i]]) current[parts[i]] = {};
+                current[parts[i]] = { ...current[parts[i]] };
+                current = current[parts[i]];
+            }
+            const arr = [...(current[parts[parts.length - 1]] || [])];
+            arr.push(defaultValue);
+            current[parts[parts.length - 1]] = arr;
+            return newData;
+        });
+    };
+
+    const removeNestedArrayItem = (path: string, index: number) => {
+        setFormData(prev => {
+            const newData = { ...prev };
+            const parts = path.split('.');
+            let current: any = newData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                current[parts[i]] = { ...current[parts[i]] };
+                current = current[parts[i]];
+            }
+            const arr = [...(current[parts[parts.length - 1]] || [])].filter((_, i) => i !== index);
+            current[parts[parts.length - 1]] = arr;
+            return newData;
         });
     };
 
@@ -562,6 +638,138 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Digital Downloads */}
+                        <div className="space-y-4 pt-6 border-t border-slate-800">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-300">Digital Downloads (Warehouse)</label>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-emerald-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: [...(prev.monetizationIdeas?.digitalDownloads || []), ""] } }))}>+ Add Download</Button>
+                            </div>
+                            
+                            {formData.monetizationIdeas?.digitalDownloads?.map((dl, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                    <div className="flex-1 flex gap-2">
+                                        <SearchableOfferSelect 
+                                            offers={localProducts.map(p => ({ ...p, name: p.title, affiliateLink: `/products/${p.slug}` }))} 
+                                            onSelect={(prod) => {
+                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                newArr[idx] = `[${prod.name}](${prod.affiliateLink})`;
+                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
+                                            }} 
+                                        />
+                                        <Input 
+                                            value={dl}
+                                            onChange={(e) => {
+                                                const newArr = [...(formData.monetizationIdeas?.digitalDownloads || [])];
+                                                newArr[idx] = e.target.value;
+                                                setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: newArr } }));
+                                            }}
+                                            className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 flex-1"
+                                            placeholder="Markdown format: [Name](URL)"
+                                        />
+                                    </div>
+                                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, digitalDownloads: prev.monetizationIdeas?.digitalDownloads?.filter((_, i) => i !== idx) || [] } }))}>
+                                        <Trash2 size={12} />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Course Topics */}
+                        <div className="space-y-4 pt-6 border-t border-slate-800">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-300">Course Topics</label>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 text-[10px] text-amber-400 hover:bg-slate-800" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, courseTopics: [...(prev.monetizationIdeas?.courseTopics || []), ""] } }))}>+ Add Topic</Button>
+                            </div>
+                            
+                            {formData.monetizationIdeas?.courseTopics?.map((topic, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                    <Input 
+                                        value={topic}
+                                        onChange={(e) => {
+                                            const newArr = [...(formData.monetizationIdeas?.courseTopics || [])];
+                                            newArr[idx] = e.target.value;
+                                            setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, courseTopics: newArr } }));
+                                        }}
+                                        className="bg-slate-800 border-slate-700 text-white text-[10px] h-9 flex-1"
+                                        placeholder="Course topic name..."
+                                    />
+                                    <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-slate-500 hover:text-red-400 shrink-0" onClick={() => setFormData(prev => ({ ...prev, monetizationIdeas: { ...prev.monetizationIdeas!, courseTopics: prev.monetizationIdeas?.courseTopics?.filter((_, i) => i !== idx) || [] } }))}>
+                                        <Trash2 size={12} />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Market Intelligence */}
+                    <Card className="p-6 space-y-6 bg-slate-900/95 border-none shadow-2xl">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                            <TrendingUp size={14} /> Market Intelligence
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 block">Demand Score</label>
+                                <Input 
+                                    value={formData.marketDemand?.demandScore}
+                                    onChange={(e) => updateNestedField('marketDemand.demandScore', e.target.value)}
+                                    placeholder="8.5/10"
+                                    className="bg-slate-800 border-slate-700 text-white text-xs h-9"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 block">Passion Score</label>
+                                <Input 
+                                    value={formData.marketDemand?.passionScore}
+                                    onChange={(e) => updateNestedField('marketDemand.passionScore', e.target.value)}
+                                    placeholder="9.0/10"
+                                    className="bg-slate-800 border-slate-700 text-white text-xs h-9"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 block">Saturation Score</label>
+                                <Input 
+                                    value={formData.marketDemand?.saturationScore}
+                                    onChange={(e) => updateNestedField('marketDemand.saturationScore', e.target.value)}
+                                    placeholder="4.0/10"
+                                    className="bg-slate-800 border-slate-700 text-white text-xs h-9"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 block">Trend Status</label>
+                                <Input 
+                                    value={formData.marketDemand?.trendStatus}
+                                    onChange={(e) => updateNestedField('marketDemand.trendStatus', e.target.value)}
+                                    placeholder="Rising"
+                                    className="bg-slate-800 border-slate-700 text-white text-xs h-9"
+                                />
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Psychology Section */}
+                    <Card className="p-6 space-y-6 bg-slate-900/95 border-none shadow-2xl">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                            <BookOpen size={14} /> Reader Psychology
+                        </div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 block">Why We Crave It</label>
+                                <Textarea 
+                                    value={formData.readerPsychology?.whyWeCraveIt}
+                                    onChange={(e) => updateNestedField('readerPsychology.whyWeCraveIt', e.target.value)}
+                                    className="bg-slate-800 border-slate-700 text-white text-xs h-20 resize-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 block">Emotional Payoff</label>
+                                <Textarea 
+                                    value={formData.readerPsychology?.emotionalPayoff}
+                                    onChange={(e) => updateNestedField('readerPsychology.emotionalPayoff', e.target.value)}
+                                    className="bg-slate-800 border-slate-700 text-white text-xs h-20 resize-none"
+                                />
+                            </div>
+                        </div>
                     </Card>
 
                     {/* Marketing & Content Strategy */}
@@ -619,6 +827,115 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
                                         </Button>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Masterclass & AI Intelligence */}
+                    <Card className="p-8 space-y-8 bg-white border-2 border-slate-900 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                            <Lightbulb size={120} />
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-slate-900 mb-4">
+                            <GraduationCap size={16} /> Creator Masterclass
+                        </div>
+
+                        <div className="space-y-6">
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Masterclass Description</label>
+                                <Textarea 
+                                    value={formData.masterclass?.masterclassDesc}
+                                    onChange={(e) => updateNestedField('masterclass.masterclassDesc', e.target.value)}
+                                    placeholder="The strategic summary of this concept..."
+                                    className="h-20 bg-slate-50 border-slate-200"
+                                />
+                            </div>
+
+                            {/* 3-Act Structure */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Act 1</label>
+                                    <Textarea 
+                                        value={formData.masterclass?.threeActStructure?.act1}
+                                        onChange={(e) => updateNestedField('masterclass.threeActStructure.act1', e.target.value)}
+                                        className="h-24 text-xs bg-slate-50"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Act 2</label>
+                                    <Textarea 
+                                        value={formData.masterclass?.threeActStructure?.act2}
+                                        onChange={(e) => updateNestedField('masterclass.threeActStructure.act2', e.target.value)}
+                                        className="h-24 text-xs bg-slate-50"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Act 3</label>
+                                    <Textarea 
+                                        value={formData.masterclass?.threeActStructure?.act3}
+                                        onChange={(e) => updateNestedField('masterclass.threeActStructure.act3', e.target.value)}
+                                        className="h-24 text-xs bg-slate-50"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Profit Beats */}
+                            <div className="space-y-4 pt-4 border-t border-slate-100">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-900">Profit Beats</label>
+                                    <Button type="button" variant="outline" size="sm" className="h-6 text-[10px]" onClick={() => addNestedArrayItem('masterclass.profitBeats', { title: "", description: "", timing: "" })}>+ Add Beat</Button>
+                                </div>
+                                <div className="grid gap-3">
+                                    {formData.masterclass?.profitBeats?.map((beat, idx) => (
+                                        <div key={idx} className="flex gap-2 p-3 bg-slate-50 rounded-lg relative">
+                                            <div className="flex-1 grid grid-cols-12 gap-2">
+                                                <Input value={beat.title} onChange={(e) => {
+                                                    const beats = [...(formData.masterclass?.profitBeats || [])];
+                                                    beats[idx] = { ...beats[idx], title: e.target.value };
+                                                    updateNestedField('masterclass.profitBeats', beats);
+                                                }} placeholder="Beat Title" className="col-span-4 h-8 text-[10px]" />
+                                                <Input value={beat.timing} onChange={(e) => {
+                                                    const beats = [...(formData.masterclass?.profitBeats || [])];
+                                                    beats[idx] = { ...beats[idx], timing: e.target.value };
+                                                    updateNestedField('masterclass.profitBeats', beats);
+                                                }} placeholder="Timing (e.g. 25%)" className="col-span-3 h-8 text-[10px]" />
+                                                <Input value={beat.description} onChange={(e) => {
+                                                    const beats = [...(formData.masterclass?.profitBeats || [])];
+                                                    beats[idx] = { ...beats[idx], description: e.target.value };
+                                                    updateNestedField('masterclass.profitBeats', beats);
+                                                }} placeholder="Description" className="col-span-5 h-8 text-[10px]" />
+                                            </div>
+                                            <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-slate-300 hover:text-red-500" onClick={() => removeNestedArrayItem('masterclass.profitBeats', idx)}>
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-8 border-t border-slate-900 space-y-6">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-indigo-600">
+                                <Terminal size={16} /> AI Command Center
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Scene Generator Prompt</label>
+                                    <Textarea 
+                                        value={formData.aiPromptCommandCenter?.sceneGeneratorPrompt}
+                                        onChange={(e) => updateNestedField('aiPromptCommandCenter.sceneGeneratorPrompt', e.target.value)}
+                                        className="h-24 bg-slate-50 font-mono text-[10px]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 block">Marketing Hook Prompt</label>
+                                    <Textarea 
+                                        value={formData.aiPromptCommandCenter?.marketingHookPrompt}
+                                        onChange={(e) => updateNestedField('aiPromptCommandCenter.marketingHookPrompt', e.target.value)}
+                                        className="h-24 bg-slate-50 font-mono text-[10px]"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </Card>
