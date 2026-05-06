@@ -196,9 +196,7 @@ SCHEMA FOR EACH OBJECT:
   "monetizationIdeas": {
     "affiliateProducts": ["[Chosen Product 1](URL 1)", "[Chosen Product 2](URL 2)"],
     "courseTopics": ["Course Topic 1"],
-    "digitalDownloads": [
-      { "title": "Asset Name", "imageUrl": "/images/placeholder-product.png", "downloadUrl": "https://...", "learnMoreUrl": "https://..." }
-    ]
+    "digitalDownloads": []
   },
   "seoStrategy": {
     "volumeRange": "1K-5K",
