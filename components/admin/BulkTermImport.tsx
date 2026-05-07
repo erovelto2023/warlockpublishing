@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight, Wand2 } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight, Wand2, Copy } from 'lucide-react';
 import { importDetailedJson, syncMarketplaceData, getGlossaryLinks } from '@/lib/actions/glossary';
 import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
 import { getMarketplaceItems } from '@/lib/actions/product.actions';
 import { getAmazonCsvContent } from '@/lib/actions/marketplace';
 import { useRouter } from 'next/navigation';
 import { repairJson } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface BulkTermImportProps {
     isOpen: boolean;
@@ -406,12 +407,23 @@ ${rawList || "Please paste keywords in the first column"}`;
                             <p className="text-[10px] font-black uppercase tracking-widest">{status.message}</p>
                         </div>
                         {status.type === 'error' && (
-                            <button 
-                                onClick={handleAutoFix}
-                                className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg"
-                            >
-                                <Wand2 size={12} /> Auto Fix JSON
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(jsonContent);
+                                        toast.success('Repaired JSON copied to clipboard');
+                                    }}
+                                    className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all flex items-center gap-2"
+                                >
+                                    <Copy size={12} /> Copy Fixed JSON
+                                </button>
+                                <button 
+                                    onClick={handleAutoFix}
+                                    className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg"
+                                >
+                                    <Wand2 size={12} /> Auto Fix JSON
+                                </button>
+                            </div>
                         )}
                     </div>
                 )}
