@@ -212,6 +212,7 @@ export async function importDetailedJson(data: any[]) {
     try {
         await connectToDatabase();
         let count = 0;
+        const importedTerms: string[] = [];
         
         for (const item of data) {
             if (!item.term) continue;
@@ -271,13 +272,14 @@ export async function importDetailedJson(data: any[]) {
                 { upsert: true, new: true }
             );
             count++;
+            importedTerms.push(item.term);
         }
         
         revalidatePath('/glossary');
         revalidatePath('/glossary/directory');
         revalidatePath('/admin');
         
-        return { success: true, count };
+        return { success: true, count, importedTerms };
     } catch (error: any) {
         console.error("Import error:", error);
         return { success: false, message: error.message };

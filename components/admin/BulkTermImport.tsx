@@ -23,11 +23,42 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
     const [isSyncing, setIsSyncing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [unifiedCatalog, setUnifiedCatalog] = useState<{name: string, url: string, category: string, source: string}[]>([]);
+    const [existingTerms, setExistingTerms] = useState<{term: string, slug: string}[]>([]);
+    const [parsedTerms, setParsedTerms] = useState<{term: string, isDuplicate: boolean}[]>([]);
+
+    useEffect(() => {
+        if (!jsonContent.trim()) {
+            setParsedTerms([]);
+            return;
+        }
+        
+        try {
+            let cleaned = jsonContent.trim();
+            const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
+            const matches = [...cleaned.matchAll(codeBlockRegex)];
+            if (matches.length > 0) cleaned = matches[0][1].trim();
+
+            const data = JSON.parse(cleaned);
+            if (Array.isArray(data)) {
+                const terms = data.map((item: any) => ({
+                    term: item.term,
+                    isDuplicate: existingTerms.some(et => et.term.toLowerCase() === (item.term || '').toLowerCase())
+                }));
+                setParsedTerms(terms);
+            }
+        } catch (e) {
+            setParsedTerms([]);
+        }
+    }, [jsonContent, existingTerms]);
 
     useEffect(() => {
         const loadCatalogs = async () => {
             try {
                 const results: {name: string, url: string, category: string, source: string}[] = [];
+                
+                // Fetch existing terms for duplicate checking
+                const links = await getGlossaryLinks();
+                setExistingTerms(links);
                 
                 // 1. Affiliate Hub Offers
                 const offers = await getAffiliateOffers();
@@ -110,6 +141,22 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
                     message: `Successfully created/updated ${result.count} glossary terms.` 
                 });
                 setJsonContent('');
+                
+                // Remove successfully imported terms from the keyword source list
+                if (result.importedTerms && Array.isArray(result.importedTerms)) {
+                    let currentRawList = rawList;
+                    result.importedTerms.forEach((term: string) => {
+                        // Create a regex to match the term case-insensitively, 
+                        // potentially followed by a newline or at the end of the string
+                        const regex = new RegExp(`^\\s*${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*(\\n|$)`, 'gmi');
+                        currentRawList = currentRawList.replace(regex, '');
+                    });
+                    setRawList(currentRawList.trim());
+                }
+
+                // Refresh existing terms list for next import
+                getGlossaryLinks().then(links => setExistingTerms(links));
+                
                 router.refresh();
             } else {
                 setStatus({ type: 'error', message: result?.message || 'Injection failed.' });
@@ -422,6 +469,25 @@ ${rawList || "Please paste keywords in the first column"}`;
                             value={jsonContent}
                             onChange={(e) => setJsonContent(e.target.value)}
                         />
+
+                        {parsedTerms.length > 0 && (
+                            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 max-h-[150px] overflow-y-auto">
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-between">
+                                    <span>Validation & Duplicate Check</span>
+                                    <span className="text-indigo-600">{parsedTerms.length} terms detected</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {parsedTerms.map((pt, i) => (
+                                        <div key={i} className={`px-2 py-1 rounded text-[9px] font-bold flex items-center gap-1 ${pt.isDuplicate ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
+                                            {pt.isDuplicate ? <AlertCircle size={10} /> : <CheckCircle2 size={10} />}
+                                            {pt.term}
+                                            <span className="opacity-50 ml-1">{pt.isDuplicate ? '(Update)' : '(New)'}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <button 
                             onClick={handleHydrate}
                             disabled={isHydrating || !jsonContent.trim()}
