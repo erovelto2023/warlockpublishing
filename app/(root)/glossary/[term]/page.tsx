@@ -27,6 +27,7 @@ import SubGenreVariationsSection from "@/components/glossary/SubGenreVariationsS
 import CommonPitfallsSection from "@/components/glossary/CommonPitfallsSection";
 import MarketDemandSection from "@/components/glossary/MarketDemandSection";
 import MarketingViralSection from "@/components/glossary/MarketingViralSection";
+import AffiliateDisclaimer from "@/components/shared/AffiliateDisclaimer";
 import {
     Accordion,
     AccordionContent,
@@ -296,6 +297,9 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
             <div className="mt-24">
                 <RandomProducts products={randomProducts} />
             </div>
+
+            {/* Affiliate Disclaimer */}
+            <AffiliateDisclaimer />
         </div>
     );
 }

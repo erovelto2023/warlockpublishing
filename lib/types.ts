@@ -63,9 +63,11 @@ export interface GlossaryTerm {
     };
     marketingStrategy?: {
         hooks: string[];
+        viralHooks: string[];
         headlines: string[];
         titles: string[];
         contentIdeas: string[];
+        contentPillars: string[];
         socialPosts: string[];
     };
     seoStrategy?: {
