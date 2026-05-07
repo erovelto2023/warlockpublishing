@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight } from 'lucide-react';
-import { importDetailedJson, syncMarketplaceData } from '@/lib/actions/glossary';
+import { importDetailedJson, syncMarketplaceData, getGlossaryLinks } from '@/lib/actions/glossary';
 import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
 import { getMarketplaceItems } from '@/lib/actions/product.actions';
 import { getAmazonCsvContent } from '@/lib/actions/marketplace';
@@ -155,7 +155,7 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
                 }
 
                 // Refresh existing terms list for next import
-                getGlossaryLinks().then(links => setExistingTerms(links));
+                getGlossaryLinks().then((links: any) => setExistingTerms(links));
                 
                 router.refresh();
             } else {
