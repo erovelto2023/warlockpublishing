@@ -65,6 +65,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
     const [editSubEmail, setEditSubEmail] = useState('');
     const [isHealing, setIsHealing] = useState(false);
     const [healProgress, setHealProgress] = useState<{ total: number, fixed: number, added: number } | null>(null);
+    const [glossarySearch, setGlossarySearch] = useState('');
     
     // Pagination State
     const [glossaryPage, setGlossaryPage] = useState(1);
@@ -167,6 +168,38 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 variant: "destructive",
             });
             setIsHealing(false);
+        }
+    };
+
+    const handleRemoveDuplicates = async () => {
+        const seen = new Set();
+        const duplicates: string[] = [];
+        
+        // Sort by viewCount descending so we keep the most popular version if duplicates exist
+        const sortedTerms = [...glossaryTerms].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+        
+        sortedTerms.forEach(term => {
+            const key = term.term.toLowerCase().trim();
+            if (seen.has(key)) {
+                duplicates.push(term._id);
+            } else {
+                seen.add(key);
+            }
+        });
+
+        if (duplicates.length === 0) {
+            toast({ title: "No Duplicates", description: "Your glossary is clean!" });
+            return;
+        }
+
+        if (!confirm(`Found ${duplicates.length} duplicate terms (keeping the versions with most views). Delete them?`)) return;
+
+        try {
+            await bulkDeleteGlossaryTerms(duplicates);
+            toast({ title: "Success", description: `Removed ${duplicates.length} duplicates.` });
+            router.refresh();
+        } catch (e) {
+            toast({ title: "Error", description: "Failed to remove duplicates.", variant: "destructive" });
         }
     };
 
@@ -464,7 +497,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </div>
                         )}
                     </div>
-                )}
+                    );
+                })()}
 
                 {/* SUBSCRIBERS TAB */}
                 {activeTab === 'subscribers' && (
@@ -921,8 +955,14 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 )}
 
                 {/* GLOSSARY TAB */}
-                {activeTab === 'glossary' && (
-                    <div className="space-y-6">
+                {activeTab === 'glossary' && (() => {
+                    const filteredGlossaryTerms = glossaryTerms.filter(t => 
+                        t.term.toLowerCase().includes(glossarySearch.toLowerCase()) || 
+                        t.slug.toLowerCase().includes(glossarySearch.toLowerCase())
+                    );
+                    
+                    return (
+                        <div className="space-y-6">
                         <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                                 <BookOpen className="text-indigo-600" /> Ultimate Glossary
@@ -935,6 +975,29 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                         <Trash2 size={14} /> Delete Selected ({selectedGlossaryTerms.length})
                                     </button>
                                 )}
+                            <div className="flex flex-col md:flex-row gap-4 items-center flex-1 mx-4">
+                                <div className="relative flex-1 w-full">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                    <input 
+                                        type="text"
+                                        placeholder="Search terms..."
+                                        value={glossarySearch}
+                                        onChange={(e) => {
+                                            setGlossarySearch(e.target.value);
+                                            setGlossaryPage(1);
+                                        }}
+                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleRemoveDuplicates}
+                                    className="px-4 py-2 rounded-lg text-sm font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 flex items-center gap-2 whitespace-nowrap"
+                                >
+                                    <Trash2 size={16} /> Remove Duplicates
+                                </button>
+                            </div>
+                        
+                            <div className="flex gap-2">
                                 <button
                                     onClick={() => setGlossaryView('import')}
                                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${glossaryView === 'import' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}
@@ -964,6 +1027,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     </button>
                                 )}
                             </div>
+                        </div>
                         
                         {glossaryView === 'import' ? (
                             <BulkTermImport 
@@ -995,7 +1059,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
-                                    {glossaryTerms.slice((glossaryPage - 1) * GLOSSARY_PAGE_SIZE, glossaryPage * GLOSSARY_PAGE_SIZE).map((term: any) => (
+                                    {filteredGlossaryTerms.slice((glossaryPage - 1) * GLOSSARY_PAGE_SIZE, glossaryPage * GLOSSARY_PAGE_SIZE).map((term: any) => (
                                         <tr key={term._id} className={`hover:bg-slate-50/80 transition-colors group ${selectedGlossaryTerms.includes(term._id) ? 'bg-indigo-50/30' : ''}`}>
                                             <td className="px-6 py-4">
                                                 <input 
@@ -1036,10 +1100,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </table>
                             
                             {/* Pagination Controls */}
-                            {glossaryTerms.length > GLOSSARY_PAGE_SIZE && (
+                            {filteredGlossaryTerms.length > GLOSSARY_PAGE_SIZE && (
                                 <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                                     <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                        Showing {(glossaryPage - 1) * GLOSSARY_PAGE_SIZE + 1} to {Math.min(glossaryPage * GLOSSARY_PAGE_SIZE, glossaryTerms.length)} of {glossaryTerms.length} terms
+                                        Showing {(glossaryPage - 1) * GLOSSARY_PAGE_SIZE + 1} to {Math.min(glossaryPage * GLOSSARY_PAGE_SIZE, filteredGlossaryTerms.length)} of {filteredGlossaryTerms.length} terms
                                     </div>
                                     <div className="flex gap-2">
                                         <button 
@@ -1050,7 +1114,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                             Prev
                                         </button>
                                         <div className="flex gap-1">
-                                            {[...Array(Math.ceil(glossaryTerms.length / GLOSSARY_PAGE_SIZE))].map((_, i) => (
+                                            {[...Array(Math.ceil(filteredGlossaryTerms.length / GLOSSARY_PAGE_SIZE))].map((_, i) => (
                                                 <button
                                                     key={i}
                                                     onClick={() => setGlossaryPage(i + 1)}
@@ -1058,10 +1122,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                                 >
                                                     {i + 1}
                                                 </button>
-                                            )).slice(Math.max(0, glossaryPage - 3), Math.min(Math.ceil(glossaryTerms.length / GLOSSARY_PAGE_SIZE), glossaryPage + 2))}
+                                            )).slice(Math.max(0, glossaryPage - 3), Math.min(Math.ceil(filteredGlossaryTerms.length / GLOSSARY_PAGE_SIZE), glossaryPage + 2))}
                                         </div>
                                         <button 
-                                            disabled={glossaryPage >= Math.ceil(glossaryTerms.length / GLOSSARY_PAGE_SIZE)}
+                                            disabled={glossaryPage >= Math.ceil(filteredGlossaryTerms.length / GLOSSARY_PAGE_SIZE)}
                                             onClick={() => setGlossaryPage(prev => prev + 1)}
                                             className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-all"
                                         >
@@ -1073,7 +1137,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </div>
                         )}
                     </div>
-                )}
+                    );
+                })()}
 
                 {/* AFFILIATE HUB TAB */}
                 {activeTab === 'affiliate' && (
