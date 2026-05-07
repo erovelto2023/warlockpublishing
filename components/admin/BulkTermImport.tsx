@@ -105,25 +105,16 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
 
     const handleHydrate = async () => {
         try {
-            let cleanedContent = jsonContent.trim();
-            const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
-            const matches = [...cleanedContent.matchAll(codeBlockRegex)];
-            if (matches.length > 0) {
-                cleanedContent = matches[0][1].trim();
-            }
-
-            cleanedContent = cleanedContent.replace(/,(\s*[\]\}])/g, '$1');
-            cleanedContent = cleanedContent.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
-                return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
-            });
-
+            // Auto-repair and sync the portal immediately
+            const repaired = repairJson(jsonContent);
+            setJsonContent(repaired);
+            
             let data;
             try {
-                data = JSON.parse(cleanedContent);
+                data = JSON.parse(repaired);
             } catch (initialError: any) {
-                // Initial parse failed, the server side normalization in importDetailedJson 
-                // actually calls deepNormalize which is quite robust.
-                data = JSON.parse(cleanedContent);
+                // If it still fails, try one more time after a basic trim in case state didn't update yet
+                data = JSON.parse(repaired.trim());
             }
 
             if (!Array.isArray(data)) {

@@ -115,5 +115,11 @@ export function repairJson(content: string): string {
         repaired = repaired.substring(startChar, lastChar + 1);
     }
 
-    return repaired;
+    // 7. Final attempt to parse and prettify if possible
+    try {
+        const obj = JSON.parse(repaired);
+        return JSON.stringify(obj, null, 2);
+    } catch (e) {
+        return repaired;
+    }
 }
