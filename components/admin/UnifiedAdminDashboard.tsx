@@ -23,7 +23,7 @@ import { deleteSalesPage, updateSalesPageRotation } from '@/lib/actions/sales-pa
 import { deleteMessage, markMessageAsRead, updateMessage } from '@/lib/actions/message';
 import { deleteSubscriber, updateSubscriber, deleteSubscribersBulk } from '@/lib/actions/subscriber.actions';
 import { useToast } from '@/components/ui/use-toast';
-import { deleteGlossaryTerm, bulkDeleteGlossaryTerms, healGlossaryVideos } from '@/lib/actions/glossary';
+import { deleteGlossaryTerm, bulkDeleteGlossaryTerms, healGlossaryVideos, wipeGlossaryDownloads } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
 import CTAManager from '@/components/admin/CTAManager';
 
@@ -997,6 +997,18 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </div>
                         
                             <div className="flex gap-2">
+                                <button
+                                    onClick={async () => {
+                                        if (confirm("Are you sure you want to WIPE ALL digital downloads from the entire glossary? This cannot be undone.")) {
+                                            const res = await wipeGlossaryDownloads();
+                                            if (res.success) alert(`Successfully wiped downloads from ${res.count} terms.`);
+                                            else alert("Failed to wipe downloads: " + res.error);
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-lg text-sm font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-500 hover:text-white flex items-center gap-2 transition-all"
+                                >
+                                    <Trash2 size={16} /> Wipe Downloads
+                                </button>
                                 <button
                                     onClick={() => setGlossaryView('import')}
                                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${glossaryView === 'import' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}

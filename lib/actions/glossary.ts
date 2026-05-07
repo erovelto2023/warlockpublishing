@@ -369,3 +369,23 @@ export async function searchYouTubeForTerm(term: string): Promise<any[]> {
     console.log("YouTube search requested for:", term);
     return [];
 }
+
+/**
+ * Maintenance: Wipes all digitalDownloads from all glossary terms.
+ * Used to clean up "false" AI-generated assets.
+ */
+export async function wipeGlossaryDownloads() {
+    try {
+        await connectToDatabase();
+        const result = await GlossaryTerm.updateMany({}, { 
+            $set: { "monetizationIdeas.digitalDownloads": [] } 
+        });
+        
+        revalidatePath('/glossary');
+        revalidatePath('/admin');
+        return { success: true, count: result.modifiedCount };
+    } catch (error: any) {
+        console.error("Wipe downloads failed:", error);
+        return { success: false, error: error.message };
+    }
+}
