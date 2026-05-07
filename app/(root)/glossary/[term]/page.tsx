@@ -26,6 +26,7 @@ import VibeCurationSection from "@/components/glossary/VibeCurationSection";
 import SubGenreVariationsSection from "@/components/glossary/SubGenreVariationsSection";
 import CommonPitfallsSection from "@/components/glossary/CommonPitfallsSection";
 import MarketDemandSection from "@/components/glossary/MarketDemandSection";
+import MarketingViralSection from "@/components/glossary/MarketingViralSection";
 import {
     Accordion,
     AccordionContent,
@@ -227,6 +228,11 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                         {/* Masterclass Section */}
                         {term.masterclass && (
                             <MasterclassSection masterclass={term.masterclass} />
+                        )}
+
+                        {/* Viral Hooks & Content Pillars */}
+                        {term.marketingStrategy && (
+                            <MarketingViralSection marketingStrategy={term.marketingStrategy} />
                         )}
 
                         {/* Sub-Genre Variations */}

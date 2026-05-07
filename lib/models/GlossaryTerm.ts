@@ -34,9 +34,11 @@ export interface IGlossaryTerm extends Document {
     };
     marketingStrategy?: {
         hooks: string[];
+        viralHooks: string[];
         headlines: string[];
         titles: string[];
         contentIdeas: string[];
+        contentPillars: string[];
         socialPosts: string[];
     };
     seoStrategy?: {
@@ -151,9 +153,11 @@ const GlossaryTermSchema: Schema = new Schema({
     },
     marketingStrategy: {
         hooks: [{ type: String }],
+        viralHooks: [{ type: String }],
         headlines: [{ type: String }],
         titles: [{ type: String }],
         contentIdeas: [{ type: String }],
+        contentPillars: [{ type: String }],
         socialPosts: [{ type: String }]
     },
     seoStrategy: {

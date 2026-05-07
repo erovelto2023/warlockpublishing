@@ -259,6 +259,10 @@ SCHEMA FOR EACH OBJECT:
       ]
     }
   ],
+  "marketingStrategy": {
+    "viralHooks": ["Hook 1 (TikTok/Shorts style)", "Hook 2 (Curiosity Gap)"],
+    "contentPillars": ["Pillar 1: Educational", "Pillar 2: Behind-the-Scenes/Process", "Pillar 3: Community/Reaction"]
+  },
   "commonPitfalls": [ 
     { "pitfall": "The common mistake", "howToAvoid": "The expert solution." } 
   ],
