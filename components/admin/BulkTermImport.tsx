@@ -8,7 +8,7 @@ import { getMarketplaceItems } from '@/lib/actions/product.actions';
 import { getAmazonCsvContent } from '@/lib/actions/marketplace';
 import { useRouter } from 'next/navigation';
 import { repairJson } from '@/lib/utils';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
 
 interface BulkTermImportProps {
     isOpen: boolean;
@@ -18,10 +18,11 @@ interface BulkTermImportProps {
 
 export default function BulkTermImport({ isOpen, onClose, isInline = false }: BulkTermImportProps) {
     const router = useRouter();
+    const { toast } = useToast();
     const [rawList, setRawList] = useState('');
     const [jsonContent, setJsonContent] = useState('');
     const [category, setCategory] = useState('Writing');
-     const [isHydrating, setIsHydrating] = useState(false);
+    const [isHydrating, setIsHydrating] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [unifiedCatalog, setUnifiedCatalog] = useState<{name: string, url: string, category: string, source: string}[]>([]);
@@ -411,7 +412,10 @@ ${rawList || "Please paste keywords in the first column"}`;
                                 <button 
                                     onClick={() => {
                                         navigator.clipboard.writeText(jsonContent);
-                                        toast.success('Repaired JSON copied to clipboard');
+                                        toast({
+                                            title: "Success",
+                                            description: "Repaired JSON copied to clipboard",
+                                        });
                                     }}
                                     className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all flex items-center gap-2"
                                 >
