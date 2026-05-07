@@ -136,19 +136,25 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             const result = await importDetailedJson(data);
             
             if (result?.success) {
+                const collisions = result.importedTerms?.filter((t: any) => t.wasCollision) || [];
+                const collisionMsg = collisions.length > 0 
+                    ? ` (${collisions.length} URL collisions resolved with suffixes)`
+                    : '';
+
                 setStatus({ 
                     type: 'success', 
-                    message: `Successfully created/updated ${result.count} glossary terms.` 
+                    message: `Successfully created/updated ${result.count} glossary terms.${collisionMsg}` 
                 });
                 setJsonContent('');
                 
                 // Remove successfully imported terms from the keyword source list
                 if (result.importedTerms && Array.isArray(result.importedTerms)) {
                     let currentRawList = rawList;
-                    result.importedTerms.forEach((term: string) => {
+                    result.importedTerms.forEach((item: any) => {
+                        const termName = typeof item === 'string' ? item : item.term;
                         // Create a regex to match the term case-insensitively, 
                         // potentially followed by a newline or at the end of the string
-                        const regex = new RegExp(`^\\s*${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*(\\n|$)`, 'gmi');
+                        const regex = new RegExp(`^\\s*${termName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*(\\n|$)`, 'gmi');
                         currentRawList = currentRawList.replace(regex, '');
                     });
                     setRawList(currentRawList.trim());

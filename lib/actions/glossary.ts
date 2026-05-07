@@ -212,7 +212,7 @@ export async function importDetailedJson(data: any[]) {
     try {
         await connectToDatabase();
         let count = 0;
-        const importedTerms: string[] = [];
+        const importedTerms: any[] = [];
         
         for (const item of data) {
             if (!item.term) continue;
@@ -271,6 +271,8 @@ export async function importDetailedJson(data: any[]) {
                 }
             }
 
+            const wasCollision = slug !== baseSlug;
+
             await GlossaryTerm.findOneAndUpdate(
                 { term: item.term },
                 { 
@@ -282,7 +284,11 @@ export async function importDetailedJson(data: any[]) {
                 { upsert: true, new: true }
             );
             count++;
-            importedTerms.push(item.term);
+            importedTerms.push({ 
+                term: item.term, 
+                slug, 
+                wasCollision 
+            } as any);
         }
         
         revalidatePath('/glossary');
