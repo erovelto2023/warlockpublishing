@@ -98,12 +98,17 @@ export function repairJson(content: string): string {
     // 3. Remove trailing commas in objects and arrays
     repaired = repaired.replace(/,(\s*[\]\}])/g, '$1');
 
-    // 4. Ensure property names are quoted (basic check for word characters followed by colon)
+    // 4. Fix missing commas between objects in an array: } { -> }, {
+    repaired = repaired.replace(/\}\s*\{/g, '}, {');
+
+    // 5. Fix missing commas between properties: "value" "nextKey": -> "value", "nextKey":
+    repaired = repaired.replace(/"\s+"([a-zA-Z0-9_]+)"\s*:/g, '", "$1":');
+
+    // 6. Ensure property names are quoted (basic check for word characters followed by colon)
     // This handles { key: "value" } -> { "key": "value" }
     repaired = repaired.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
 
-    // 5. Fix multi-line strings that aren't escaped (common in AI output)
-    // This is tricky, but we can at least handle newlines inside quotes
+    // 7. Fix multi-line strings that aren't escaped (common in AI output)
     repaired = repaired.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
         return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
     });
@@ -115,7 +120,27 @@ export function repairJson(content: string): string {
         repaired = repaired.substring(startChar, lastChar + 1);
     }
 
-    // 7. Final attempt to parse and prettify if possible
+    // 8. Handle truncation (close unclosed quotes, braces, and brackets)
+    // First, fix unclosed quotes
+    const quoteMatches = repaired.match(/"/g);
+    if (quoteMatches && quoteMatches.length % 2 !== 0) {
+        repaired += '"';
+    }
+
+    // Then, close unclosed braces and brackets
+    let openBraces = (repaired.match(/\{/g) || []).length - (repaired.match(/\}/g) || []).length;
+    let openBrackets = (repaired.match(/\[/g) || []).length - (repaired.match(/\]/g) || []).length;
+    
+    while (openBraces > 0) {
+        repaired += '}';
+        openBraces--;
+    }
+    while (openBrackets > 0) {
+        repaired += ']';
+        openBrackets--;
+    }
+
+    // 9. Final attempt to parse and prettify if possible
     try {
         const obj = JSON.parse(repaired);
         return JSON.stringify(obj, null, 2);
