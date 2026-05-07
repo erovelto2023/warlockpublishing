@@ -119,8 +119,8 @@ export function repairJson(content: string): string {
     // Case C: After a closing brace or bracket (nested objects/arrays)
     repaired = repaired.replace(/([\]\}])\s*,?\s+"([^"]+)"\s*:/g, '$1, "$2":');
 
-    // 6. Fix missing commas between array elements: "val1" "val2" -> "val1", "val2"
-    repaired = repaired.replace(/"\s+"(?![^"]*":)/g, '", "');
+    // 6. Fix missing commas between array elements: "val1" "val2" OR 123 456 -> "val1", "val2" OR 123, 456
+    repaired = repaired.replace(/("|\d+|true|false|null)\s+(?![^"]*":)("|\d+|true|false|null)/g, '$1, $2');
 
     // 7. Fix missing colons: "key" "value" -> "key": "value"
     repaired = repaired.replace(/"\s*([^"]+)"\s+("|\d+|true|false|null|\[|\{)/g, '"$1": $2');

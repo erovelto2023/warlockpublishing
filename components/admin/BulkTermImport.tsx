@@ -28,10 +28,12 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
     const [unifiedCatalog, setUnifiedCatalog] = useState<{name: string, url: string, category: string, source: string}[]>([]);
     const [existingTerms, setExistingTerms] = useState<{term: string, slug: string}[]>([]);
     const [parsedTerms, setParsedTerms] = useState<{term: string, isDuplicate: boolean}[]>([]);
+    const [hasFixed, setHasFixed] = useState(false);
 
     useEffect(() => {
         if (!jsonContent.trim()) {
             setParsedTerms([]);
+            setHasFixed(false);
             return;
         }
         
@@ -106,6 +108,7 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
     }, []);
 
     const handleHydrate = async () => {
+        setHasFixed(false);
         try {
             // Auto-repair and sync the portal immediately
             const repaired = repairJson(jsonContent);
@@ -176,6 +179,7 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
         try {
             const fixed = repairJson(jsonContent);
             setJsonContent(fixed);
+            setHasFixed(true);
             setStatus({ type: 'success', message: 'JSON structure repaired! Please try populating again.' });
         } catch (err: any) {
             setStatus({ type: 'error', message: `Auto-fix failed: ${err.message}` });
@@ -409,18 +413,20 @@ ${rawList || "Please paste keywords in the first column"}`;
                         </div>
                         {status.type === 'error' && (
                             <div className="flex items-center gap-2">
-                                <button 
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(jsonContent);
-                                        toast({
-                                            title: "Success",
-                                            description: "Repaired JSON copied to clipboard",
-                                        });
-                                    }}
-                                    className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all flex items-center gap-2"
-                                >
-                                    <Copy size={12} /> Copy Fixed JSON
-                                </button>
+                                {hasFixed && (
+                                    <button 
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(jsonContent);
+                                            toast({
+                                                title: "Success",
+                                                description: "Repaired JSON copied to clipboard",
+                                            });
+                                        }}
+                                        className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all flex items-center gap-2"
+                                    >
+                                        <Copy size={12} /> Copy Fixed JSON
+                                    </button>
+                                )}
                                 <button 
                                     onClick={handleAutoFix}
                                     className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg"
