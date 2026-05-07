@@ -108,9 +108,11 @@ export default function GlossaryEditor({ initialData }: GlossaryEditorProps) {
         },
         marketingStrategy: {
             hooks: [""],
+            viralHooks: [""],
             headlines: [""],
             titles: [""],
             contentIdeas: [""],
+            contentPillars: [""],
             socialPosts: [""]
         },
         seoStrategy: {
