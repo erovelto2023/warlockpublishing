@@ -1,7 +1,10 @@
+import { autoLinkGlossary } from "@/lib/utils/glossary-linking";
 import { Card } from "@/components/ui/card";
 
-export default function AuthorityArticle({ content }: { content: string }) {
+export default function AuthorityArticle({ content, allTerms = [] }: { content: string, allTerms?: { term: string, slug: string }[] }) {
     if (!content) return null;
+
+    const linkedContent = allTerms.length > 0 ? autoLinkGlossary(content, allTerms) : content;
 
     return (
         <section className="mt-12">
@@ -28,7 +31,7 @@ export default function AuthorityArticle({ content }: { content: string }) {
                     [&_.cnn-fast-facts_li]:text-base [&_.cnn-fast-facts_li]:font-bold [&_.cnn-fast-facts_li]:text-slate-900 [&_.cnn-fast-facts_li]:dark:text-white [&_.cnn-fast-facts_li]:mb-3 [&_.cnn-fast-facts_li]:relative [&_.cnn-fast-facts_li]:pl-6
                     [&_.cnn-fast-facts_li]:before:content-[''] [&_.cnn-fast-facts_li]:before:absolute [&_.cnn-fast-facts_li]:before:left-0 [&_.cnn-fast-facts_li]:before:top-2.5 [&_.cnn-fast-facts_li]:before:w-2 [&_.cnn-fast-facts_li]:before:h-2 [&_.cnn-fast-facts_li]:before:bg-red-600 [&_.cnn-fast-facts_li]:before:rounded-full
                     "
-                    dangerouslySetInnerHTML={{ __html: content.replace(/src="http:\/\//g, 'src="https://') }}
+                    dangerouslySetInnerHTML={{ __html: linkedContent.replace(/src="http:\/\//g, 'src="https://') }}
                 />
 
                 <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">

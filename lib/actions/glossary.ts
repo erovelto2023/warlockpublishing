@@ -133,6 +133,12 @@ export async function getGlossaryTermBySlug(slug: string) {
     return serializeTerm(term);
 }
 
+export async function getGlossaryLinks() {
+    await connectToDatabase();
+    const terms = await GlossaryTerm.find({ isPublished: true }, 'term slug').lean();
+    return terms.map(t => ({ term: t.term, slug: t.slug }));
+}
+
 export async function getGlossaryTermById(id: string) {
     await connectToDatabase();
     const term = await GlossaryTerm.findById(id);

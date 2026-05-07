@@ -120,6 +120,13 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
         }
     };
 
+    const handleDraftSocial = (term: any) => {
+        const hook = term.marketingStrategy?.viralHooks?.[0] || term.snapshot;
+        const text = `🚀 Concept Strategy: ${term.term}\n\n"${hook}"\n\nRead the full brief: https://warlockpublishing.com/glossary/${term.slug} #WritingCommunity #WarlockPublishing #AuthorStrategy`;
+        navigator.clipboard.writeText(text);
+        alert("Social post drafted and copied to clipboard!");
+    };
+
     const handleHealVideos = async (isAuto = false, currentFixed = 0, currentAdded = 0) => {
         if (!isAuto && !confirm('This will audit terms and fix YouTube links. It works in small batches to prevent timeouts. Continue?')) return;
         
@@ -1101,6 +1108,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right space-x-2">
+                                                <button onClick={() => handleDraftSocial(term)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Draft Social Post"><Share2 size={16} /></button>
                                                 <a href={`/glossary/${term.slug}`} target="_blank" className="inline-block p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"><Eye size={16} /></a>
                                                 <button onClick={() => router.push(`/admin/glossary/${term._id}/edit`)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"><Edit size={16} /></button>
                                                 <button onClick={() => handleDelete('glossary' as any, term._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>

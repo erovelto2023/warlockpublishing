@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function GlossaryLandingPage() {
     const { terms } = await getGlossaryTerms({ limit: 6 });
+    const { terms: trendingTerms } = await getGlossaryTerms({ limit: 5, sortBy: 'viewCount' });
 
     // Extract categories for browsing
     const categories = Array.from(new Set(terms.map(t => t.category))).sort();
@@ -45,6 +46,26 @@ export default async function GlossaryLandingPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Trending Bar */}
+            <div className="bg-indigo-600 py-3 overflow-hidden whitespace-nowrap border-y border-indigo-500 relative z-20">
+                <div className="container mx-auto px-4 flex items-center gap-6">
+                    <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-100 shrink-0">
+                        <TrendingUp size={14} /> Trending Now:
+                    </span>
+                    <div className="flex gap-8 items-center overflow-x-auto no-scrollbar">
+                        {trendingTerms.map((t) => (
+                            <Link 
+                                key={t._id} 
+                                href={`/glossary/${t.slug}`}
+                                className="text-xs font-bold text-white hover:text-indigo-200 transition-colors uppercase tracking-tight"
+                            >
+                                {t.term}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
 
             {/* Quick Stats / Trust Signals */}
             <section className="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">

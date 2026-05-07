@@ -1,4 +1,4 @@
-import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView } from "@/lib/actions/glossary";
+import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView, getGlossaryLinks } from "@/lib/actions/glossary";
 import { GlossaryTerm } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -28,6 +28,7 @@ import CommonPitfallsSection from "@/components/glossary/CommonPitfallsSection";
 import MarketDemandSection from "@/components/glossary/MarketDemandSection";
 import MarketingViralSection from "@/components/glossary/MarketingViralSection";
 import AffiliateDisclaimer from "@/components/shared/AffiliateDisclaimer";
+import BriefDownloadButton from "@/components/glossary/BriefDownloadButton";
 import {
     Accordion,
     AccordionContent,
@@ -72,6 +73,9 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
     // Fetch random products for showcase
     const randomProducts = await getFeaturedItems();
 
+    // Fetch all terms for internal linking
+    const allLinks = await getGlossaryLinks();
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <StructuredData term={term} />
@@ -84,6 +88,7 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                         <Link href="/glossary/directory" className="hover:text-indigo-500 transition-colors">{term.category}</Link>
                     </div>
                     <div className="flex items-center gap-4">
+                        <BriefDownloadButton />
                         <Button variant="ghost" size="sm" className="text-xs font-bold uppercase tracking-wider">
                             <MessageSquare size={14} className="mr-2" /> Share
                         </Button>
@@ -156,7 +161,7 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                         {/* Authority Article / Blog Content */}
                         {(term.articleContent || cta) && (
                             <div>
-                                {term.articleContent && <AuthorityArticle content={term.articleContent} />}
+                                {term.articleContent && <AuthorityArticle content={term.articleContent} allTerms={allLinks} />}
                                 {cta && (
                                     <div className="mt-8">
                                         <CallToActionBlock cta={cta} />
