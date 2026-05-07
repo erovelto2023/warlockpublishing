@@ -497,8 +497,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </div>
                         )}
                     </div>
-                    );
-                })()}
+                )}
 
                 {/* SUBSCRIBERS TAB */}
                 {activeTab === 'subscribers' && (
@@ -1137,7 +1136,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             </div>
                         )}
                     </div>
-                    );
+                    )
                 })()}
 
                 {/* AFFILIATE HUB TAB */}
