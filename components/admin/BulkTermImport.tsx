@@ -180,6 +180,8 @@ For EACH keyword provided below, you must generate a high-ranking, high-converti
 6. CRITICAL: ALL URLs (YouTube, Affiliate links, Image links) MUST use 'https://'. Never use 'http://'.
 7. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
 8. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (starting with https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
+9. CRITICAL: DO NOT hallucinate "digitalDownloads". The "digitalDownloads" array MUST BE EMPTY [].
+10. CRITICAL: DO NOT hallucinate books in "vibeCuration". Use products from the catalog or generic placeholders only.
 
 AVAILABLE AFFILIATE CATALOG:
 ${affiliateCatalogStr}
