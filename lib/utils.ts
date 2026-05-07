@@ -77,108 +77,73 @@ export function forceHttps(url: string | undefined | null): string {
 }
 
 /**
- * Robustly attempts to repair common AI-generated JSON formatting errors.
- * Handles trailing commas, unquoted keys, smart quotes, and surrounding text.
+ * Complete ground-up rewrite of JSON repair utility.
  */
 export function repairJson(content: string): string {
-    let repaired = content.trim();
+    let s = content.trim();
 
-    // 1. Strip non-printable control characters (common source of JSON.parse failure)
-    repaired = repaired.replace(/[\x00-\x1F\x7F-\x9F]/g, (match) => {
-        if (match === '\n' || match === '\r' || match === '\t') return match;
-        return '';
-    });
-
-    // 2. Strip markdown code blocks if present
+    // 1. CLEANING: Remove markdown blocks and invisible control characters
     const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
-    const matches = [...repaired.matchAll(codeBlockRegex)];
-    if (matches.length > 0) {
-        repaired = matches[0][1].trim();
-    }
-
-    // 3. Replace smart/curly quotes and convert single-quoted strings to double-quoted
-    repaired = repaired
-        .replace(/[\u201C\u201D]/g, '"')
-        .replace(/[\u2018\u2019]/g, "'");
+    const matches = [...s.matchAll(codeBlockRegex)];
+    if (matches.length > 0) s = matches[0][1].trim();
     
-    // Convert 'key': 'value' to "key": "value" (carefully)
-    repaired = repaired.replace(/([{,]\s*)'([a-zA-Z0-9_]+)'\s*:/g, '$1"$2":');
-    repaired = repaired.replace(/:\s*'([^']*)'/g, ': "$1"');
+    // Strip non-printable control characters except whitespace
+    s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
 
-    // 4. Remove trailing commas in objects and arrays
-    repaired = repaired.replace(/,(\s*[\]\}])/g, '$1');
+    // 2. NORMALIZATION: Smart quotes and single quotes
+    s = s.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
+    
+    // 3. PROPERTY DELIMITERS: Fix missing colons ("key" "value" -> "key": "value")
+    s = s.replace(/"\s*([^"]+)"\s+("|\d+|true|false|null|\[|\{)/g, '"$1": $2');
 
-    // 5. Fix missing/double commas between objects in an array: } { -> }, {
-    repaired = repaired.replace(/\}\s*,?\s*\{/g, '}, {');
+    // 4. COMMA INJECTION: Ultra-aggressive pass for "Expected ',' or '}'"
+    const p1 = '(?:\\"|\\d+|true|false|null|\\}|\\])';
+    const p2 = '(?:\\"|\\d+|true|false|null|\\{|\\[';
+    
+    // Heuristic: If we see a value/closing-bracket followed by another value/opening-bracket with space, add a comma
+    // BUT avoid matching keys (quotes followed by colons)
+    s = s.replace(new RegExp(`(${p1})\\s+(?![^"]*":)(${p2})`, 'g'), '$1, $2');
 
-    // 5. Fix missing/double commas between properties
-    // Case A: After a closing quote
-    repaired = repaired.replace(/"\s*,?\s+"([^"]+)"\s*:/g, '", "$1":');
-    // Case B: After a number, boolean, or null
-    repaired = repaired.replace(/(\d+|true|false|null)\s*,?\s+"([^"]+)"\s*:/g, '$1, "$2":');
-    // Case C: After a closing brace or bracket (nested objects/arrays)
-    repaired = repaired.replace(/([\]\}])\s*,?\s+"([^"]+)"\s*:/g, '$1, "$2":');
+    // Fix double commas
+    s = s.replace(/,\s*,/g, ',');
+    
+    // Remove trailing commas before closing braces/brackets
+    s = s.replace(/,(\s*[\]\}])/g, '$1');
 
-    // 6. Fix missing commas between array elements: "val1" "val2" OR 123 456 -> "val1", "val2" OR 123, 456
-    repaired = repaired.replace(/("|\d+|true|false|null)\s+(?![^"]*":)("|\d+|true|false|null)/g, '$1, $2');
+    // 5. KEY QUOTING: Ensure all keys are double-quoted
+    s = s.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
 
-    // 7. Fix missing colons: "key" "value" -> "key": "value"
-    repaired = repaired.replace(/"\s*([^"]+)"\s+("|\d+|true|false|null|\[|\{)/g, '"$1": $2');
-
-    // 7. Ensure property names are quoted
-    repaired = repaired.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-
-    // 9. Fix multi-line strings that aren't escaped
-    repaired = repaired.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
+    // 6. MULTI-LINE STRINGS: Escape literal newlines inside double quotes
+    s = s.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
         return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
     });
 
-    // 10. Extract the primary JSON structure (Widest balanced brackets/braces)
-    const firstBracket = repaired.indexOf('[');
-    const lastBracket = repaired.lastIndexOf(']');
-    const firstBrace = repaired.indexOf('{');
-    const lastBrace = repaired.lastIndexOf('}');
+    // 7. EXTRACTION: Find the widest balanced structure
+    const startPos = Math.min(
+        s.indexOf('[') === -1 ? Infinity : s.indexOf('['),
+        s.indexOf('{') === -1 ? Infinity : s.indexOf('{')
+    );
+    const endPos = Math.max(s.lastIndexOf(']'), s.lastIndexOf('}'));
     
-    let startChar = -1;
-    let endChar = -1;
+    if (startPos !== Infinity && endPos !== -1 && endPos > startPos) {
+        s = s.substring(startPos, endPos + 1);
+    }
+
+    // 8. TRUNCATION RECOVERY: Close any open quotes, braces, or brackets
+    const quoteMatches = s.match(/"/g);
+    if (quoteMatches && quoteMatches.length % 2 !== 0) s += '"';
+
+    let openBraces = (s.match(/\{/g) || []).length - (s.match(/\}/g) || []).length;
+    let openBrackets = (s.match(/\[/g) || []).length - (s.match(/\]/g) || []).length;
     
-    if (firstBracket !== -1 && lastBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) {
-        startChar = firstBracket;
-        endChar = lastBracket;
-    } else if (firstBrace !== -1 && lastBrace !== -1) {
-        startChar = firstBrace;
-        endChar = lastBrace;
-    }
+    while (openBraces > 0) { s += '}'; openBraces--; }
+    while (openBrackets > 0) { s += ']'; openBrackets--; }
 
-    if (startChar !== -1 && endChar !== -1 && endChar > startChar) {
-        repaired = repaired.substring(startChar, endChar + 1);
-    }
-
-    // 11. Handle truncation (close unclosed quotes, braces, and brackets)
-    // First, fix unclosed quotes
-    const quoteMatches = repaired.match(/"/g);
-    if (quoteMatches && quoteMatches.length % 2 !== 0) {
-        repaired += '"';
-    }
-
-    // Then, close unclosed braces and brackets
-    let openBraces = (repaired.match(/\{/g) || []).length - (repaired.match(/\}/g) || []).length;
-    let openBrackets = (repaired.match(/\[/g) || []).length - (repaired.match(/\]/g) || []).length;
-    
-    while (openBraces > 0) {
-        repaired += '}';
-        openBraces--;
-    }
-    while (openBrackets > 0) {
-        repaired += ']';
-        openBrackets--;
-    }
-
-    // 9. Final attempt to parse and prettify if possible
+    // 9. PRETTIFY: Final attempt to validate and format
     try {
-        const obj = JSON.parse(repaired);
+        const obj = JSON.parse(s);
         return JSON.stringify(obj, null, 2);
     } catch (e) {
-        return repaired;
+        return s;
     }
 }
