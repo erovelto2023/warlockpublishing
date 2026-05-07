@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Loader2, Zap, FileJson, Sparkles, ArrowRight, Wand2 } from 'lucide-react';
 import { importDetailedJson, syncMarketplaceData, getGlossaryLinks } from '@/lib/actions/glossary';
 import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
 import { getMarketplaceItems } from '@/lib/actions/product.actions';
 import { getAmazonCsvContent } from '@/lib/actions/marketplace';
 import { useRouter } from 'next/navigation';
+import { repairJson } from '@/lib/utils';
 
 interface BulkTermImportProps {
     isOpen: boolean;
@@ -175,6 +176,16 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             });
         } finally {
             setIsHydrating(false);
+        }
+    };
+
+    const handleAutoFix = () => {
+        try {
+            const fixed = repairJson(jsonContent);
+            setJsonContent(fixed);
+            setStatus({ type: 'success', message: 'JSON structure repaired! Please try populating again.' });
+        } catch (err: any) {
+            setStatus({ type: 'error', message: `Auto-fix failed: ${err.message}` });
         }
     };
 
@@ -398,9 +409,19 @@ ${rawList || "Please paste keywords in the first column"}`;
 
                 {/* Status Bar */}
                 {status && (
-                    <div className={`px-8 py-3 flex items-center gap-3 border-b animate-in slide-in-from-top-2 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-rose-50 text-rose-800 border-rose-100'}`}>
-                        {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                        <p className="text-[10px] font-black uppercase tracking-widest">{status.message}</p>
+                    <div className={`px-8 py-3 flex items-center justify-between border-b animate-in slide-in-from-top-2 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-rose-50 text-rose-800 border-rose-100'}`}>
+                        <div className="flex items-center gap-3">
+                            {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                            <p className="text-[10px] font-black uppercase tracking-widest">{status.message}</p>
+                        </div>
+                        {status.type === 'error' && (
+                            <button 
+                                onClick={handleAutoFix}
+                                className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg"
+                            >
+                                <Wand2 size={12} /> Auto Fix JSON
+                            </button>
+                        )}
                     </div>
                 )}
 

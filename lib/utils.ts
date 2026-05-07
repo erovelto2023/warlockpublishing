@@ -75,3 +75,45 @@ export function forceHttps(url: string | undefined | null): string {
     }
     return url;
 }
+
+/**
+ * Robustly attempts to repair common AI-generated JSON formatting errors.
+ * Handles trailing commas, unquoted keys, smart quotes, and surrounding text.
+ */
+export function repairJson(content: string): string {
+    let repaired = content.trim();
+
+    // 1. Strip markdown code blocks if present
+    const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
+    const matches = [...repaired.matchAll(codeBlockRegex)];
+    if (matches.length > 0) {
+        repaired = matches[0][1].trim();
+    }
+
+    // 2. Replace smart/curly quotes
+    repaired = repaired
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/[\u2018\u2019]/g, "'");
+
+    // 3. Remove trailing commas in objects and arrays
+    repaired = repaired.replace(/,(\s*[\]\}])/g, '$1');
+
+    // 4. Ensure property names are quoted (basic check for word characters followed by colon)
+    // This handles { key: "value" } -> { "key": "value" }
+    repaired = repaired.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+
+    // 5. Fix multi-line strings that aren't escaped (common in AI output)
+    // This is tricky, but we can at least handle newlines inside quotes
+    repaired = repaired.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
+        return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+    });
+
+    // 6. Try to find the start of an array or object if there is trailing garbage
+    const startChar = repaired.indexOf('[');
+    const lastChar = repaired.lastIndexOf(']');
+    if (startChar !== -1 && lastChar !== -1 && lastChar > startChar) {
+        repaired = repaired.substring(startChar, lastChar + 1);
+    }
+
+    return repaired;
+}
