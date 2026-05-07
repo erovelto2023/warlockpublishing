@@ -217,10 +217,20 @@ export async function importDetailedJson(data: any[]) {
         for (const item of data) {
             if (!item.term) continue;
             
-            const slug = item.slug || item.term
+            const baseSlug = item.slug || item.term
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '');
+            
+            // ENSURE UNIQUE SLUG: Check if this slug is taken by another term
+            let slug = baseSlug;
+            let slugConflict = await GlossaryTerm.findOne({ slug, term: { $ne: item.term } });
+            let counter = 1;
+            while (slugConflict) {
+                slug = `${baseSlug}-${counter}`;
+                slugConflict = await GlossaryTerm.findOne({ slug, term: { $ne: item.term } });
+                counter++;
+            }
 
             // AUTO-FIX: Convert legacy string digitalDownloads to new object structure
             if (item.monetizationIdeas?.digitalDownloads && Array.isArray(item.monetizationIdeas.digitalDownloads)) {
