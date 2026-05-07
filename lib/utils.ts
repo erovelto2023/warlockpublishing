@@ -111,18 +111,18 @@ export function repairJson(content: string): string {
     // 5. Fix missing/double commas between objects in an array: } { -> }, {
     repaired = repaired.replace(/\}\s*,?\s*\{/g, '}, {');
 
-    // 6. Fix missing/double commas between properties
+    // 5. Fix missing/double commas between properties
     // Case A: After a closing quote
-    repaired = repaired.replace(/"\s*,?\s+"([a-zA-Z0-9_]+)"\s*:/g, '", "$1":');
+    repaired = repaired.replace(/"\s*,?\s+"([^"]+)"\s*:/g, '", "$1":');
     // Case B: After a number, boolean, or null
-    repaired = repaired.replace(/(\d+|true|false|null)\s*,?\s+"([a-zA-Z0-9_]+)"\s*:/g, '$1, "$2":');
+    repaired = repaired.replace(/(\d+|true|false|null)\s*,?\s+"([^"]+)"\s*:/g, '$1, "$2":');
     // Case C: After a closing brace or bracket (nested objects/arrays)
-    repaired = repaired.replace(/([\]\}])\s*,?\s+"([a-zA-Z0-9_]+)"\s*:/g, '$1, "$2":');
+    repaired = repaired.replace(/([\]\}])\s*,?\s+"([^"]+)"\s*:/g, '$1, "$2":');
 
-    // 7. Fix missing colons: "key" "value" -> "key": "value"
-    repaired = repaired.replace(/"\s*([a-zA-Z0-9_]+)"\s+("|\d+|true|false|null|\[|\{)/g, '"$1": $2');
+    // 6. Fix missing colons: "key" "value" -> "key": "value"
+    repaired = repaired.replace(/"\s*([^"]+)"\s+("|\d+|true|false|null|\[|\{)/g, '"$1": $2');
 
-    // 8. Ensure property names are quoted
+    // 7. Ensure property names are quoted
     repaired = repaired.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
 
     // 9. Fix multi-line strings that aren't escaped
