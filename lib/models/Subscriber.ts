@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const SubscriberSchema = new mongoose.Schema({
+    name: { type: String },
     email: { type: String, required: true },
     penNameId: { type: mongoose.Schema.Types.ObjectId, ref: "PenName" },
     userId: { type: String }, // The admin user who owns the pen name
@@ -15,4 +16,4 @@ if (mongoose.models && mongoose.models.Subscriber) {
     delete mongoose.models.Subscriber;
 }
 
-export default mongoose.model("Subscriber", SubscriberSchema);
+export default mongoose.models.Subscriber || mongoose.model("Subscriber", SubscriberSchema);

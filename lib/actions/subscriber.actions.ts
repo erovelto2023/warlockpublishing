@@ -6,8 +6,10 @@ import PenName from "@/lib/models/PenName";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-export async function subscribeToMailingList(email: string, penNameId?: string, signupUrl?: string) {
+export async function subscribeToMailingList(data: { email: string, name?: string, penNameId?: string, signupUrl?: string }) {
     await connectToDatabase();
+
+    const { email, name, penNameId, signupUrl } = data;
 
     const headersList = await headers();
     const userAgent = headersList.get("user-agent") || "unknown";
@@ -20,16 +22,16 @@ export async function subscribeToMailingList(email: string, penNameId?: string, 
     // 1. If penNameId is provided, find the owner
     if (penNameId) {
         const penName = await PenName.findById(penNameId);
-        if (!penName) {
-            return { success: false, message: "Terminal Error: Source identity not found." };
+        if (penName) {
+            userId = penName.userId;
         }
-        userId = penName.userId;
     }
 
     try {
         // 2. Create the subscriber with compliance data
         await Subscriber.create({
             email: email.toLowerCase().trim(),
+            name: name?.trim(),
             penNameId: penNameId || null,
             userId: userId,
             ipAddress,
@@ -54,6 +56,12 @@ export async function getSubscribers(penNameId: string) {
     return JSON.parse(JSON.stringify(subscribers));
 }
 
+export async function getAllSubscribers() {
+    await connectToDatabase();
+    const subscribers = await Subscriber.find().sort({ createdAt: -1 });
+    return JSON.parse(JSON.stringify(subscribers));
+}
+
 export async function deleteSubscriber(id: string) {
     await connectToDatabase();
     await Subscriber.findByIdAndDelete(id);
@@ -68,7 +76,7 @@ export async function deleteSubscribersBulk(ids: string[]) {
     return { success: true };
 }
 
-export async function updateSubscriber(id: string, data: { email: string }) {
+export async function updateSubscriber(id: string, data: { email: string, name?: string }) {
     await connectToDatabase();
     await Subscriber.findByIdAndUpdate(id, data);
     revalidatePath("/admin");

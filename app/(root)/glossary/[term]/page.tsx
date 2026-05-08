@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import ChecklistSection from "@/components/glossary/ChecklistSection";
 import ProductPipelineSection from "@/components/glossary/ProductPipelineSection";
-import MarketingStrategySection from "@/components/glossary/MarketingStrategySection";
+import GlossarySignupSection from "@/components/glossary/GlossarySignupSection";
 import SEOStrategySection from "@/components/glossary/SEOStrategySection";
 import StructuredData from "@/components/glossary/StructuredData";
 import AuthorityArticle from "@/components/glossary/AuthorityArticle";
@@ -270,8 +270,11 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                         {/* SEO Strategy Section */}
                         {term.seoStrategy && <SEOStrategySection strategy={term.seoStrategy} />}
 
-                        {/* Marketing Strategy Section */}
-                        {term.marketingStrategy && <MarketingStrategySection strategy={term.marketingStrategy} />}
+                        {/* Signup Section */}
+                        <GlossarySignupSection 
+                            term={term.term} 
+                            image={term.monetizationIdeas?.digitalDownloads?.[0]?.imageUrl} 
+                        />
 
                         {/* Product Pipeline Section */}
                         <ProductPipelineSection term={term.term} ideas={term.monetizationIdeas} />
