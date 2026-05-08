@@ -93,12 +93,15 @@ export function repairJson(content: string): string {
     // 2. NORMALIZATION: Smart quotes and single quotes
     s = s.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
     
+    // 2.5. ESCAPING: Fix unescaped backslashes (avoiding valid escapes)
+    s = s.replace(/\\(?!(["\\\/bfnrt]|u[0-9a-fA-F]{4}))/g, '\\\\');
+
     // 3. PROPERTY DELIMITERS: Fix missing colons ("key" "value" -> "key": "value")
     s = s.replace(/"\s*([^"]+)"\s+("|\d+|true|false|null|\[|\{)/g, '"$1": $2');
 
     // 4. COMMA INJECTION: Ultra-aggressive pass for "Expected ',' or '}'"
     const p1 = '(?:\\"|\\d+|true|false|null|\\}|\\])';
-    const p2 = '(?:\\"|\\d+|true|false|null|\\{|\\[)';
+    const p2 = '(?:\\"|\\d+|true|false|null|\\{|\\[';
     
     // Heuristic: If we see a value/closing-bracket followed by another value/opening-bracket with space, add a comma
     // BUT avoid matching keys (quotes followed by colons)
@@ -154,8 +157,6 @@ export function repairJson(content: string): string {
     if (s.includes(']') && s.includes('[')) {
         // Look for cases where an array ends and another begins: ] [
         if (/\]\s*\[/.test(s)) {
-            // We strip the outer brackets of individual arrays and wrap the whole thing
-            // Or easier: just wrap them and the parser will handle it if we fix the middle
             s = '[' + s.replace(/\]\s*\[/g, '], [') + ']';
         }
     }
@@ -167,7 +168,7 @@ export function repairJson(content: string): string {
 
     // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
     let currentAttempt = s;
-    for (let attempt = 0; attempt < 20; attempt++) { // More attempts for large files
+    for (let attempt = 0; attempt < 30; attempt++) { // Even more attempts
         try {
             const obj = JSON.parse(currentAttempt);
             return JSON.stringify(obj, null, 2);
@@ -176,20 +177,23 @@ export function repairJson(content: string): string {
             if (errorPos) {
                 const pos = parseInt(errorPos[1]);
                 
-                // Scan backward for the last non-whitespace character
                 let leftPos = pos - 1;
                 while (leftPos >= 0 && /\s/.test(currentAttempt[leftPos])) leftPos--;
                 const charBefore = currentAttempt[leftPos];
                 
-                // Scan forward for the next non-whitespace character
                 let rightPos = pos;
                 while (rightPos < currentAttempt.length && /\s/.test(currentAttempt[rightPos])) rightPos++;
                 const charAt = currentAttempt[rightPos];
 
                 if (!charBefore || !charAt) break;
 
+                // Case: Unescaped internal quote
+                if (charAt === '"' && ![':', ',', '}', ']', '{', '['].includes(charBefore)) {
+                    currentAttempt = currentAttempt.substring(0, rightPos) + '\\"' + currentAttempt.substring(rightPos + 1);
+                    continue;
+                }
+
                 // Case: Missing comma between array elements or properties
-                // Look for: "val" "val", } {, ] [, "val" {, etc.
                 const needsCommaBefore = ['"', '}', ']', 'e', 's', 'l', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(charBefore);
                 const needsCommaAfter = ['"', '{', '['].includes(charAt);
                 
