@@ -118,12 +118,17 @@ export function repairJson(content: string): string {
         return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
     });
 
-    // 7. EXTRACTION: Find the widest balanced structure
-    const startPos = Math.min(
-        s.indexOf('[') === -1 ? Infinity : s.indexOf('['),
-        s.indexOf('{') === -1 ? Infinity : s.indexOf('{')
+    // 7. EXTRACTION: Find the widest balanced structure and handle multiple top-level blocks
+    const firstBracket = s.indexOf('[');
+    const lastBracket = s.lastIndexOf(']');
+    const firstBrace = s.indexOf('{');
+    const lastBrace = s.lastIndexOf('}');
+    
+    let startPos = Math.min(
+        firstBracket === -1 ? Infinity : firstBracket,
+        firstBrace === -1 ? Infinity : firstBrace
     );
-    const endPos = Math.max(s.lastIndexOf(']'), s.lastIndexOf('}'));
+    let endPos = Math.max(lastBracket, lastBrace);
     
     if (startPos !== Infinity && endPos !== -1 && endPos > startPos) {
         s = s.substring(startPos, endPos + 1);
@@ -139,11 +144,32 @@ export function repairJson(content: string): string {
     while (openBraces > 0) { s += '}'; openBraces--; }
     while (openBrackets > 0) { s += ']'; openBrackets--; }
 
-    // 9. PRETTIFY: Final attempt to validate and format
+    // 9. MULTI-BLOCK WRAPPING: If it's multiple objects/arrays like {...} {...}, wrap in [...]
+    if (s.startsWith('{') && s.endsWith('}') && s.includes('}{')) {
+        s = '[' + s.replace(/\}\s*\{/g, '}, {') + ']';
+    } else if (s.startsWith('[') && s.endsWith(']') && s.includes('][')) {
+        // If it's multiple arrays, we might need to flatten or just wrap. Wrapping is safer.
+        s = '[' + s.replace(/\]\s*\[/g, '], [') + ']';
+    }
+
+    // 10. PRETTIFY: Final attempt to validate and format
     try {
         const obj = JSON.parse(s);
         return JSON.stringify(obj, null, 2);
     } catch (e) {
+        // Fallback: If parse fails, try to see if there's trailing garbage after a valid JSON
+        try {
+            // Heuristic: try to parse prefixes of the string
+            for (let i = s.length - 1; i > 0; i--) {
+                if (s[i] === ']' || s[i] === '}') {
+                    try {
+                        const partial = s.substring(0, i + 1);
+                        const obj = JSON.parse(partial);
+                        return JSON.stringify(obj, null, 2);
+                    } catch (inner) { continue; }
+                }
+            }
+        } catch (f) {}
         return s;
     }
 }
