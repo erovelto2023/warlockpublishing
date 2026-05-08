@@ -19,7 +19,8 @@ export function NewsletterForm({ penNameId }: NewsletterFormProps) {
 
         setLoading(true);
         try {
-            const result = await subscribeToMailingList(email, penNameId);
+            const signupUrl = typeof window !== 'undefined' ? window.location.href : '';
+            const result = await subscribeToMailingList({ email, penNameId, signupUrl });
             if (result.success) {
                 toast({
                     title: "Success",

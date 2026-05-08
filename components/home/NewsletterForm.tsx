@@ -16,7 +16,7 @@ export default function NewsletterForm() {
         setStatus('loading');
         try {
             const signupUrl = typeof window !== 'undefined' ? window.location.href : '';
-            const result = await subscribeToMailingList(email, undefined, signupUrl);
+            const result = await subscribeToMailingList({ email, signupUrl });
             if (result.success) {
                 setStatus('success');
                 setMessage(result.message);
