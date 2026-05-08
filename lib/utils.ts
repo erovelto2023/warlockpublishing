@@ -148,23 +148,22 @@ export function repairJson(content: string): string {
     while (openBrackets > 0) { s += ']'; openBrackets--; }
 
     // 9. MULTI-BLOCK WRAPPING: If it's multiple objects/arrays like {...} {...} or [...] [...], wrap in [...]
-    if (s.includes('}') && s.includes('{')) {
-        // Look for cases where an object ends and another begins: } {
-        if (/}\s*\{/.test(s)) {
-            s = '[' + s.replace(/\}\s*\{/g, '}, {') + ']';
-        }
-    }
-    if (s.includes(']') && s.includes('[')) {
-        // Look for cases where an array ends and another begins: ] [
-        if (/\]\s*\[/.test(s)) {
-            s = '[' + s.replace(/\]\s*\[/g, '], [') + ']';
+    // This solves the "Unexpected non-whitespace character after JSON" error
+    try {
+        JSON.parse(s);
+    } catch (e: any) {
+        if (e.message.includes("Unexpected non-whitespace character") || 
+            e.message.includes("after JSON")) {
+            s = '[' + s + ']';
         }
     }
 
-    // Double check: if it's still not wrapped in [] but has multiple { or [, wrap it
-    if (!s.startsWith('[') && s.match(/\}\s*,?\s*\{/)) {
-        s = '[' + s + ']';
-    }
+    // Clean up any double-wrapping or malformed starts
+    s = s.replace(/^\[\s*\[/, '[').replace(/\]\s*\]$/, ']');
+    
+    // Ensure all blocks are joined by commas
+    s = s.replace(/\}\s*\{/g, '}, {');
+    s = s.replace(/\]\s*\[/g, '], [');
 
     // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
     let currentAttempt = s;
