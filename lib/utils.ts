@@ -101,7 +101,7 @@ export function repairJson(content: string): string {
 
     // 4. COMMA INJECTION: Ultra-aggressive pass for "Expected ',' or '}'"
     const p1 = '(?:\\"|\\d+|true|false|null|\\}|\\])';
-    const p2 = '(?:\\"|\\d+|true|false|null|\\{|\\[';
+    const p2 = '(?:\\"|\\d+|true|false|null|\\{|\\[)';
     
     // Heuristic: If we see a value/closing-bracket followed by another value/opening-bracket with space, add a comma
     // BUT avoid matching keys (quotes followed by colons)
