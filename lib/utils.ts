@@ -162,8 +162,9 @@ export function repairJson(content: string): string {
     s = s.replace(/^\[\s*\[/, '[').replace(/\]\s*\]$/, ']');
     
     // Ensure all blocks are joined by commas
+    // If we have [...] [...], we want to merge them into one flat array [...]
+    s = s.replace(/\]\s*\[/g, ', ');
     s = s.replace(/\}\s*\{/g, '}, {');
-    s = s.replace(/\]\s*\[/g, '], [');
 
     // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
     let currentAttempt = s;

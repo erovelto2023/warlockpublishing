@@ -130,7 +130,13 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             setIsHydrating(true);
             setStatus(null);
 
-            const result = await importDetailedJson(data);
+            // DEFENSIVE: Flatten the data if it's nested (e.g. [[...], [...]])
+            let finalData = data;
+            if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
+                finalData = data.flat();
+            }
+
+            const result = await importDetailedJson(finalData);
             
             if (result?.success) {
                 const collisions = result.importedTerms?.filter((t: any) => t.wasCollision) || [];
@@ -185,7 +191,14 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             setStatus({ type: 'success', message: 'JSON repaired! Attempting to populate database...' });
             
             const data = JSON.parse(fixed);
-            const result = await importDetailedJson(data);
+            
+            // DEFENSIVE: Flatten if nested
+            let finalData = data;
+            if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
+                finalData = data.flat();
+            }
+
+            const result = await importDetailedJson(finalData);
             
             if (result.success) {
                 // Clear the portal on success
