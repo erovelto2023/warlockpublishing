@@ -152,24 +152,42 @@ export function repairJson(content: string): string {
         s = '[' + s.replace(/\]\s*\[/g, '], [') + ']';
     }
 
-    // 10. PRETTIFY: Final attempt to validate and format
-    try {
-        const obj = JSON.parse(s);
-        return JSON.stringify(obj, null, 2);
-    } catch (e) {
-        // Fallback: If parse fails, try to see if there's trailing garbage after a valid JSON
+    // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
+    let currentAttempt = s;
+    for (let attempt = 0; attempt < 10; attempt++) {
         try {
-            // Heuristic: try to parse prefixes of the string
-            for (let i = s.length - 1; i > 0; i--) {
-                if (s[i] === ']' || s[i] === '}') {
-                    try {
-                        const partial = s.substring(0, i + 1);
-                        const obj = JSON.parse(partial);
-                        return JSON.stringify(obj, null, 2);
-                    } catch (inner) { continue; }
+            const obj = JSON.parse(currentAttempt);
+            return JSON.stringify(obj, null, 2);
+        } catch (e: any) {
+            const errorPos = e.message.match(/at position (\d+)/);
+            if (errorPos) {
+                const pos = parseInt(errorPos[1]);
+                const charAt = currentAttempt[pos];
+                const charBefore = currentAttempt[pos - 1];
+                
+                // Case: Missing comma between array elements or properties
+                if ((charBefore === '"' || charBefore === '}' || charBefore === ']') && 
+                    (charAt === '"' || charAt === '{' || charAt === '[')) {
+                    currentAttempt = currentAttempt.substring(0, pos) + ',' + currentAttempt.substring(pos);
+                    continue;
+                }
+                
+                // Case: Missing colon
+                if (charBefore === '"' && charAt === '"') {
+                    currentAttempt = currentAttempt.substring(0, pos) + ':' + currentAttempt.substring(pos);
+                    continue;
+                }
+
+                // If we can't pinpoint a specific fix, try to jump slightly and inject a comma
+                // This is a last-resort heuristic for "Expected ',' or '}'"
+                if (e.message.includes("Expected ','") || e.message.includes("Expected ':'")) {
+                     currentAttempt = currentAttempt.substring(0, pos) + ',' + currentAttempt.substring(pos);
+                     continue;
                 }
             }
-        } catch (f) {}
-        return s;
+            break; 
+        }
     }
+
+    return currentAttempt;
 }
