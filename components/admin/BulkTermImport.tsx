@@ -175,14 +175,41 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
         }
     };
 
-    const handleAutoFix = () => {
+    const handleAutoFix = async () => {
         try {
             const fixed = repairJson(jsonContent);
             setJsonContent(fixed);
             setHasFixed(true);
-            setStatus({ type: 'success', message: 'JSON structure repaired! Please try populating again.' });
+            
+            // Automatically attempt to populate after fixing
+            setStatus({ type: 'success', message: 'JSON repaired! Attempting to populate database...' });
+            
+            const data = JSON.parse(fixed);
+            const result = await importDetailedJson(data, category);
+            
+            if (result.success) {
+                // Clear the portal on success
+                setJsonContent('');
+                setHasFixed(false);
+                setStatus({ 
+                    type: 'success', 
+                    message: `Successfully imported ${result.count} terms! ${result.collisions ? `(${result.collisions} slugs auto-incremented)` : ''}` 
+                });
+                
+                if (result.importedTerms) {
+                    const currentTerms = rawList.split('\n').filter(t => t.trim());
+                    const remainingTerms = currentTerms.filter(term => 
+                        !result.importedTerms.includes(term.trim())
+                    );
+                    setRawList(remainingTerms.join('\n'));
+                }
+                
+                router.refresh();
+            } else {
+                setStatus({ type: 'error', message: result.error || 'Import failed after repair.' });
+            }
         } catch (err: any) {
-            setStatus({ type: 'error', message: `Auto-fix failed: ${err.message}` });
+            setStatus({ type: 'error', message: `Auto-fix/Populate failed: ${err.message}` });
         }
     };
 
@@ -411,30 +438,30 @@ ${rawList || "Please paste keywords in the first column"}`;
                             {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                             <p className="text-[10px] font-black uppercase tracking-widest">{status.message}</p>
                         </div>
-                        {status.type === 'error' && (
-                            <div className="flex items-center gap-2">
-                                {hasFixed && (
-                                    <button 
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(jsonContent);
-                                            toast({
-                                                title: "Success",
-                                                description: "Repaired JSON copied to clipboard",
-                                            });
-                                        }}
-                                        className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all flex items-center gap-2"
-                                    >
-                                        <Copy size={12} /> Copy Fixed JSON
-                                    </button>
-                                )}
+                        <div className="flex items-center gap-2">
+                            {hasFixed && (
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(jsonContent);
+                                        toast({
+                                            title: "Success",
+                                            description: "Repaired JSON copied to clipboard",
+                                        });
+                                    }}
+                                    className="px-3 py-1 bg-slate-200 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all flex items-center gap-2"
+                                >
+                                    <Copy size={12} /> Copy Fixed JSON
+                                </button>
+                            )}
+                            {status.type === 'error' && (
                                 <button 
                                     onClick={handleAutoFix}
-                                    className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg"
+                                    className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2 shadow-lg animate-pulse"
                                 >
-                                    <Wand2 size={12} /> Auto Fix JSON
+                                    <Wand2 size={12} /> Auto Fix & Populate
                                 </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 )}
 
