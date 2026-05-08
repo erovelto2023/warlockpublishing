@@ -144,12 +144,25 @@ export function repairJson(content: string): string {
     while (openBraces > 0) { s += '}'; openBraces--; }
     while (openBrackets > 0) { s += ']'; openBrackets--; }
 
-    // 9. MULTI-BLOCK WRAPPING: If it's multiple objects/arrays like {...} {...}, wrap in [...]
-    if (s.startsWith('{') && s.endsWith('}') && s.includes('}{')) {
-        s = '[' + s.replace(/\}\s*\{/g, '}, {') + ']';
-    } else if (s.startsWith('[') && s.endsWith(']') && s.includes('][')) {
-        // If it's multiple arrays, we might need to flatten or just wrap. Wrapping is safer.
-        s = '[' + s.replace(/\]\s*\[/g, '], [') + ']';
+    // 9. MULTI-BLOCK WRAPPING: If it's multiple objects/arrays like {...} {...} or [...] [...], wrap in [...]
+    if (s.includes('}') && s.includes('{')) {
+        // Look for cases where an object ends and another begins: } {
+        if (/}\s*\{/.test(s)) {
+            s = '[' + s.replace(/\}\s*\{/g, '}, {') + ']';
+        }
+    }
+    if (s.includes(']') && s.includes('[')) {
+        // Look for cases where an array ends and another begins: ] [
+        if (/\]\s*\[/.test(s)) {
+            // We strip the outer brackets of individual arrays and wrap the whole thing
+            // Or easier: just wrap them and the parser will handle it if we fix the middle
+            s = '[' + s.replace(/\]\s*\[/g, '], [') + ']';
+        }
+    }
+
+    // Double check: if it's still not wrapped in [] but has multiple { or [, wrap it
+    if (!s.startsWith('[') && s.match(/\}\s*,?\s*\{/)) {
+        s = '[' + s + ']';
     }
 
     // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
