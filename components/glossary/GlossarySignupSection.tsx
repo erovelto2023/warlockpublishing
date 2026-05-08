@@ -102,7 +102,7 @@ export default function GlossarySignupSection({ term, image }: GlossarySignupSec
 
                 <div className="space-y-4">
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                        Get exclusive strategic insights on <span className="text-indigo-600 dark:text-indigo-400 font-bold">"{term}"</span> and other high-authority concepts delivered straight to your terminal.
+                        Join my list and be updated to cool news and offers.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-3">
@@ -132,7 +132,7 @@ export default function GlossarySignupSection({ term, image }: GlossarySignupSec
                             disabled={loading}
                             className="w-full bg-slate-900 dark:bg-indigo-600 hover:bg-black dark:hover:bg-indigo-700 text-white h-12 font-black uppercase tracking-[0.2em] text-[10px] shadow-lg shadow-slate-200 dark:shadow-none"
                         >
-                            {loading ? "Synchronizing..." : "Initialize Access"}
+                            {loading ? "Subscribing..." : "Subscribe"}
                         </Button>
                     </form>
                     
