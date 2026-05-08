@@ -154,7 +154,7 @@ export function repairJson(content: string): string {
 
     // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
     let currentAttempt = s;
-    for (let attempt = 0; attempt < 10; attempt++) {
+    for (let attempt = 0; attempt < 20; attempt++) { // More attempts for large files
         try {
             const obj = JSON.parse(currentAttempt);
             return JSON.stringify(obj, null, 2);
@@ -162,24 +162,36 @@ export function repairJson(content: string): string {
             const errorPos = e.message.match(/at position (\d+)/);
             if (errorPos) {
                 const pos = parseInt(errorPos[1]);
-                const charAt = currentAttempt[pos];
-                const charBefore = currentAttempt[pos - 1];
                 
+                // Scan backward for the last non-whitespace character
+                let leftPos = pos - 1;
+                while (leftPos >= 0 && /\s/.test(currentAttempt[leftPos])) leftPos--;
+                const charBefore = currentAttempt[leftPos];
+                
+                // Scan forward for the next non-whitespace character
+                let rightPos = pos;
+                while (rightPos < currentAttempt.length && /\s/.test(currentAttempt[rightPos])) rightPos++;
+                const charAt = currentAttempt[rightPos];
+
+                if (!charBefore || !charAt) break;
+
                 // Case: Missing comma between array elements or properties
-                if ((charBefore === '"' || charBefore === '}' || charBefore === ']') && 
-                    (charAt === '"' || charAt === '{' || charAt === '[')) {
-                    currentAttempt = currentAttempt.substring(0, pos) + ',' + currentAttempt.substring(pos);
+                // Look for: "val" "val", } {, ] [, "val" {, etc.
+                const needsCommaBefore = ['"', '}', ']', 'e', 's', 'l', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(charBefore);
+                const needsCommaAfter = ['"', '{', '['].includes(charAt);
+                
+                if (needsCommaBefore && needsCommaAfter) {
+                    currentAttempt = currentAttempt.substring(0, leftPos + 1) + ',' + currentAttempt.substring(leftPos + 1);
                     continue;
                 }
                 
                 // Case: Missing colon
                 if (charBefore === '"' && charAt === '"') {
-                    currentAttempt = currentAttempt.substring(0, pos) + ':' + currentAttempt.substring(pos);
+                    currentAttempt = currentAttempt.substring(0, leftPos + 1) + ':' + currentAttempt.substring(leftPos + 1);
                     continue;
                 }
 
-                // If we can't pinpoint a specific fix, try to jump slightly and inject a comma
-                // This is a last-resort heuristic for "Expected ',' or '}'"
+                // Generic fallback for "Expected" errors
                 if (e.message.includes("Expected ','") || e.message.includes("Expected ':'")) {
                      currentAttempt = currentAttempt.substring(0, pos) + ',' + currentAttempt.substring(pos);
                      continue;
