@@ -264,6 +264,15 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
 - For "visualAsset", create prompts for thematic cover art or Pinterest-style coloring page previews.`;
         }
 
+        // Add special hardware-first strategy for Stoner and Japanese niches
+        if (category.toLowerCase().includes('stoner') || category.toLowerCase().includes('japanese')) {
+            categorySpecificInstructions += `\n\n### SPECIAL STRATEGY: HARDWARE-FIRST & AUTHORITY SIGNALING
+The market demand data shows extreme Passion Scores (9.9+) for this niche.
+- Mention specific paper stock requirements (e.g., 120GSM cream-tinted paper for Japanese Noir, ink-bleed-shield black-backed pages for Stoner art).
+- Propose "Hardware Bundles" or "Asset Kits" in the monetization ideas (e.g., technical fineliners or UV-LED keychain lights).
+- Use elite authority signaling in the content (Institutional Lead).`;
+        }
+
         const affiliateCatalogStr = unifiedCatalog.length > 0 
             ? unifiedCatalog.map(o => `- [${o.name}](${o.url}) (Niche/Category: ${o.category}) [Source: ${o.source}]`).join('\n')
             : "No affiliate products available.";
@@ -274,17 +283,20 @@ ${categorySpecificInstructions}
 
 For EACH keyword provided below, you must generate a high-ranking, high-converting JSON object that follows this EXACT schema. This data acts as the structural engine for a premium glossary system.
 
-### MANDATORY RULES:
+### MANDATORY JSON COMPLIANCE RULES:
 1. Valid JSON Array only. No conversational text or markdown explanation outside the array.
 2. Use DOUBLE QUOTES (") for all keys and string values.
-3. CRITICAL: Tropes are "cognitive shortcuts". Explain the reader psychology in depth.
-4. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
-5. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
-6. CRITICAL: ALL URLs (YouTube, Affiliate links, Image links) MUST use 'https://'. Never use 'http://'.
-7. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
-8. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (starting with https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
-9. CRITICAL: DO NOT hallucinate "digitalDownloads". The "digitalDownloads" array MUST BE EMPTY [].
-10. CRITICAL: DO NOT hallucinate books in "vibeCuration". Use products from the catalog or generic placeholders only.
+3. CRITICAL: For "articleContent" and any HTML strings, you MUST escape all internal double quotes using a backslash (e.g., use <div class=\\\"cnn-fast-facts\\\">) or use single quotes for HTML attributes.
+4. CRITICAL: NO LITERAL NEWLINES within string values. All strings must be a single line. Use \\n characters if you need to represent a line break in the HTML or text.
+5. Ensure the entire output is a single, valid JSON array of objects.
+6. CRITICAL: Tropes are "cognitive shortcuts". Explain the reader psychology in depth.
+7. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
+8. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
+9. CRITICAL: ALL URLs (YouTube, Affiliate links, Image links) MUST use 'https://'. Never use 'http://'.
+10. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
+11. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (starting with https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
+12. CRITICAL: DO NOT hallucinate "digitalDownloads". The "digitalDownloads" array MUST BE EMPTY [].
+13. CRITICAL: DO NOT hallucinate books in "vibeCuration". Use products from the catalog or generic placeholders only.
 
 AVAILABLE AFFILIATE CATALOG:
 ${affiliateCatalogStr}
