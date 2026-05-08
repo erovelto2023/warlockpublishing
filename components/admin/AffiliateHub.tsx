@@ -389,12 +389,11 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                     <Table>
                         <TableHeader className="bg-slate-50 border-b border-slate-200">
                             <TableRow className="border-slate-200 hover:bg-transparent">
-                                <TableHead className="w-12 text-slate-500"></TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Offer Details</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Network & Category</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Offer</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 hidden md:table-cell">Network</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Payout</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Engagement</TableHead>
-                                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Action Center</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 hidden lg:table-cell">Clicks</TableHead>
+                                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-slate-500">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -405,50 +404,40 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                             ) : (
                                 paginatedOffers.map((offer) => (
                                     <TableRow key={offer._id} className="border-slate-200 hover:bg-slate-50 transition-colors group">
-                                        <TableCell>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                onClick={() => handleToggleFavorite(offer._id)}
-                                                className={offer.isFavorite ? "text-emerald-500" : "text-slate-400 hover:text-emerald-500"}
-                                            >
-                                                {offer.isFavorite ? <Star size={18} fill="currentColor" /> : <StarOff size={18} />}
-                                            </Button>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-start gap-2">
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="font-bold text-slate-900 transition-colors truncate">{offer.name}</p>
-                                                    <p className="text-[10px] text-slate-500 font-mono mt-1 truncate">{offer.affiliateLink}</p>
-                                                </div>
+                                        <TableCell className="py-3">
+                                            <div className="flex items-center gap-3">
                                                 <Button 
                                                     variant="ghost" 
                                                     size="icon" 
-                                                    className="h-8 w-8 text-slate-400 hover:text-slate-900 shrink-0"
-                                                    onClick={() => handleEdit(offer)}
+                                                    onClick={() => handleToggleFavorite(offer._id)}
+                                                    className={`h-8 w-8 shrink-0 ${offer.isFavorite ? "text-emerald-500" : "text-slate-300 hover:text-emerald-500"}`}
                                                 >
-                                                    <Edit3 size={14} />
+                                                    {offer.isFavorite ? <Star size={16} fill="currentColor" /> : <StarOff size={16} />}
                                                 </Button>
+                                                <div className="min-w-0">
+                                                    <p className="font-bold text-slate-900 text-sm truncate max-w-[150px] md:max-w-[250px]">{offer.name}</p>
+                                                    <p className="text-[10px] text-slate-400 font-mono truncate max-w-[150px] opacity-60">{offer.affiliateLink}</p>
+                                                </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col gap-1">
-                                                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold w-fit">{offer.network || 'None'}</span>
-                                                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold w-fit">{offer.category}</span>
+                                        <TableCell className="hidden md:table-cell">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[10px] font-bold text-slate-600 truncate max-w-[80px]">{offer.network || 'None'}</span>
+                                                <span className="text-[9px] text-slate-400 font-medium truncate max-w-[80px]">{offer.category}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="text-xs">
                                                 <p className="font-bold text-emerald-600">{offer.payoutAmount || 'N/A'}</p>
-                                                <p className="text-[10px] text-slate-500 uppercase tracking-wider">{offer.commissionLevel}</p>
+                                                <p className="text-[9px] text-slate-400 uppercase tracking-tight">{offer.commissionLevel}</p>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden lg:table-cell">
                                             <div className="flex items-center gap-2">
-                                                <div className="h-1.5 w-16 bg-slate-100 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-slate-900" style={{ width: `${Math.min((offer.clicks || 0) / 10, 100)}%` }}></div>
+                                                <span className="text-[10px] font-black text-slate-900">{offer.clicks || 0}</span>
+                                                <div className="h-1 w-8 bg-slate-100 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-slate-400" style={{ width: `${Math.min((offer.clicks || 0) / 10, 100)}%` }}></div>
                                                 </div>
-                                                <span className="text-[10px] font-bold text-slate-600">{offer.clicks || 0}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
