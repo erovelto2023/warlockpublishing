@@ -295,10 +295,12 @@ export async function importDetailedJson(data: any[]) {
         revalidatePath('/glossary/directory');
         revalidatePath('/admin');
         
-        return { success: true, count, importedTerms };
+        const collisions = importedTerms.filter(t => t.wasCollision).length;
+        
+        return { success: true, count, importedTerms, collisions };
     } catch (error: any) {
         console.error("Import error:", error);
-        return { success: false, message: error.message };
+        return { success: false, message: error.message, count: 0, importedTerms: [] };
     }
 }
 

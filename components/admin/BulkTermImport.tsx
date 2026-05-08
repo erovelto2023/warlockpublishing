@@ -193,20 +193,22 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
                 setHasFixed(false);
                 setStatus({ 
                     type: 'success', 
-                    message: `Successfully imported ${result.count} terms! ${result.collisions ? `(${result.collisions} slugs auto-incremented)` : ''}` 
+                    message: `Successfully imported ${result.count} terms! ${(result as any).collisions ? `(${(result as any).collisions} slugs auto-incremented)` : ''}` 
                 });
                 
                 if (result.importedTerms) {
                     const currentTerms = rawList.split('\n').filter(t => t.trim());
+                    // Extract term strings from the importedTerms objects
+                    const importedTermStrings = result.importedTerms.map((t: any) => t.term);
                     const remainingTerms = currentTerms.filter(term => 
-                        !result.importedTerms.includes(term.trim())
+                        !importedTermStrings.includes(term.trim())
                     );
                     setRawList(remainingTerms.join('\n'));
                 }
                 
                 router.refresh();
             } else {
-                setStatus({ type: 'error', message: result.error || 'Import failed after repair.' });
+                setStatus({ type: 'error', message: (result as any).message || 'Import failed after repair.' });
             }
         } catch (err: any) {
             setStatus({ type: 'error', message: `Auto-fix/Populate failed: ${err.message}` });
