@@ -85,7 +85,7 @@ export function repairJson(content: string): string {
     // 1. CLEANING: Remove markdown blocks and invisible control characters
     const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
     const matches = [...s.matchAll(codeBlockRegex)];
-    if (matches.length > 0) s = matches[0][1].trim();
+    if (matches.length > 0) s = matches.map(m => m[1].trim()).join(', ');
     
     // Strip non-printable control characters except whitespace
     s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
@@ -147,24 +147,34 @@ export function repairJson(content: string): string {
     while (openBraces > 0) { s += '}'; openBraces--; }
     while (openBrackets > 0) { s += ']'; openBrackets--; }
 
-    // 9. MULTI-BLOCK WRAPPING: If it's multiple objects/arrays like {...} {...} or [...] [...], wrap in [...]
+    // 9. MULTI-BLOCK WRAPPING: If it's multiple objects/arrays like {...} {...} or [...] [...], wrap and join them
     // This solves the "Unexpected non-whitespace character after JSON" error
     try {
         JSON.parse(s);
     } catch (e: any) {
         if (e.message.includes("Unexpected non-whitespace character") || 
             e.message.includes("after JSON")) {
-            s = '[' + s + ']';
+            
+            // 1. Force join any disconnected objects/arrays
+            s = s.replace(/\]\s*\[/g, ' , ')
+                 .replace(/\}\s*\{/g, ' } , { ')
+                 .replace(/\}\s*\[/g, ' } , [ ')
+                 .replace(/\]\s*\{/g, ' ] , { ');
+            
+            // 2. Ensure the whole thing is wrapped in an array if it's multiple blocks
+            if (!s.startsWith('[')) s = '[' + s;
+            if (!s.endsWith(']')) s = s + ']';
+            
+            // 3. Clean up any double-wrapping that might have been introduced
+            s = s.replace(/^\[\s*\[/, '[').replace(/\]\s*\]$/, ']');
         }
     }
 
-    // Clean up any double-wrapping or malformed starts
-    s = s.replace(/^\[\s*\[/, '[').replace(/\]\s*\]$/, ']');
-    
     // Ensure all blocks are joined by commas
-    // If we have [...] [...], we want to merge them into one flat array [...]
     s = s.replace(/\]\s*\[/g, ', ');
     s = s.replace(/\}\s*\{/g, '}, {');
+    s = s.replace(/,\s*,/g, ',');
+    s = s.replace(/\[\s*,/g, '[').replace(/,\s*\]/g, ']');
 
     // 10. SURGICAL REPAIR: Iterative repair based on parser feedback
     let currentAttempt = s;

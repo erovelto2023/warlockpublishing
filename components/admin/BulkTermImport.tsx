@@ -41,15 +41,28 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             let cleaned = jsonContent.trim();
             const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
             const matches = [...cleaned.matchAll(codeBlockRegex)];
-            if (matches.length > 0) cleaned = matches[0][1].trim();
-
-            const data = JSON.parse(cleaned);
+            
+            if (matches.length > 0) {
+                // If there are multiple code blocks, join them into a simulated array string
+                cleaned = matches.map(m => m[1].trim()).join(', ');
+            }
+            
+            // Run repairJson before parsing for the preview
+            const repaired = repairJson(cleaned);
+            const data = JSON.parse(repaired);
+            
             if (Array.isArray(data)) {
                 const terms = data.map((item: any) => ({
                     term: item.term,
                     isDuplicate: existingTerms.some(et => et.term.toLowerCase() === (item.term || '').toLowerCase())
                 }));
                 setParsedTerms(terms);
+            } else if (typeof data === 'object' && data !== null) {
+                // Single object case
+                setParsedTerms([{
+                    term: (data as any).term,
+                    isDuplicate: existingTerms.some(et => et.term.toLowerCase() === ((data as any).term || '').toLowerCase())
+                }]);
             }
         } catch (e) {
             setParsedTerms([]);
@@ -110,8 +123,16 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
     const handleHydrate = async () => {
         setHasFixed(false);
         try {
+            let input = jsonContent.trim();
+            const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
+            const matches = [...input.matchAll(codeBlockRegex)];
+            
+            if (matches.length > 0) {
+                input = matches.map(m => m[1].trim()).join(', ');
+            }
+
             // Auto-repair and sync the portal immediately
-            const repaired = repairJson(jsonContent);
+            const repaired = repairJson(input);
             setJsonContent(repaired);
             
             let data;
@@ -120,6 +141,10 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             } catch (initialError: any) {
                 // If it still fails, try one more time after a basic trim in case state didn't update yet
                 data = JSON.parse(repaired.trim());
+            }
+
+            if (!Array.isArray(data) && typeof data === 'object') {
+                data = [data]; // Wrap single object
             }
 
             if (!Array.isArray(data)) {
@@ -183,7 +208,15 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
 
     const handleAutoFix = async () => {
         try {
-            const fixed = repairJson(jsonContent);
+            let input = jsonContent.trim();
+            const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/g;
+            const matches = [...input.matchAll(codeBlockRegex)];
+            
+            if (matches.length > 0) {
+                input = matches.map(m => m[1].trim()).join(', ');
+            }
+
+            const fixed = repairJson(input);
             setJsonContent(fixed);
             setHasFixed(true);
             
@@ -193,9 +226,9 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             const data = JSON.parse(fixed);
             
             // DEFENSIVE: Flatten if nested
-            let finalData = data;
-            if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
-                finalData = data.flat();
+            let finalData = Array.isArray(data) ? data : [data];
+            if (Array.isArray(finalData) && finalData.length > 0 && Array.isArray(finalData[0])) {
+                finalData = finalData.flat();
             }
 
             const result = await importDetailedJson(finalData);
