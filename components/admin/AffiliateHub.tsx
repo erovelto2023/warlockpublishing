@@ -416,9 +416,19 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                                             </Button>
                                         </TableCell>
                                         <TableCell>
-                                            <div>
-                                                <p className="font-bold text-slate-900 transition-colors">{offer.name}</p>
-                                                <p className="text-[10px] text-slate-500 font-mono mt-1 max-w-[200px] truncate">{offer.affiliateLink}</p>
+                                            <div className="flex items-start gap-2">
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-bold text-slate-900 transition-colors truncate">{offer.name}</p>
+                                                    <p className="text-[10px] text-slate-500 font-mono mt-1 truncate">{offer.affiliateLink}</p>
+                                                </div>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-slate-400 hover:text-slate-900 shrink-0"
+                                                    onClick={() => handleEdit(offer)}
+                                                >
+                                                    <Edit3 size={14} />
+                                                </Button>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -451,6 +461,15 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                                                 >
                                                     {copiedId === offer._id ? <Check size={14} /> : <Copy size={14} />}
                                                     <span className="text-[10px] font-bold uppercase tracking-widest">{copiedId === offer._id ? 'Copied' : 'Link'}</span>
+                                                </Button>
+                                                <Button 
+                                                    variant="secondary" 
+                                                    size="sm" 
+                                                    className="h-8 gap-2 bg-slate-900 text-white hover:bg-slate-800"
+                                                    onClick={() => handleEdit(offer)}
+                                                >
+                                                    <Edit3 size={14} />
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Edit</span>
                                                 </Button>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -517,11 +536,11 @@ export default function AffiliateHub({ initialOffers }: AffiliateHubProps) {
                                     </Button>
                                     <Button 
                                         variant="outline" 
-                                        size="icon" 
-                                        className="h-12 w-12 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                        className="h-12 flex-1 gap-2 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-black uppercase tracking-widest text-xs"
                                         onClick={() => handleEdit(offer)}
                                     >
-                                        <Edit3 size={18} />
+                                        <Edit3 size={16} />
+                                        Edit Details
                                     </Button>
                                 </div>
                             </div>
