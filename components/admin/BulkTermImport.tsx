@@ -309,140 +309,50 @@ The market demand data shows extreme Passion Scores (9.9+) for this niche.
         const affiliateCatalogStr = unifiedCatalog.length > 0 
             ? unifiedCatalog.map(o => `- [${o.name}](${o.url}) (Niche/Category: ${o.category}) [Source: ${o.source}]`).join('\n')
             : "No affiliate products available.";
+
         const prompt = `Act as an Expert AI & SEO Content Architect for Warlock Publishing.
-You are a master architect designing the "Ultimate Authority Pipeline" for ${category}. 
+You are designing the "Ultimate Authority Pipeline" for ${category}. 
 
 ${categorySpecificInstructions}
 
-For EACH keyword provided below, you must generate a high-ranking, high-converting JSON object that follows this EXACT schema. This data acts as the structural engine for a premium glossary system.
+Generate a valid JSON array of objects for the keywords below. 
 
-### MANDATORY JSON COMPLIANCE RULES:
-1. Valid JSON Array only. No conversational text or markdown explanation outside the array.
-2. Use DOUBLE QUOTES (") for all keys and string values.
-3. CRITICAL: For "articleContent" and any HTML strings, you MUST escape all internal double quotes using a backslash (e.g., use <div class=\\\"cnn-fast-facts\\\">) or use single quotes for HTML attributes.
-4. CRITICAL: NO LITERAL NEWLINES within string values. All strings must be a single line. Use \\n characters if you need to represent a line break in the HTML or text.
-5. Ensure the entire output is a single, valid JSON array of objects.
-6. CRITICAL: Tropes are "cognitive shortcuts". Explain the reader psychology in depth.
-7. Ensure the "masterclass" and "aiPromptCommandCenter" sections are hyper-tailored to the niche.
-8. All images should use the placeholder '/images/placeholder-product.png' unless you have a specific Amazon ASIN.
-9. CRITICAL: ALL URLs (YouTube, Affiliate links, Image links) MUST use 'https://'. Never use 'http://'.
-10. For "affiliateProducts", YOU MUST CHOOSE 2-4 products from the "AVAILABLE AFFILIATE CATALOG" below that best match the niche keyword. Output them EXACTLY in Markdown format: [Product Name](Affiliate URL). DO NOT hallucinate products.
-11. For "youtubeVideoId", YOU MUST provide a REAL, VERIFIED full YouTube video URL (starting with https://www.youtube.com/watch?v=...) that is highly relevant to the term. DO NOT hallucinate fake video IDs. If you are unsure of a specific video, provide a known high-quality authority video in this niche. Every term MUST have a video.
-12. CRITICAL: DO NOT hallucinate "digitalDownloads". The "digitalDownloads" array MUST BE EMPTY [].
-13. CRITICAL: DO NOT hallucinate books in "vibeCuration". Use products from the catalog or generic placeholders only.
+### CRITICAL: JSON SAFETY RULES (TO PREVENT ERRORS)
+1. Use DOUBLE QUOTES (") for JSON keys and values.
+2. STICK TO SINGLE QUOTES (') for ALL HTML attributes (e.g., <div class='fast-facts'>). NEVER use double quotes inside a string value.
+3. NO PHYSICAL NEWLINES inside string values. Use \\n for line breaks.
+4. Output ONLY the JSON array. No conversational text.
+5. Keep descriptions punchy. If the output is too long, it will be cut off and fail.
+
+### SIMPLIFIED SCHEMA:
+{
+  "term": "Main Term",
+  "snapshot": "1-sentence punchy summary.",
+  "definition": "Clear 2-sentence authoritative definition.",
+  "articleContent": "High-fidelity article with standard HTML. Use <div class='cnn-fast-facts'> for key points. Use <h2> for subheadings. Use <blockquote> for quotes. USE SINGLE QUOTES FOR ALL HTML CLASS/ATTRS.",
+  "category": "${category}",
+  "youtubeVideoId": "https://www.youtube.com/watch?v=...",
+  "monetizationIdeas": {
+    "affiliateProducts": ["[Product 1](URL)", "[Product 2](URL)"],
+    "courseTopics": ["Topic 1"]
+  },
+  "marketDemand": { "demandScore": "9/10", "passionScore": "10/10", "trendStatus": "Rising" },
+  "readerPsychology": { "whyWeCraveIt": "...", "emotionalPayoff": "..." },
+  "masterclass": {
+    "masterclassDesc": "...",
+    "threeActStructure": { "act1": "Hook", "act2": "Escalation", "act3": "Resolution" },
+    "profitBeats": [ { "title": "Beat 1", "description": "...", "timing": "15%" } ],
+    "technicalComponents": { "powerTitle": "...", "tropes": ["Trope 1"], "hook": "..." },
+    "profitabilityChecklist": ["Checklist Item 1"]
+  },
+  "marketingStrategy": { "viralHooks": ["Hook 1"], "contentPillars": ["Pillar 1"] },
+  "faqItems": [ { "question": "Q1?", "answer": "A1." }, { "question": "Q2?", "answer": "A2." }, { "question": "Q3?", "answer": "A3." } ]
+}
 
 AVAILABLE AFFILIATE CATALOG:
 ${affiliateCatalogStr}
 
-SCHEMA FOR EACH OBJECT:
-{
-  "term": "Main Term",
-  "slug": "main-term-slug",
-  "snapshot": "1-sentence punchy summary for SEO snippets. This is MANDATORY.",
-  "definition": "Clear, authoritative 2-3 sentence definition for SGE. Explain the narrative or practical purpose.",
-  "articleContent": "A high-fidelity news article using the CNN 'Inverted Pyramid+' model. Structure: 1. Digital Headline (SEO-focused, present tense), 2. Fast Facts Box (HTML: <div class='cnn-fast-facts'><h3>Key Points</h3><ul>...</ul></div>), 3. Hard Lede (25-35 words), 4. Institutional Lead (mention authorities), 5. Nut Graf (The 'Why it Matters' context), 6. Development (punchy 2-3 sentence paragraphs), 7. Direct Attribution (blockquotes with 'said'), 8. Deep-Dive Subheadings, 9. Forward-Looking Statement, 10. Contributor Footer. Format with standard HTML tags.",
-  "category": "${category}",
-  "youtubeVideoId": "https://www.youtube.com/watch?v=REAL_VIDEO_ID_HERE",
-  "monetizationIdeas": {
-    "affiliateProducts": ["[Chosen Product 1](URL 1)", "[Chosen Product 2](URL 2)"],
-    "courseTopics": ["Course Topic 1"],
-    "digitalDownloads": []
-  },
-  "seoStrategy": {
-    "volumeRange": "1K-5K",
-    "difficulty": "Low",
-    "relatedKeywords": ["keyword 1", "keyword 2"]
-  },
-  "marketDemand": { 
-    "demandScore": "X.X/10", 
-    "passionScore": "X.X/10", 
-    "saturationScore": "X.X/10",
-    "trendStatus": "Rising/Stable/Oversaturated"
-  },
-  "readerPsychology": {
-    "whyWeCraveIt": "Deep analysis of the human hardwiring for this specific pattern.",
-    "cognitiveShortcut": "How this trope acts as a mental shortcut for immediate immersion.",
-    "emotionalPayoff": "The specific emotional reward for the reader/user.",
-    "catharticRelease": "Exploration of the psychological release or wish fulfillment provided."
-  },
-  "masterclass": {
-    "masterclassDesc": "A high-level, 1-2 sentence strategic summary of how a creator can commercially dominate this specific concept.",
-    "threeActStructure": { 
-        "act1": "Setup & Hook: How to introduce the concept and trap the reader's attention within the first 10% of the asset.", 
-        "act2": "Escalation & Complexity: The middle 60% where tension is built, variables are introduced, and the 'Value' is delivered.", 
-        "act3": "Resolution & Payoff: The final 30% where the emotional or practical promise is fulfilled and the user is converted into a fan." 
-    },
-    "profitBeats": [ 
-        { "title": "Strategic Beat Title", "description": "Specific tactical instruction for this moment in the content lifecycle.", "timing": "e.g. 15% (The Inciting Incident) or Step 3" } 
-    ],
-    "characterArchetypes": [
-        { "role": "The Catalyst/Alpha/Specialist", "description": "How this specific persona drives the value or narrative of the term." }
-    ],
-    "technicalComponents": { 
-        "powerTitle": "A high-CTR, curiosity-gap title for a book, course, or video about this term.", 
-        "tropes": ["Specific Trope 1", "Specific Trope 2"], 
-        "hook": "A 1-sentence magnetic hook that uses the 'Open Loop' technique." 
-    },
-    "profitabilityChecklist": [
-        "Checklist item for ensuring maximum commercial viability (e.g., 'Is the high-concept hook present?')",
-        "Checklist item for user retention/engagement."
-    ]
-  },
-  "subGenreVariations": [
-    { "genre": "Sub-Genre A", "variation": "How the concept shifts in this sub-genre." }
-  ],
-  "vibeCuration": [
-    {
-      "vibe": "Yellow",
-      "vibeDescription": "For readers seeking passion and catharsis.",
-      "books": [
-        { "title": "Example Book 1", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "https://amazon.com/..." }
-      ]
-    },
-    {
-      "vibe": "Blue",
-      "vibeDescription": "For readers seeking depth and atmosphere.",
-      "books": [
-        { "title": "Example Book 2", "author": "Author Name", "salesHook": "The 'Vibe' hook.", "buyUrl": "https://amazon.com/..." }
-      ]
-    }
-  ],
-  "marketingStrategy": {
-    "viralHooks": ["Hook 1 (TikTok/Shorts style)", "Hook 2 (Curiosity Gap)"],
-    "contentPillars": ["Pillar 1: Educational", "Pillar 2: Behind-the-Scenes/Process", "Pillar 3: Community/Reaction"]
-  },
-  "commonPitfalls": [ 
-    { "pitfall": "The common mistake", "howToAvoid": "The expert solution." } 
-  ],
-  "faqItems": [
-    { "question": "Question 1?", "answer": "Detailed answer 1." },
-    { "question": "Question 2?", "answer": "Detailed answer 2." },
-    { "question": "Question 3?", "answer": "Detailed answer 3." },
-    { "question": "Question 4?", "answer": "Detailed answer 4." },
-    { "question": "Question 5?", "answer": "Detailed answer 5." },
-    { "question": "Question 6?", "answer": "Detailed answer 6." },
-    { "question": "Question 7?", "answer": "Detailed answer 7." },
-    { "question": "Question 8?", "answer": "Detailed answer 8." },
-    { "question": "Question 9?", "answer": "Detailed answer 9." },
-    { "question": "Question 10?", "answer": "Detailed answer 10." }
-  ],
-  "checklist": {
-    "title": "Getting Started Checklist",
-    "description": "Step-by-step guide to implementing this concept.",
-    "items": [
-      { "task": "Task 1", "description": "What to do first." },
-      { "task": "Task 2", "description": "Next step." },
-      { "task": "Task 3", "description": "Final verification." }
-    ]
-  },
-  "aiPromptCommandCenter": {
-    "sceneGeneratorPrompt": "Full AI prompt to generate a high-tension scene or concept draft involving [term].",
-    "marketingHookPrompt": "Full AI prompt to generate 5 viral TikTok/social hooks for [term].",
-    "aiImagePrompt": "Cinematic AI image generation prompt for covers or aesthetic assets."
-  }
-}
-
-KEYWORDS TO RESEARCH AND CONVERT TO JSON:
+KEYWORDS TO RESEARCH:
 ${rawList || "Please paste keywords in the first column"}`;
 
         navigator.clipboard.writeText(prompt);
