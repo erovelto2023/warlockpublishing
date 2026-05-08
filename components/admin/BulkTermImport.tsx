@@ -185,7 +185,7 @@ export default function BulkTermImport({ isOpen, onClose, isInline = false }: Bu
             setStatus({ type: 'success', message: 'JSON repaired! Attempting to populate database...' });
             
             const data = JSON.parse(fixed);
-            const result = await importDetailedJson(data, category);
+            const result = await importDetailedJson(data);
             
             if (result.success) {
                 // Clear the portal on success
