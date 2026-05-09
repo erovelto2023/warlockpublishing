@@ -149,7 +149,7 @@ export default async function GlossaryEntryPage({ params }: { params: Promise<{ 
                                 <Card className="overflow-hidden bg-black aspect-video relative group border-none shadow-2xl">
                                     <iframe
                                         className="w-full h-full"
-                                        src={`https://www.youtube.com/embed/${extractYouTubeId(term.youtubeVideoId)}`}
+                                        src={`https://www.youtube-nocookie.com/embed/${extractYouTubeId(term.youtubeVideoId)}?rel=0&modestbranding=1`}
                                         title={term.term}
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
@@ -333,7 +333,8 @@ function ChevronRight({ size, className }: { size: number, className?: string })
 
 function extractYouTubeId(urlOrId: string) {
     if (!urlOrId) return '';
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    // Handle standard watch URLs, shorts, embed, and mobile (youtu.be) links
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = urlOrId.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : urlOrId;
+    return (match && match[1].length === 11) ? match[1] : urlOrId;
 }

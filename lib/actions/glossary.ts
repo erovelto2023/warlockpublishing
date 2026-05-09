@@ -18,21 +18,30 @@ export async function isYouTubeVideoActive(urlOrId: string): Promise<boolean> {
     if (!urlOrId) return false;
     
     // Extract ID
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    // Robust regex that handles watch?, shorts/, embed/, and mobile youtu.be/
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = urlOrId.match(regExp);
-    const id = (match && match[2].length === 11) ? match[2] : urlOrId;
+    const id = (match && match[1].length === 11) ? match[1] : urlOrId;
     
     if (id.length !== 11) return false;
 
     try {
         const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`, {
             method: 'GET',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+            },
             next: { revalidate: 3600 } // Cache results for an hour
         });
-        return response.ok;
+        
+        // If 404, it's definitely gone. If 401/403/500, we might be blocked, so assume it exists to avoid deleting valid data.
+        if (response.status === 404) return false;
+        if (!response.ok) return true; 
+
+        return true;
     } catch (error) {
         console.error("YouTube validation failed:", error);
-        return false;
+        return true; // Fallback to true to avoid destructive clearing
     }
 }
 
