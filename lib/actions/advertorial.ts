@@ -17,7 +17,7 @@ export async function getAdvertorials() {
 
 export async function getAdvertorialBySlug(slug: string) {
     await connectToDatabase();
-    const doc = await Advertorial.findOne({ slug, isPublished: true });
+    const doc = await Advertorial.findOne({ slug }).populate('affiliateOfferId');
     return serialize(doc);
 }
 
