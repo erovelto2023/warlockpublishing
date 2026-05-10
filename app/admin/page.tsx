@@ -10,6 +10,7 @@ import { getGlossaryTerms } from '@/lib/actions/glossary';
 import { getAnalyticsSummary } from '@/lib/actions/analytics.actions';
 import { getAffiliateOffers } from '@/lib/actions/affiliate.actions';
 import { getCallToActions } from '@/lib/actions/cta.actions';
+import { getAdvertorials } from '@/lib/actions/advertorial';
 import { connectToDatabase } from '@/lib/db';
 import Subscriber from '@/lib/models/Subscriber';
 import { Metadata } from 'next';
@@ -33,7 +34,7 @@ export default async function AdminPage() {
     }
 
     // Fetch All Data in parallel
-    const [products, penNames, offers, blogResult, messagesResult, subscribers, glossaryResult, affiliateOffers, analytics, ctas] = await Promise.all([
+    const [products, penNames, offers, blogResult, messagesResult, subscribers, glossaryResult, affiliateOffers, analytics, ctas, advertorials] = await Promise.all([
         getAllProducts(),
         getPenNames(),
         getSalesPages(),
@@ -47,7 +48,8 @@ export default async function AdminPage() {
         getGlossaryTerms({ limit: 10000, publishedOnly: false, sortBy: 'viewCount' }),
         getAffiliateOffers(),
         getAnalyticsSummary(),
-        getCallToActions()
+        getCallToActions(),
+        getAdvertorials()
     ]);
 
     return (
@@ -62,6 +64,7 @@ export default async function AdminPage() {
             affiliateOffers={JSON.parse(JSON.stringify(affiliateOffers))}
             analytics={JSON.parse(JSON.stringify(analytics))}
             ctas={JSON.parse(JSON.stringify(ctas))}
+            advertorials={JSON.parse(JSON.stringify(advertorials))}
         />
     );
 }

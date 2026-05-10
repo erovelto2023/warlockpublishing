@@ -26,6 +26,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { deleteGlossaryTerm, bulkDeleteGlossaryTerms, healGlossaryVideos, wipeGlossaryDownloads } from '@/lib/actions/glossary';
 import { getSanitizedProduct } from '@/lib/product-utils';
 import CTAManager from '@/components/admin/CTAManager';
+import AdvertorialManager from './AdvertorialManager';
+import { deleteAdvertorial } from '@/lib/actions/advertorial';
+
 
 interface AdminDashboardProps {
     products: any[];
@@ -38,11 +41,12 @@ interface AdminDashboardProps {
     affiliateOffers: any[];
     analytics?: any;
     ctas?: any[];
+    advertorials?: any[];
 }
 
-export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, affiliateOffers, analytics, ctas = [] }: AdminDashboardProps) {
+export default function UnifiedAdminDashboard({ products, penNames, blogPosts, messages, offers, subscribers, glossaryTerms, affiliateOffers, analytics, ctas = [], advertorials = [] }: AdminDashboardProps) {
     const { toast } = useToast();
-    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary' | 'affiliate' | 'cta_builder'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pen_names' | 'products' | 'offers' | 'blog' | 'messages' | 'subscribers' | 'media' | 'warehouse' | 'settings' | 'marketplace' | 'glossary' | 'affiliate' | 'cta_builder' | 'advertorials'>('overview');
     const router = useRouter();
 
     // Stats
@@ -349,6 +353,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
                             { id: 'glossary', label: 'Glossary', icon: BookOpen },
                             { id: 'affiliate', label: 'Affiliate Hub', icon: LinkIcon },
+                            { id: 'advertorials', label: 'Advertorials', icon: FileText },
                             { id: 'cta_builder', label: 'CTA Builder', icon: Target },
                             { id: 'settings', label: 'Site Config', icon: Settings },
                         ].map((tab) => (
@@ -1162,6 +1167,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 {/* AFFILIATE HUB TAB */}
                 {activeTab === 'affiliate' && (
                     <AffiliateHub initialOffers={affiliateOffers} />
+                )}
+
+                {activeTab === 'advertorials' && (
+                    <AdvertorialManager initialAdvertorials={advertorials} />
                 )}
 
             </main>
