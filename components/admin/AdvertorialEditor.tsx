@@ -50,15 +50,18 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
         }
     };
 
+    // Shared input styles to ensure black text on white background
+    const inputStyles = "rounded-none border-slate-200 bg-white text-black focus:border-black focus:ring-0 placeholder:text-slate-300";
+
     return (
         <div className="max-w-5xl mx-auto space-y-8 pb-20 bg-white text-black min-h-screen p-8">
             <header className="flex justify-between items-center bg-white py-4 border-b border-black sticky top-0 z-50">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-slate-100">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-slate-100 text-black">
                         <ArrowLeft size={20} />
                     </Button>
                     <div>
-                        <h1 className="text-xl font-bold uppercase tracking-widest">Edit Advertorial</h1>
+                        <h1 className="text-xl font-bold uppercase tracking-widest text-black">Edit Advertorial</h1>
                         <p className="text-[10px] text-slate-400 font-mono">{advertorial._id}</p>
                     </div>
                 </div>
@@ -82,20 +85,20 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                 <div className="lg:col-span-2 space-y-12">
                     {/* Core Architecture */}
                     <section className="space-y-6">
-                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] border-b border-slate-100 pb-2">01 Core Architecture</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] border-b border-slate-100 pb-2 text-black">01 Core Architecture</h2>
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase text-slate-400">Main Title</label>
-                                <Input className="rounded-none border-slate-200 focus:border-black" value={formData.title} onChange={e => handleChange('title', e.target.value)} />
+                                <Input className={inputStyles} value={formData.title} onChange={e => handleChange('title', e.target.value)} />
                             </div>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold uppercase text-slate-400">Slug</label>
-                                    <Input className="rounded-none border-slate-200 focus:border-black" value={formData.slug} onChange={e => handleChange('slug', e.target.value)} />
+                                    <Input className={inputStyles} value={formData.slug} onChange={e => handleChange('slug', e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold uppercase text-slate-400">Category</label>
-                                    <Input className="rounded-none border-slate-200 focus:border-black" value={formData.category} onChange={e => handleChange('category', e.target.value)} />
+                                    <Input className={inputStyles} value={formData.category} onChange={e => handleChange('category', e.target.value)} />
                                 </div>
                             </div>
                         </div>
@@ -103,31 +106,31 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
 
                     {/* Narrative Arc */}
                     <section className="space-y-6">
-                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] border-b border-slate-100 pb-2">02 Narrative Arc</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] border-b border-slate-100 pb-2 text-black">02 Narrative Arc</h2>
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase text-slate-400">Friction Reveal</label>
-                                <Textarea className="rounded-none min-h-[120px] border-slate-200 focus:border-black" value={formData.narrative.frictionReveal} onChange={e => handleChange('narrative.frictionReveal', e.target.value)} />
+                                <Textarea className={`${inputStyles} min-h-[120px]`} value={formData.narrative.frictionReveal} onChange={e => handleChange('narrative.frictionReveal', e.target.value)} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase text-slate-400">Editorial Pivot</label>
-                                <Textarea className="rounded-none min-h-[120px] border-slate-200 focus:border-black" value={formData.narrative.editorialPivot} onChange={e => handleChange('narrative.editorialPivot', e.target.value)} />
+                                <Textarea className={`${inputStyles} min-h-[120px]`} value={formData.narrative.editorialPivot} onChange={e => handleChange('narrative.editorialPivot', e.target.value)} />
                             </div>
                         </div>
                     </section>
 
                     {/* Value & Proof */}
                     <section className="space-y-6">
-                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] border-b border-slate-100 pb-2">03 Value & Proof</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] border-b border-slate-100 pb-2 text-black">03 Value & Proof</h2>
                         <div className="space-y-6">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold uppercase text-slate-400">Price Anchoring</label>
-                                <Textarea className="rounded-none border-slate-200 focus:border-black" value={formData.valueReinforcement.priceAnchoring} onChange={e => handleChange('valueReinforcement.priceAnchoring', e.target.value)} />
+                                <Textarea className={inputStyles} value={formData.valueReinforcement.priceAnchoring} onChange={e => handleChange('valueReinforcement.priceAnchoring', e.target.value)} />
                             </div>
                             
                             <div className="space-y-4">
                                 {formData.valueReinforcement.steps.map((step: any, i: number) => (
-                                    <div key={i} className="p-6 border border-slate-100 space-y-4 relative group">
+                                    <div key={i} className="p-6 border border-slate-100 space-y-4 relative group bg-white">
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs font-bold text-slate-300">Step {i + 1}</span>
                                             <button onClick={() => {
@@ -135,19 +138,19 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                                                 handleChange('valueReinforcement.steps', steps);
                                             }} className="text-slate-300 hover:text-black"><Trash2 size={14} /></button>
                                         </div>
-                                        <Input className="rounded-none border-slate-200" value={step.title} onChange={e => {
+                                        <Input className={inputStyles} value={step.title} onChange={e => {
                                             const steps = [...formData.valueReinforcement.steps];
                                             steps[i].title = e.target.value;
                                             handleChange('valueReinforcement.steps', steps);
                                         }} />
-                                        <Textarea className="rounded-none border-slate-200" value={step.description} onChange={e => {
+                                        <Textarea className={inputStyles} value={step.description} onChange={e => {
                                             const steps = [...formData.valueReinforcement.steps];
                                             steps[i].description = e.target.value;
                                             handleChange('valueReinforcement.steps', steps);
                                         }} />
                                     </div>
                                 ))}
-                                <Button variant="outline" className="w-full rounded-none border-dashed border-slate-200 text-slate-400 hover:text-black hover:border-black" onClick={() => handleChange('valueReinforcement.steps', [...formData.valueReinforcement.steps, { title: '', description: '' }])}>
+                                <Button variant="outline" className="w-full rounded-none border-dashed border-slate-200 text-slate-400 hover:text-black hover:border-black bg-white" onClick={() => handleChange('valueReinforcement.steps', [...formData.valueReinforcement.steps, { title: '', description: '' }])}>
                                     + Add Step
                                 </Button>
                             </div>
@@ -169,8 +172,8 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                                 <option key={offer._id} value={offer._id} className="bg-white text-black">{offer.title}</option>
                             ))}
                         </select>
-                        <Input className="rounded-none border-slate-200" value={formData.customTargetUrl || ''} onChange={e => handleChange('customTargetUrl', e.target.value)} placeholder="Custom Link URL" />
-                        <Input className="rounded-none border-slate-200" value={formData.summaryBox.ctaText} onChange={e => handleChange('summaryBox.ctaText', e.target.value)} placeholder="CTA Button Text" />
+                        <Input className={inputStyles} value={formData.customTargetUrl || ''} onChange={e => handleChange('customTargetUrl', e.target.value)} placeholder="Custom Link URL" />
+                        <Input className={inputStyles} value={formData.summaryBox.ctaText} onChange={e => handleChange('summaryBox.ctaText', e.target.value)} placeholder="CTA Button Text" />
                     </section>
 
                     {/* Urgency */}
@@ -186,7 +189,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                             <option value="slots" className="bg-white text-black">Slots</option>
                         </select>
                         {formData.scarcity?.type !== 'none' && (
-                            <Input className="rounded-none border-slate-200" value={formData.scarcity?.value || ''} onChange={e => handleChange('scarcity.value', e.target.value)} placeholder="Signal Value" />
+                            <Input className={inputStyles} value={formData.scarcity?.value || ''} onChange={e => handleChange('scarcity.value', e.target.value)} placeholder="Signal Value" />
                         )}
                     </section>
 
