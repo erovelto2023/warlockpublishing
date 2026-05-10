@@ -169,7 +169,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                         >
                             <option value="" className="bg-white text-black">-- Catalog Offer --</option>
                             {affiliateOffers.map(offer => (
-                                <option key={offer._id} value={offer._id} className="bg-white text-black">{offer.title}</option>
+                                <option key={offer._id} value={offer._id} className="bg-white text-black">{offer.name || offer.title}</option>
                             ))}
                         </select>
                         <Input className={inputStyles} value={formData.customTargetUrl || ''} onChange={e => handleChange('customTargetUrl', e.target.value)} placeholder="Custom Link URL" />
