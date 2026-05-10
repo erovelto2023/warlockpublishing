@@ -6,8 +6,9 @@ import {
     Star, Zap, HelpCircle, ChevronRight, TrendingUp
 } from "lucide-react";
 
-export default async function AdvertorialPage({ params }: { params: { slug: string } }) {
-    const advertorial = await getAdvertorialBySlug(params.slug);
+export default async function AdvertorialPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const advertorial = await getAdvertorialBySlug(slug);
 
     if (!advertorial) notFound();
 
