@@ -44,7 +44,7 @@ export default async function AdminPage() {
             await connectToDatabase();
             return Subscriber.find({}).sort({ createdAt: -1 }).lean();
         })(),
-        getGlossaryTerms({ limit: 1000, publishedOnly: false, sortBy: 'viewCount' }),
+        getGlossaryTerms({ limit: 10000, publishedOnly: false, sortBy: 'viewCount' }),
         getAffiliateOffers(),
         getAnalyticsSummary(),
         getCallToActions()
