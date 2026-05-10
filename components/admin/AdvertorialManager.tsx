@@ -91,8 +91,9 @@ function AdvertorialManager({ initialAdvertorials }: AdvertorialManagerProps) {
                                             <span className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">{ad.category}</span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex gap-3 text-xs font-medium text-slate-500">
-                                                <span className="flex items-center gap-1"><Eye size={12} /> {ad.viewCount || 0}</span>
+                                            <div className="text-center w-fit px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg">
+                                                <div className="text-sm font-black text-black">{ad.viewCount || 0}</div>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Views</div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right space-x-2">

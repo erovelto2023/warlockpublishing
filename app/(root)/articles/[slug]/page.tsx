@@ -1,4 +1,4 @@
-import { getAdvertorialBySlug } from "@/lib/actions/advertorial";
+import { getAdvertorialBySlug, trackAdvertorialView } from "@/lib/actions/advertorial";
 import { notFound } from "next/navigation";
 import { 
     CheckCircle2, ArrowRight, ShieldCheck, 
@@ -10,6 +10,9 @@ export default async function AdvertorialPage({ params }: { params: Promise<{ sl
     const advertorial = await getAdvertorialBySlug(slug);
 
     if (!advertorial) notFound();
+
+    // Increment view count
+    await trackAdvertorialView(advertorial._id);
 
     // Resolve Target URL (Prioritize Catalog Offer if available)
     let targetUrl = advertorial.affiliateOfferId?.affiliateLink || advertorial.customTargetUrl || advertorial.summaryBox?.targetUrl || "#";

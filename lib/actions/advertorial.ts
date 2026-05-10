@@ -66,3 +66,7 @@ export async function importAdvertorials(data: any[]) {
         return { success: false, message: error.message };
     }
 }
+export async function trackAdvertorialView(id: string) {
+    await connectToDatabase();
+    await Advertorial.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
+}
