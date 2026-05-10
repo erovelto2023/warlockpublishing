@@ -212,7 +212,7 @@ export default async function AdvertorialPage({ params }: { params: Promise<{ sl
                         <span className="flex items-center gap-1.5"><Star size={14} className="text-amber-500" /> TRUSTED BRAND</span>
                     </div>
                 </div>
-            </article>
+            </div>
         </div>
     );
 }
