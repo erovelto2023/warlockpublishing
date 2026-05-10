@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Copy, Terminal, Send, Check, AlertCircle, FileJson } from 'lucide-react';
+import { Copy, Terminal, Send, Check, AlertCircle, FileJson, RefreshCw } from 'lucide-react';
 import { importAdvertorials } from '@/lib/actions/advertorial';
 import { repairJson } from '@/lib/utils';
 
@@ -96,91 +96,74 @@ Authoritative, "insider," helpful, and peer-to-peer (avoid corporate brochure sp
     };
 
     return (
-        <div className="space-y-8">
-            <Card className="p-8 border-slate-200 shadow-xl bg-white">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-indigo-600 text-white rounded-lg">
-                        <Terminal size={20} />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold">Advertorial Prompt Architect</h2>
-                        <p className="text-sm text-slate-500">Generate the Master Prompt for your next high-converting bridge page.</p>
+        <div className="space-y-12 bg-white text-black p-8">
+            <header className="space-y-2 border-b border-black pb-6">
+                <h2 className="text-2xl font-bold uppercase tracking-widest flex items-center gap-3">
+                    <Terminal size={24} /> Prompt Architect
+                </h2>
+                <p className="text-xs text-slate-400 font-medium">Generate conversion-ready prompts and import AI data.</p>
+            </header>
+
+            <div className="grid md:grid-cols-2 gap-12">
+                <div className="space-y-8">
+                    <div className="space-y-4">
+                        <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Step 1: Configuration</h3>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">Product Name</label>
+                                <Input className="rounded-none border-slate-200 focus:border-black" value={productName} onChange={e => setProductName(e.target.value)} placeholder="e.g., ExpressVPN" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">Category</label>
+                                <Input className="rounded-none border-slate-200 focus:border-black" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g., Tech Deals" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">The Friction (Barrier)</label>
+                                <Textarea className="rounded-none border-slate-200 focus:border-black" value={friction} onChange={e => setFriction(e.target.value)} placeholder="Why is this hard or expensive?" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">The Hack (Secret)</label>
+                                <Textarea className="rounded-none border-slate-200 focus:border-black" value={hack} onChange={e => setHack(e.target.value)} placeholder="What is the insider secret?" />
+                            </div>
+                            <Button onClick={copyMasterPrompt} className="w-full bg-black hover:bg-slate-800 text-white font-bold h-12 rounded-none gap-2">
+                                <Copy size={18} /> Copy Master Prompt
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-8">
                     <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Product Name</label>
-                            <Input value={productName} onChange={e => setProductName(e.target.value)} placeholder="e.g., ExpressVPN" />
+                        <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Step 2: Ingestion</h3>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">AI JSON Output</label>
+                                <Textarea 
+                                    value={jsonInput} 
+                                    onChange={e => setJsonInput(e.target.value)} 
+                                    placeholder="Paste the JSON array here..."
+                                    className="min-h-[300px] font-mono text-xs rounded-none border-slate-200 focus:border-black bg-slate-50"
+                                />
+                            </div>
+                            <Button 
+                                onClick={handleImport} 
+                                disabled={isImporting || !jsonInput} 
+                                className="w-full bg-black hover:bg-slate-800 text-white font-bold h-12 rounded-none gap-2"
+                            >
+                                {isImporting ? <RefreshCw className="animate-spin" /> : <FileJson size={18} />}
+                                Import Advertorials
+                            </Button>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Category</label>
-                            <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g., Tech Deals" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-slate-500">The Friction (Barrier)</label>
-                            <Textarea value={friction} onChange={e => setFriction(e.target.value)} placeholder="Why is this currently hard or expensive for people?" />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-slate-500">The Hack (Secret/Deal)</label>
-                            <Textarea value={hack} onChange={e => setHack(e.target.value)} placeholder="What is the insider secret or deal you're providing?" />
-                        </div>
-                        <Button onClick={copyMasterPrompt} className="w-full bg-indigo-600 hover:bg-indigo-700 h-12 gap-2">
-                            <Copy size={18} /> Copy Master Prompt
-                        </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Paste AI Output (JSON)</label>
-                            <Textarea 
-                                value={jsonInput} 
-                                onChange={e => setJsonInput(e.target.value)} 
-                                placeholder="Paste the JSON array generated by the AI here..."
-                                className="min-h-[300px] font-mono text-sm bg-slate-50"
-                            />
-                        </div>
-                        <Button 
-                            onClick={handleImport} 
-                            disabled={isImporting || !jsonInput} 
-                            className="w-full bg-slate-900 hover:bg-black h-12 gap-2"
-                        >
-                            {isImporting ? <RefreshCw className="animate-spin" /> : <FileJson size={18} />}
-                            Import Advertorials
-                        </Button>
                     </div>
                 </div>
+            </div>
 
-                {status.type && (
-                    <div className={`mt-6 p-4 rounded-xl flex items-center gap-3 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
-                        {status.type === 'success' ? <Check size={20} /> : <AlertCircle size={20} />}
-                        <p className="text-sm font-medium">{status.message}</p>
-                    </div>
-                )}
-            </Card>
+            {status.type && (
+                <div className={`p-4 border-2 flex items-center gap-3 ${status.type === 'success' ? 'bg-white border-black text-black' : 'bg-white border-red-600 text-red-600'}`}>
+                    {status.type === 'success' ? <Check size={20} /> : <AlertCircle size={20} />}
+                    <p className="text-sm font-bold uppercase tracking-widest">{status.message}</p>
+                </div>
+            )}
         </div>
     );
-}
-
-function RefreshCw(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-            <path d="M21 3v5h-5" />
-            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-            <path d="M3 21v-5h5" />
-        </svg>
-    )
 }
