@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { 
     Save, ArrowLeft, Plus, Trash2, 
-    Link as LinkIcon, AlertCircle, Check
+    Link as LinkIcon, AlertCircle, Check, Target, Layout
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateAdvertorial } from '@/lib/actions/advertorial';
