@@ -97,6 +97,7 @@ function AdvertorialManager({ initialAdvertorials }: AdvertorialManagerProps) {
                                         </td>
                                         <td className="px-6 py-4 text-right space-x-2">
                                             <a href={`/articles/${ad.slug}`} target="_blank" className="inline-block p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"><Eye size={16} /></a>
+                                            <button onClick={() => window.open(`/admin/articles/${ad._id}/edit`, '_blank')} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"><Edit size={16} /></button>
                                             <button onClick={() => handleDelete(ad._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
                                         </td>
                                     </tr>

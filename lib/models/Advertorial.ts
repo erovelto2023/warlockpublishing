@@ -31,7 +31,13 @@ export interface IAdvertorial extends Document {
         answer: string;
     }[];
     seoKeywords: string[];
-    ctaPlacements: string[];
+    affiliateOfferId?: string;
+    customTargetUrl?: string;
+    scarcity?: {
+        type: 'timer' | 'slots' | 'none';
+        value: string;
+    };
+    template: 'standard' | 'listicle' | 'comparison' | 'minimalist';
     isPublished: boolean;
     viewCount: number;
     createdAt: Date;
@@ -69,7 +75,13 @@ const AdvertorialSchema: Schema = new Schema({
         answer: { type: String }
     }],
     seoKeywords: [{ type: String }],
-    ctaPlacements: [{ type: String }],
+    affiliateOfferId: { type: Schema.Types.ObjectId, ref: 'AffiliateOffer' },
+    customTargetUrl: { type: String },
+    scarcity: {
+        type: { type: String, enum: ['timer', 'slots', 'none'], default: 'none' },
+        value: { type: String }
+    },
+    template: { type: String, enum: ['standard', 'listicle', 'comparison', 'minimalist'], default: 'standard' },
     isPublished: { type: Boolean, default: true },
     viewCount: { type: Number, default: 0 }
 }, {

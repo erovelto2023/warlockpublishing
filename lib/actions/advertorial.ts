@@ -21,6 +21,12 @@ export async function getAdvertorialBySlug(slug: string) {
     return serialize(doc);
 }
 
+export async function getAdvertorialById(id: string) {
+    await connectToDatabase();
+    const doc = await Advertorial.findById(id);
+    return serialize(doc);
+}
+
 export async function createAdvertorial(data: any) {
     await connectToDatabase();
     const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
