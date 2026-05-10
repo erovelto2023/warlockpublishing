@@ -158,10 +158,16 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                 <div className="space-y-12">
                     {/* Affiliate Hub */}
                     <section className="space-y-4">
-                        <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Affiliate Settings</h2>
-                        <select className="w-full h-10 border border-slate-200 px-3 text-sm focus:border-black outline-none" value={formData.affiliateOfferId || ''} onChange={e => handleChange('affiliateOfferId', e.target.value || null)}>
-                            <option value="">-- Catalog Offer --</option>
-                            {affiliateOffers.map(offer => <option key={offer._id} value={offer._id}>{offer.title}</option>)}
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Affiliate Settings</h2>
+                        <select 
+                            className="w-full h-10 border border-slate-200 bg-white text-black px-3 text-sm focus:border-black outline-none" 
+                            value={formData.affiliateOfferId || ''} 
+                            onChange={e => handleChange('affiliateOfferId', e.target.value || null)}
+                        >
+                            <option value="" className="bg-white text-black">-- Catalog Offer --</option>
+                            {affiliateOffers.map(offer => (
+                                <option key={offer._id} value={offer._id} className="bg-white text-black">{offer.title}</option>
+                            ))}
                         </select>
                         <Input className="rounded-none border-slate-200" value={formData.customTargetUrl || ''} onChange={e => handleChange('customTargetUrl', e.target.value)} placeholder="Custom Link URL" />
                         <Input className="rounded-none border-slate-200" value={formData.summaryBox.ctaText} onChange={e => handleChange('summaryBox.ctaText', e.target.value)} placeholder="CTA Button Text" />
@@ -169,11 +175,15 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
 
                     {/* Urgency */}
                     <section className="space-y-4">
-                        <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Urgency Signal</h2>
-                        <select className="w-full h-10 border border-slate-200 px-3 text-sm focus:border-black outline-none" value={formData.scarcity?.type || 'none'} onChange={e => handleChange('scarcity.type', e.target.value)}>
-                            <option value="none">No Urgency</option>
-                            <option value="timer">Timer</option>
-                            <option value="slots">Slots</option>
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Urgency Signal</h2>
+                        <select 
+                            className="w-full h-10 border border-slate-200 bg-white text-black px-3 text-sm focus:border-black outline-none" 
+                            value={formData.scarcity?.type || 'none'} 
+                            onChange={e => handleChange('scarcity.type', e.target.value)}
+                        >
+                            <option value="none" className="bg-white text-black">No Urgency</option>
+                            <option value="timer" className="bg-white text-black">Timer</option>
+                            <option value="slots" className="bg-white text-black">Slots</option>
                         </select>
                         {formData.scarcity?.type !== 'none' && (
                             <Input className="rounded-none border-slate-200" value={formData.scarcity?.value || ''} onChange={e => handleChange('scarcity.value', e.target.value)} placeholder="Signal Value" />
