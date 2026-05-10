@@ -12,7 +12,22 @@ export default async function AdvertorialPage({ params }: { params: Promise<{ sl
     if (!advertorial) notFound();
 
     // Resolve Target URL (Prioritize Catalog Offer if available)
-    const targetUrl = advertorial.affiliateOfferId?.affiliateLink || advertorial.customTargetUrl || advertorial.summaryBox?.targetUrl || "#";
+    let targetUrl = advertorial.affiliateOfferId?.affiliateLink || advertorial.customTargetUrl || advertorial.summaryBox?.targetUrl || "#";
+
+    // Clean URL: Handle relative-looking absolute URLs and markdown remnants
+    if (targetUrl !== "#") {
+        // Remove markdown [text](url) if AI included it
+        const mdMatch = targetUrl.match(/\[.*\]\((.*)\)/);
+        if (mdMatch) targetUrl = mdMatch[1];
+
+        // Ensure protocol
+        if (!targetUrl.startsWith('http') && !targetUrl.startsWith('//')) {
+            targetUrl = `https://${targetUrl}`;
+        }
+        
+        // Fix common typo: https:/ instead of https://
+        targetUrl = targetUrl.replace(/^https?:\/([^\/])/, 'https://$1');
+    }
 
     return (
         <div className="min-h-screen bg-white text-black font-sans selection:bg-slate-200 pb-20">
