@@ -21,6 +21,7 @@ export default async function Navbar() {
         { name: 'Ebooks', href: '/products' },
         { name: 'Marketplace', href: '/offers' },
         { name: 'Glossary', href: '/glossary' },
+        { name: 'Discovery', href: '/articles' },
         { name: 'Blog', href: '/blog' },
     ];
 
