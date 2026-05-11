@@ -122,12 +122,12 @@ export default function IndustrialTemplate({ advertorial }: { advertorial: any }
                     {/* Final CTA */}
                     <section className="py-20 border-t-4 border-black text-center space-y-10 bg-white">
                         <div className="space-y-4">
-                            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black">Ready to make the switch?</h2>
-                            <p className="text-xl text-slate-500 font-medium">Join 5,000+ others who optimized their workflow this month.</p>
+                            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black">Ready to optimize?</h2>
+                            <p className="text-xl text-slate-500 font-medium">Get the tool that's changing the way professionals work.</p>
                         </div>
                         <div className="flex flex-col items-center gap-6">
                             <a href={targetUrl} target="_blank" className="inline-flex bg-black text-white px-12 py-6 text-lg font-black uppercase tracking-[0.3em] hover:bg-slate-800 transition-all gap-4 shadow-2xl">
-                                Secure Your Access <ArrowRight size={24} />
+                                {summaryBox.ctaText || "Secure Your Access"} <ArrowRight size={24} />
                             </a>
                             <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
                                 <span className="flex items-center gap-1.5"><ShieldCheck size={14} className="text-black" /> ENCRYPTED LINK</span>

@@ -89,9 +89,9 @@ export default function MagazineTemplate({ advertorial }: { advertorial: any }) 
 
                 {/* Final Masthead CTA */}
                 <footer className="border-t-4 border-black py-20 text-center space-y-10">
-                    <h2 className="text-5xl font-black uppercase tracking-tighter italic">Join the Elite.</h2>
+                    <h2 className="text-5xl font-black uppercase tracking-tighter italic">Secure the Tool.</h2>
                     <a href={targetUrl} target="_blank" className="inline-flex h-16 items-center justify-center px-16 border-4 border-black font-black uppercase text-lg tracking-[0.2em] hover:bg-black hover:text-white transition-all">
-                        Upgrade Today
+                        {summaryBox.ctaText || "Claim The Offer"}
                     </a>
                 </footer>
             </div>

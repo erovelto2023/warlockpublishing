@@ -77,11 +77,11 @@ export default function MinimalistTemplate({ advertorial }: { advertorial: any }
                 {/* Final CTA */}
                 <footer className="pt-20 text-center space-y-10">
                     <div className="space-y-4">
-                        <h2 className="text-3xl font-bold tracking-tight">Ready to start?</h2>
-                        <p className="text-slate-500">Join the thousands of professionals using this system today.</p>
+                        <h2 className="text-3xl font-bold tracking-tight">Ready to get started?</h2>
+                        <p className="text-slate-500">Access the tool and start optimizing your results today.</p>
                     </div>
                     <a href={targetUrl} target="_blank" className="inline-flex h-14 items-center justify-center px-10 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200">
-                        Get Started Now
+                        {summaryBox.ctaText || "Get Started Now"}
                     </a>
                 </footer>
             </div>
