@@ -37,7 +37,7 @@ export interface IAdvertorial extends Document {
         type: 'timer' | 'slots' | 'none';
         value: string;
     };
-    template: 'standard' | 'listicle' | 'comparison' | 'minimalist';
+    template: 'standard' | 'listicle' | 'comparison' | 'minimalist' | 'industrial' | 'magazine';
     isPublished: boolean;
     viewCount: number;
     createdAt: Date;
@@ -81,7 +81,7 @@ const AdvertorialSchema: Schema = new Schema({
         type: { type: String, enum: ['timer', 'slots', 'none'], default: 'none' },
         value: { type: String }
     },
-    template: { type: String, enum: ['standard', 'listicle', 'comparison', 'minimalist'], default: 'standard' },
+    template: { type: String, enum: ['standard', 'listicle', 'comparison', 'minimalist', 'industrial', 'magazine'], default: 'industrial' },
     isPublished: { type: Boolean, default: true },
     viewCount: { type: Number, default: 0 }
 }, {
