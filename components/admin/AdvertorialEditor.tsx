@@ -159,6 +159,23 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                 </div>
 
                 <div className="space-y-12">
+                    {/* Design System */}
+                    <section className="space-y-4">
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Design System</h2>
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-bold uppercase text-slate-400">Layout Template</label>
+                            <select 
+                                className="w-full h-10 border border-slate-200 bg-white text-black px-3 text-sm focus:border-black outline-none" 
+                                value={formData.template || 'industrial'} 
+                                onChange={e => handleChange('template', e.target.value)}
+                            >
+                                <option value="industrial" className="bg-white text-black">Industrial (White & Bold)</option>
+                                <option value="minimalist" className="bg-white text-black">Minimalist (Clean & Spaced)</option>
+                                <option value="magazine" className="bg-white text-black">Magazine (Serif & Multi-column)</option>
+                            </select>
+                        </div>
+                    </section>
+
                     {/* Affiliate Hub */}
                     <section className="space-y-4">
                         <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Affiliate Settings</h2>
