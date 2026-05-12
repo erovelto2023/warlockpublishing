@@ -99,6 +99,7 @@ export async function getGlossaryTerms(options: {
     page?: number;
     publishedOnly?: boolean;
     sortBy?: 'term' | 'viewCount';
+    minimal?: boolean;
 } = {}) {
     await connectToDatabase();
 
@@ -109,7 +110,8 @@ export async function getGlossaryTerms(options: {
         limit = 50, 
         page = 1,
         publishedOnly = true,
-        sortBy = 'term'
+        sortBy = 'term',
+        minimal = false
     } = options;
 
     const query: any = {};
@@ -134,7 +136,13 @@ export async function getGlossaryTerms(options: {
         sortObj.term = 1;
     }
 
-    const terms = await GlossaryTerm.find(query)
+    let queryBuilder = GlossaryTerm.find(query);
+    
+    if (minimal) {
+        queryBuilder = queryBuilder.select('term slug category viewCount isPublished createdAt callToActionId monetizationIdeas');
+    }
+
+    const terms = await queryBuilder
         .sort(sortObj)
         .skip(skip)
         .limit(limit);
@@ -366,8 +374,9 @@ export async function healGlossaryVideos() {
         console.log(`[Healer] Phase 2: Fixing ${needsFixing.length} terms...`);
 
         // Phase 2: Only search for terms that need it (Slower search)
-        // Process up to 50 terms per run to maximize repair speed
-        const WORK_LIMIT = 50;
+        // We limit this to 20 terms per batch to ensure we stay well under 30s timeouts.
+        // The UI handles re-calling this action until all items are healed.
+        const WORK_LIMIT = 20;
         const toProcess = needsFixing.slice(0, WORK_LIMIT);
         const SEARCH_BATCH = 3; // Keep search batch small to avoid getting blocked
 
