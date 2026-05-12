@@ -9,7 +9,7 @@ import {
     Download, Layout, Megaphone, Target
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import BulkAdvertorialImport from './BulkAdvertorialImport';
+import UltimateAdvertorialBuilder from './UltimateAdvertorialBuilder';
 import { deleteAdvertorial } from '@/lib/actions/advertorial';
 
 interface AdvertorialManagerProps {
@@ -17,7 +17,7 @@ interface AdvertorialManagerProps {
 }
 
 function AdvertorialManager({ initialAdvertorials }: AdvertorialManagerProps) {
-    const [view, setView] = useState<'list' | 'import'>('list');
+    const [view, setView] = useState<'list' | 'build'>('list');
     const [search, setSearch] = useState('');
     const router = useRouter();
 
@@ -38,26 +38,26 @@ function AdvertorialManager({ initialAdvertorials }: AdvertorialManagerProps) {
         <div className="space-y-6">
             <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                    <Megaphone className="text-indigo-600" /> Advertorial Builder
+                    <Megaphone className="text-indigo-600" /> Advertorial Command Center
                 </h2>
                 <div className="flex gap-2">
                     <button
                         onClick={() => setView('list')}
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
                     >
-                        List View
+                        Management List
                     </button>
                     <button
-                        onClick={() => setView('import')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'import' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}
+                        onClick={() => setView('build')}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'build' ? 'bg-indigo-600 text-white shadow-md' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'}`}
                     >
-                        <Plus size={16} /> Prompt Architect
+                        <Plus size={16} /> Framework Architect
                     </button>
                 </div>
             </div>
 
-            {view === 'import' ? (
-                <BulkAdvertorialImport />
+            {view === 'build' ? (
+                <UltimateAdvertorialBuilder />
             ) : (
                 <div className="space-y-4">
                     <div className="relative max-w-md">

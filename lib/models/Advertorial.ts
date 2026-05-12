@@ -37,7 +37,49 @@ export interface IAdvertorial extends Document {
         type: 'timer' | 'slots' | 'none';
         value: string;
     };
-    template: 'standard' | 'listicle' | 'comparison' | 'minimalist' | 'industrial' | 'magazine';
+    template: 'standard' | 'listicle' | 'comparison' | 'minimalist' | 'industrial' | 'magazine' | 'ultimate';
+    
+    // New Framework Fields
+    ftcDisclosure?: string;
+    heroSection?: {
+        headline: string;
+        boldClaim: string;
+        imageUrl?: string;
+        imagePrompt?: string;
+    };
+    listicleItems?: {
+        subheading: string;
+        content: string;
+    }[];
+    comparisonData?: {
+        title: string;
+        features: {
+            name: string;
+            ourValue: string;
+            competitorValue: string;
+            isBetter: boolean;
+        }[];
+    };
+    socialProof?: {
+        quote: string;
+        author: string;
+        source?: string;
+        avatarUrl?: string;
+    }[];
+    conversionClose?: {
+        ctaText: string;
+        urgencyText: string;
+        guaranteeText: string;
+    };
+    scraperInputs?: {
+        targetUrl: string;
+        competitorUrls: string[];
+        targetAudience: string;
+        painPoint: string;
+        headlineFormula: string;
+        saftCompliance: boolean;
+    };
+
     isPublished: boolean;
     viewCount: number;
     createdAt: Date;
@@ -81,7 +123,49 @@ const AdvertorialSchema: Schema = new Schema({
         type: { type: String, enum: ['timer', 'slots', 'none'], default: 'none' },
         value: { type: String }
     },
-    template: { type: String, enum: ['standard', 'listicle', 'comparison', 'minimalist', 'industrial', 'magazine'], default: 'industrial' },
+    template: { type: String, enum: ['standard', 'listicle', 'comparison', 'minimalist', 'industrial', 'magazine', 'ultimate'], default: 'ultimate' },
+    
+    // New Framework Schema
+    ftcDisclosure: { type: String, default: 'Advertisement' },
+    heroSection: {
+        headline: { type: String },
+        boldClaim: { type: String },
+        imageUrl: { type: String },
+        imagePrompt: { type: String }
+    },
+    listicleItems: [{
+        subheading: { type: String },
+        content: { type: String }
+    }],
+    comparisonData: {
+        title: { type: String, default: 'How We Compare' },
+        features: [{
+            name: { type: String },
+            ourValue: { type: String },
+            competitorValue: { type: String },
+            isBetter: { type: Boolean, default: true }
+        }]
+    },
+    socialProof: [{
+        quote: { type: String },
+        author: { type: String },
+        source: { type: String },
+        avatarUrl: { type: String }
+    }],
+    conversionClose: {
+        ctaText: { type: String },
+        urgencyText: { type: String },
+        guaranteeText: { type: String }
+    },
+    scraperInputs: {
+        targetUrl: { type: String },
+        competitorUrls: [{ type: String }],
+        targetAudience: { type: String },
+        painPoint: { type: String },
+        headlineFormula: { type: String },
+        saftCompliance: { type: Boolean, default: false }
+    },
+
     isPublished: { type: Boolean, default: true },
     viewCount: { type: Number, default: 0 }
 }, {
