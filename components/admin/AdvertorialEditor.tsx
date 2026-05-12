@@ -177,6 +177,189 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                                 </Button>
                             </div>
                         </div>
+                    {/* Ultimate Framework (Hero, VSL, Listicle) */}
+                    <section className="space-y-8 pt-8 border-t-2 border-slate-100">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-indigo-600">04 Ultimate Framework</h2>
+                            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[8px] font-black uppercase rounded">High Conversion</span>
+                        </div>
+
+                        {/* Hero Section */}
+                        <div className="space-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-100">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hero & Media</h3>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-400">Hero Headline</label>
+                                    <Input className={inputStyles} value={formData.heroSection.headline} onChange={e => handleChange('heroSection.headline', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-400">Bold Claim</label>
+                                    <Input className={inputStyles} value={formData.heroSection.boldClaim} onChange={e => handleChange('heroSection.boldClaim', e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-400">Hero Image URL</label>
+                                    <Input className={inputStyles} value={formData.heroSection.imageUrl} onChange={e => handleChange('heroSection.imageUrl', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-400">Hero Video URL</label>
+                                    <Input className={inputStyles} value={formData.heroSection.videoUrl} onChange={e => handleChange('heroSection.videoUrl', e.target.value)} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* VSL Section */}
+                        <div className="space-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-100">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Video Sales Letter (VSL)</h3>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-400">VSL Title</label>
+                                    <Input className={inputStyles} value={formData.vsl?.title} onChange={e => handleChange('vsl.title', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-slate-400">VSL Video URL</label>
+                                    <Input className={inputStyles} value={formData.vsl?.videoUrl} onChange={e => handleChange('vsl.videoUrl', e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">VSL Description</label>
+                                <Textarea className={inputStyles} value={formData.vsl?.description} onChange={e => handleChange('vsl.description', e.target.value)} />
+                            </div>
+                        </div>
+
+                        {/* Listicle Items */}
+                        <div className="space-y-6">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Narrative Listicle Items</h3>
+                            <div className="space-y-4">
+                                {formData.listicleItems?.map((item: any, i: number) => (
+                                    <div key={i} className="p-6 border border-slate-200 space-y-4 bg-white shadow-sm rounded-xl">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Item #{i + 1}</span>
+                                            <button onClick={() => {
+                                                const items = formData.listicleItems.filter((_: any, idx: number) => idx !== i);
+                                                handleChange('listicleItems', items);
+                                            }} className="text-slate-300 hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+                                        </div>
+                                        <Input className={inputStyles} placeholder="Subheading" value={item.subheading} onChange={e => {
+                                            const items = [...formData.listicleItems];
+                                            items[i].subheading = e.target.value;
+                                            handleChange('listicleItems', items);
+                                        }} />
+                                        <Textarea className={`${inputStyles} min-h-[100px]`} placeholder="Content" value={item.content} onChange={e => {
+                                            const items = [...formData.listicleItems];
+                                            items[i].content = e.target.value;
+                                            handleChange('listicleItems', items);
+                                        }} />
+                                    </div>
+                                ))}
+                                <Button variant="outline" className="w-full h-12 border-dashed border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-600 hover:bg-indigo-50 font-bold" onClick={() => handleChange('listicleItems', [...(formData.listicleItems || []), { subheading: '', content: '' }])}>
+                                    <Plus size={16} className="mr-2" /> Add Listicle Narrative Block
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Comparison Engine */}
+                        <div className="space-y-6 bg-indigo-50/30 p-6 rounded-2xl border border-indigo-100">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Comparison Engine</h3>
+                            <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase text-indigo-600">Comparison Title</label>
+                                    <Input className={inputStyles} value={formData.comparisonData?.title} onChange={e => handleChange('comparisonData.title', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    {formData.comparisonData?.features?.map((f: any, i: number) => (
+                                        <div key={i} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end bg-white p-3 rounded-lg border border-indigo-100">
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] font-black uppercase text-slate-400">Feature</label>
+                                                <Input className="h-8 text-xs px-2" value={f.name} onChange={e => {
+                                                    const features = [...formData.comparisonData.features];
+                                                    features[i].name = e.target.value;
+                                                    handleChange('comparisonData.features', features);
+                                                }} />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] font-black uppercase text-slate-400">Our Value</label>
+                                                <Input className="h-8 text-xs px-2 border-indigo-200" value={f.ourValue} onChange={e => {
+                                                    const features = [...formData.comparisonData.features];
+                                                    features[i].ourValue = e.target.value;
+                                                    handleChange('comparisonData.features', features);
+                                                }} />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[8px] font-black uppercase text-slate-400">Competitor</label>
+                                                <Input className="h-8 text-xs px-2" value={f.competitorValue} onChange={e => {
+                                                    const features = [...formData.comparisonData.features];
+                                                    features[i].competitorValue = e.target.value;
+                                                    handleChange('comparisonData.features', features);
+                                                }} />
+                                            </div>
+                                            <button onClick={() => {
+                                                const features = formData.comparisonData.features.filter((_: any, idx: number) => idx !== i);
+                                                handleChange('comparisonData.features', features);
+                                            }} className="h-8 text-slate-300 hover:text-red-600 flex items-center justify-center"><Trash2 size={14} /></button>
+                                        </div>
+                                    ))}
+                                    <Button variant="ghost" className="w-full h-8 text-[10px] font-black uppercase text-indigo-600 hover:bg-indigo-100" onClick={() => handleChange('comparisonData.features', [...(formData.comparisonData?.features || []), { name: '', ourValue: '', competitorValue: '', isBetter: true }])}>
+                                        + Add Comparison Row
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Social Proof */}
+                        <div className="space-y-6">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Social Proof (Testimonials)</h3>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                {formData.socialProof?.map((proof: any, i: number) => (
+                                    <div key={i} className="p-4 border border-slate-100 bg-white rounded-xl space-y-3 relative group">
+                                        <button onClick={() => {
+                                            const proofs = formData.socialProof.filter((_: any, idx: number) => idx !== i);
+                                            handleChange('socialProof', proofs);
+                                        }} className="absolute top-2 right-2 text-slate-200 group-hover:text-red-500 transition-colors"><Trash2 size={12} /></button>
+                                        <Textarea className="text-xs h-20" placeholder="Quote" value={proof.quote} onChange={e => {
+                                            const proofs = [...formData.socialProof];
+                                            proofs[i].quote = e.target.value;
+                                            handleChange('socialProof', proofs);
+                                        }} />
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Input className="h-8 text-xs" placeholder="Author" value={proof.author} onChange={e => {
+                                                const proofs = [...formData.socialProof];
+                                                proofs[i].author = e.target.value;
+                                                handleChange('socialProof', proofs);
+                                            }} />
+                                            <Input className="h-8 text-xs" placeholder="Source" value={proof.source} onChange={e => {
+                                                const proofs = [...formData.socialProof];
+                                                proofs[i].source = e.target.value;
+                                                handleChange('socialProof', proofs);
+                                            }} />
+                                        </div>
+                                    </div>
+                                ))}
+                                <Button variant="outline" className="h-full min-h-[120px] border-dashed border-slate-200 text-slate-300 hover:text-black hover:border-black font-bold uppercase text-[10px]" onClick={() => handleChange('socialProof', [...(formData.socialProof || []), { quote: '', author: '', source: '' }])}>
+                                    + Add Testimonial
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Conversion Close */}
+                        <div className="bg-slate-900 p-6 rounded-2xl space-y-4">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Conversion Close (Direct Response)</h3>
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[8px] font-black uppercase text-slate-500">CTA Text</label>
+                                    <Input className="bg-slate-800 border-slate-700 text-white h-9" value={formData.conversionClose?.ctaText} onChange={e => handleChange('conversionClose.ctaText', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[8px] font-black uppercase text-slate-500">Urgency Text</label>
+                                    <Input className="bg-slate-800 border-slate-700 text-white h-9" value={formData.conversionClose?.urgencyText} onChange={e => handleChange('conversionClose.urgencyText', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[8px] font-black uppercase text-slate-500">Guarantee Text</label>
+                                    <Input className="bg-slate-800 border-slate-700 text-white h-9" value={formData.conversionClose?.guaranteeText} onChange={e => handleChange('conversionClose.guaranteeText', e.target.value)} />
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </div>
 
