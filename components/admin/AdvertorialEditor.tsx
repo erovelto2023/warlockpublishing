@@ -18,20 +18,42 @@ interface AdvertorialEditorProps {
 }
 
 export default function AdvertorialEditor({ advertorial, affiliateOffers }: AdvertorialEditorProps) {
-    const [formData, setFormData] = useState(advertorial);
+    // Ensure all possible fields have safe defaults to prevent crashes
+    const safeAdvertorial = {
+        title: '',
+        slug: '',
+        category: 'General',
+        template: 'industrial',
+        summaryBox: { title: '', bulletPoints: [], ctaText: '', targetUrl: '' },
+        narrative: { frictionReveal: '', editorialPivot: '' },
+        valueReinforcement: { priceAnchoring: '', steps: [] },
+        comparisonTable: { headers: [], rows: [] },
+        faq: [],
+        heroSection: { headline: '', boldClaim: '', imageUrl: '', videoUrl: '' },
+        listicleItems: [],
+        comparisonData: { title: '', features: [] },
+        socialProof: [],
+        conversionClose: { ctaText: '', urgencyText: '', guaranteeText: '' },
+        ...advertorial
+    };
+
+    const [formData, setFormData] = useState(safeAdvertorial);
     const [isSaving, setIsSaving] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
     const router = useRouter();
 
     const handleChange = (path: string, value: any) => {
-        const newData = { ...formData };
-        const parts = path.split('.');
-        let current = newData;
-        for (let i = 0; i < parts.length - 1; i++) {
-            current = current[parts[i]];
-        }
-        current[parts[parts.length - 1]] = value;
-        setFormData(newData);
+        setFormData((prev: any) => {
+            const newData = { ...prev };
+            const parts = path.split('.');
+            let current: any = newData;
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (!current[parts[i]]) current[parts[i]] = {};
+                current = current[parts[i]];
+            }
+            current[parts[parts.length - 1]] = value;
+            return newData;
+        });
     };
 
     const handleSave = async () => {
