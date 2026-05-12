@@ -1,4 +1,5 @@
-import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView, getGlossaryLinks, extractYouTubeId } from "@/lib/actions/glossary";
+import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView, getGlossaryLinks } from "@/lib/actions/glossary";
+import { extractYouTubeId } from "@/lib/utils";
 import { GlossaryTerm } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";

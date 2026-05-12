@@ -230,3 +230,27 @@ export function repairJson(content: string): string {
 
     return currentAttempt;
 }
+
+/**
+ * Robustly extracts a YouTube Video ID from any URL format.
+ */
+export function extractYouTubeId(urlOrId: string) {
+    if (!urlOrId) return '';
+    const trimmed = urlOrId.trim();
+    if (trimmed.length === 11 && !trimmed.includes('/')) return trimmed;
+
+    // Handle standard watch URLs, shorts, live, embed, and mobile (youtu.be) links
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/|youtube-nocookie\.com\/embed\/)([^"&?\/\s]{11})/;
+    const match = trimmed.match(regExp);
+    
+    if (match && match[1].length === 11) return match[1];
+    
+    // Final fallback: try to find any 11-char alphanumeric string that looks like an ID
+    // but only if the URL contains 'youtube'
+    if (trimmed.includes('youtube')) {
+        const fallbackMatch = trimmed.match(/[a-zA-Z0-9_-]{11}/);
+        if (fallbackMatch) return fallbackMatch[0];
+    }
+    
+    return trimmed;
+}
