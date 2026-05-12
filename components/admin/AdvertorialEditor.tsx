@@ -177,6 +177,8 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                                 </Button>
                             </div>
                         </div>
+                    </section>
+
                     {/* Ultimate Framework (Hero, VSL, Listicle) */}
                     <section className="space-y-8 pt-8 border-t-2 border-slate-100">
                         <div className="flex items-center gap-2">
