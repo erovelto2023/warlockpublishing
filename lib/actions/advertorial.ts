@@ -21,10 +21,26 @@ export async function getAdvertorialBySlug(slug: string) {
     return serialize(doc);
 }
 
-export async function getAdvertorialById(id: string) {
-    await connectToDatabase();
-    const doc = await Advertorial.findById(id);
-    return serialize(doc);
+export async function getAdvertorialById(idOrSlug: string) {
+    try {
+        await connectToDatabase();
+        // Try finding by ID first
+        let doc = null;
+        if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
+            doc = await Advertorial.findById(idOrSlug).lean();
+        }
+        
+        // Fallback to slug if not found or not a valid ID
+        if (!doc) {
+            doc = await Advertorial.findOne({ slug: idOrSlug }).lean();
+        }
+
+        if (!doc) return null;
+        return JSON.parse(JSON.stringify(doc));
+    } catch (error) {
+        console.error('Error fetching advertorial:', error);
+        return null;
+    }
 }
 
 export async function createAdvertorial(data: any) {
