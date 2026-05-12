@@ -15,7 +15,7 @@ import { repairJson } from '@/lib/utils';
 
 const HEADLINE_FORMULAS = ['PAS (Problem-Agitate-Solution)', 'AIDA (Attention-Interest-Desire-Action)', 'How-To', 'Curiosity Gap'];
 
-export default function UltimateAdvertorialBuilder() {
+export default function UltimateAdvertorialBuilder({ affiliateOffers = [] }: { affiliateOffers?: any[] }) {
     // Scraper & Gen Inputs
     const [targetUrl, setTargetUrl] = useState('');
     const [competitorUrls, setCompetitorUrls] = useState('');
@@ -25,10 +25,21 @@ export default function UltimateAdvertorialBuilder() {
     const [isSaft, setIsSaft] = useState(false);
     const [offerDetails, setOfferDetails] = useState('');
     const [proofSources, setProofSources] = useState('');
+    
+    // Media Integration
+    const [heroVideoUrl, setHeroVideoUrl] = useState('');
+    const [vslTitle, setVslTitle] = useState('');
+    const [vslVideoUrl, setVslVideoUrl] = useState('');
+
+    // Link Integration
+    const [selectedAffiliateId, setSelectedAffiliateId] = useState('');
+    const [customTargetUrl, setCustomTargetUrl] = useState('');
 
     const [jsonInput, setJsonInput] = useState('');
     const [isImporting, setIsImporting] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+
+    const selectedOffer = affiliateOffers.find(o => o._id === selectedAffiliateId);
 
     const copyUltimatePrompt = () => {
         const prompt = `You are an expert direct-response copywriter. Generate a high-converting advertorial following the ${headlineFormula} formula and a listicle format. 
@@ -41,11 +52,16 @@ The content must balance educational value with promotional messaging. Ensure FT
 - Primary Pain Point: ${painPoint}
 - Offer & Urgency: ${offerDetails}
 - Social Proof Sources: ${proofSources}
+- Affiliate Product Name: ${selectedOffer?.name || 'N/A'}
+- Custom Target URL: ${customTargetUrl || 'N/A'}
+- Hero Video Provided: ${heroVideoUrl ? 'YES (' + heroVideoUrl + ')' : 'NO'}
+- VSL Video Provided: ${vslVideoUrl ? 'YES (' + vslVideoUrl + ')' : 'NO'}
 - SAFT Compliance Required: ${isSaft ? 'YES' : 'NO'}
 
 ### SYSTEM DIRECTIVE:
 Generate a high-converting advertorial that bridges the gap between an advertisement and a product page. 
 Use the PAS (Problem-Agitate-Solution) formula and a numbered listicle format.
+If videos are provided, weave them naturally into the narrative.
 
 ### OUTPUT JSON SCHEMA:
 {
@@ -54,10 +70,18 @@ Use the PAS (Problem-Agitate-Solution) formula and a numbered listicle format.
   "category": "Niche category",
   "template": "ultimate",
   "ftc_disclosure": "Advertisement",
+  "affiliateOfferId": "${selectedAffiliateId}",
+  "customTargetUrl": "${customTargetUrl}",
   "heroSection": {
     "headline": "Magnetic Headline using ${headlineFormula}",
     "boldClaim": "Bold credible claim upfront",
-    "imagePrompt": "Detailed AI image generation prompt for hero section"
+    "imagePrompt": "Detailed AI image generation prompt for hero section",
+    "videoUrl": "${heroVideoUrl}"
+  },
+  "vsl": {
+    "title": "${vslTitle || 'Watch This Before You Buy'}",
+    "videoUrl": "${vslVideoUrl}",
+    "description": "Short compelling reason to watch"
   },
   "listicleItems": [
     { "subheading": "Benefit-focused statement 1", "content": "Educational narrative leading to product" },
@@ -131,6 +155,62 @@ Educational, authoritative, peer-to-peer. Focus on the Narrative Arc from Pain P
                 <div className="grid lg:grid-cols-2 gap-12">
                     {/* Left Column: Form */}
                     <div className="space-y-8">
+                        {/* LINK & VIDEO INTEGRATION SECTION */}
+                        <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 space-y-6">
+                            <h3 className="text-xs font-black uppercase tracking-widest text-indigo-400 flex items-center gap-2">
+                                <Shield size={14} /> Conversion Assets (Links & Video)
+                            </h3>
+                            
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-indigo-600 tracking-wider">Affiliate Offer</label>
+                                        <div className="relative">
+                                            <select 
+                                                className="w-full h-10 px-3 bg-white border border-indigo-200 rounded-md text-sm font-medium focus:ring-2 focus:ring-indigo-500 transition-all appearance-none"
+                                                value={selectedAffiliateId}
+                                                onChange={e => setSelectedAffiliateId(e.target.value)}
+                                            >
+                                                <option value="">-- Optional Affiliate Link --</option>
+                                                {affiliateOffers.map(o => <option key={o._id} value={o._id}>{o.name}</option>)}
+                                            </select>
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-400" size={14} />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-indigo-600 tracking-wider">Custom Button URL</label>
+                                        <Input 
+                                            className="border-indigo-200 focus:ring-2 focus:ring-indigo-500 transition-all" 
+                                            value={customTargetUrl} 
+                                            onChange={e => setCustomTargetUrl(e.target.value)} 
+                                            placeholder="Overrides affiliate link"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-indigo-600 tracking-wider">Hero Video URL</label>
+                                        <Input 
+                                            className="border-indigo-200 focus:ring-2 focus:ring-indigo-500 transition-all" 
+                                            value={heroVideoUrl} 
+                                            onChange={e => setHeroVideoUrl(e.target.value)} 
+                                            placeholder="YouTube/Vimeo/Direct Link"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-indigo-600 tracking-wider">VSL Section Video URL</label>
+                                        <Input 
+                                            className="border-indigo-200 focus:ring-2 focus:ring-indigo-500 transition-all" 
+                                            value={vslVideoUrl} 
+                                            onChange={e => setVslVideoUrl(e.target.value)} 
+                                            placeholder="Dedicated VSL Video"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">

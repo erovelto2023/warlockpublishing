@@ -14,9 +14,10 @@ import { deleteAdvertorial } from '@/lib/actions/advertorial';
 
 interface AdvertorialManagerProps {
     initialAdvertorials: any[];
+    affiliateOffers: any[];
 }
 
-function AdvertorialManager({ initialAdvertorials }: AdvertorialManagerProps) {
+function AdvertorialManager({ initialAdvertorials, affiliateOffers }: AdvertorialManagerProps) {
     const [view, setView] = useState<'list' | 'build'>('list');
     const [search, setSearch] = useState('');
     const router = useRouter();
@@ -57,7 +58,7 @@ function AdvertorialManager({ initialAdvertorials }: AdvertorialManagerProps) {
             </div>
 
             {view === 'build' ? (
-                <UltimateAdvertorialBuilder />
+                <UltimateAdvertorialBuilder affiliateOffers={affiliateOffers} />
             ) : (
                 <div className="space-y-4">
                     <div className="relative max-w-md">

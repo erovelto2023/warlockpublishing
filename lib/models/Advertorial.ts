@@ -46,6 +46,12 @@ export interface IAdvertorial extends Document {
         boldClaim: string;
         imageUrl?: string;
         imagePrompt?: string;
+        videoUrl?: string;
+    };
+    vsl?: {
+        title: string;
+        videoUrl: string;
+        description?: string;
     };
     listicleItems?: {
         subheading: string;
@@ -131,7 +137,13 @@ const AdvertorialSchema: Schema = new Schema({
         headline: { type: String },
         boldClaim: { type: String },
         imageUrl: { type: String },
-        imagePrompt: { type: String }
+        imagePrompt: { type: String },
+        videoUrl: { type: String }
+    },
+    vsl: {
+        title: { type: String },
+        videoUrl: { type: String },
+        description: { type: String }
     },
     listicleItems: [{
         subheading: { type: String },

@@ -1170,7 +1170,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                 )}
 
                 {activeTab === 'advertorials' && (
-                    <AdvertorialManager initialAdvertorials={advertorials} />
+                    <AdvertorialManager initialAdvertorials={advertorials} affiliateOffers={affiliateOffers} />
                 )}
 
             </main>
