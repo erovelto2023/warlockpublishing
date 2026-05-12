@@ -34,14 +34,17 @@ export async function isYouTubeVideoActive(urlOrId: string): Promise<boolean> {
             next: { revalidate: 3600 } // Cache results for an hour
         });
         
-        // If 404, it's definitely gone. If 401/403/500, we might be blocked, so assume it exists to avoid deleting valid data.
-        if (response.status === 404) return false;
-        if (!response.ok) return true; 
+        // Strict check: Only return true if the video is public and accessible (200 OK)
+        if (response.status === 200) return true;
+        
+        // If 404, 401 (Private), or 403, it's not usable for us
+        if ([401, 403, 404].includes(response.status)) return false;
 
+        // For other errors (500, etc), assume it might be a temporary issue and don't clear yet
         return true;
     } catch (error) {
         console.error("YouTube validation failed:", error);
-        return true; // Fallback to true to avoid destructive clearing
+        return true; // Fallback to true for network errors to avoid destructive clearing
     }
 }
 
@@ -52,30 +55,39 @@ export async function isYouTubeVideoActive(urlOrId: string): Promise<boolean> {
 export async function searchYouTubeVideo(keyword: string): Promise<string | null> {
     if (!keyword) return null;
     
-    // Add category/context if needed, but the keyword is usually the term name
-    const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(keyword + " guide")}&sp=EgIQAQ%253D%253D`;
-    
-    try {
-        const res = await fetch(searchUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-                'Accept-Language': 'en-US,en;q=0.9'
-            },
-            next: { revalidate: 3600 }
-        });
+    // Add variations for better results
+    const queries = [
+        `${keyword} guide for beginners`,
+        `${keyword} explained`,
+        `${keyword} tutorial`
+    ];
+
+    for (const query of queries) {
+        const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=EgIQAQ%253D%253D`;
         
-        const html = await res.text();
-        
-        // Find the first videoId pattern in the YouTube embedded JSON data
-        const match = html.match(/"videoId":"([^"]{11})"/);
-        if (match && match[1]) {
-            return `https://www.youtube.com/watch?v=${match[1]}`;
+        try {
+            const res = await fetch(searchUrl, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                    'Accept-Language': 'en-US,en;q=0.9'
+                },
+                next: { revalidate: 3600 }
+            });
+            
+            const html = await res.text();
+            
+            // More robust regex for videoId in various YouTube JSON structures
+            const videoIdMatch = html.match(/"videoId":"([^"]{11})"/i) || 
+                               html.match(/\/watch\?v=([^"&?\/\s]{11})/i);
+                               
+            if (videoIdMatch && videoIdMatch[1]) {
+                return `https://www.youtube.com/watch?v=${videoIdMatch[1]}`;
+            }
+        } catch (e) {
+            console.error(`[YouTubeSearch] Failed for query "${query}":`, e);
         }
-        return null;
-    } catch (e) {
-        console.error(`[YouTubeSearch] Failed for keyword "${keyword}":`, e);
-        return null;
     }
+    return null;
 }
 
 export async function getGlossaryTerms(options: { 
@@ -332,12 +344,20 @@ export async function healGlossaryVideos() {
         for (let i = 0; i < terms.length; i += CHECK_BATCH) {
             const batch = terms.slice(i, i + CHECK_BATCH);
             await Promise.all(batch.map(async (term) => {
-                const hasExisting = term.youtubeVideoId && term.youtubeVideoId.trim().length > 0;
+                const rawId = term.youtubeVideoId || "";
+                const cleanId = extractYouTubeId(rawId);
+                const hasExisting = cleanId.length === 11 && !cleanId.includes('/');
+                
                 if (!hasExisting) {
                     needsFixing.push(term);
                 } else {
-                    const isActive = await isYouTubeVideoActive(term.youtubeVideoId);
-                    if (!isActive) needsFixing.push(term);
+                    const isActive = await isYouTubeVideoActive(cleanId);
+                    if (!isActive) {
+                        needsFixing.push(term);
+                    } else if (rawId !== cleanId) {
+                        // It's active but was a full URL or dirty ID - fix it immediately
+                        await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: cleanId });
+                    }
                 }
             }));
         }
@@ -345,17 +365,18 @@ export async function healGlossaryVideos() {
         console.log(`[Healer] Phase 2: Fixing ${needsFixing.length} terms...`);
 
         // Phase 2: Only search for terms that need it (Slower search)
-        // We limit this to 15 terms per request to guarantee we stay under the 30s timeout
-        const WORK_LIMIT = 15;
+        // Process up to 50 terms per run to maximize repair speed
+        const WORK_LIMIT = 50;
         const toProcess = needsFixing.slice(0, WORK_LIMIT);
-        const SEARCH_BATCH = 5; // Search is slower/heavier, keep batch smaller
+        const SEARCH_BATCH = 3; // Keep search batch small to avoid getting blocked
 
         for (let i = 0; i < toProcess.length; i += SEARCH_BATCH) {
             const batch = toProcess.slice(i, i + SEARCH_BATCH);
             await Promise.all(batch.map(async (term) => {
                 const replacement = await searchYouTubeVideo(term.term);
                 if (replacement) {
-                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: replacement });
+                    const videoId = extractYouTubeId(replacement);
+                    await GlossaryTerm.findByIdAndUpdate(term._id, { youtubeVideoId: videoId });
                     if (term.youtubeVideoId) healedCount++;
                     else addedCount++;
                 } else if (term.youtubeVideoId) {
@@ -423,4 +444,28 @@ export async function wipeGlossaryDownloads() {
         console.error("Wipe downloads failed:", error);
         return { success: false, error: error.message };
     }
+}
+
+/**
+ * Robustly extracts a YouTube Video ID from any URL format.
+ */
+export function extractYouTubeId(urlOrId: string) {
+    if (!urlOrId) return '';
+    const trimmed = urlOrId.trim();
+    if (trimmed.length === 11 && !trimmed.includes('/')) return trimmed;
+
+    // Handle standard watch URLs, shorts, live, embed, and mobile (youtu.be) links
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/|youtube-nocookie\.com\/embed\/)([^"&?\/\s]{11})/;
+    const match = trimmed.match(regExp);
+    
+    if (match && match[1].length === 11) return match[1];
+    
+    // Final fallback: try to find any 11-char alphanumeric string that looks like an ID
+    // but only if the URL contains 'youtube'
+    if (trimmed.includes('youtube')) {
+        const fallbackMatch = trimmed.match(/[a-zA-Z0-9_-]{11}/);
+        if (fallbackMatch) return fallbackMatch[0];
+    }
+    
+    return trimmed;
 }

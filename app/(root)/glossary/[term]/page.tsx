@@ -1,4 +1,4 @@
-import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView, getGlossaryLinks } from "@/lib/actions/glossary";
+import { getGlossaryTermBySlug, getGlossaryTerms, incrementGlossaryView, getGlossaryLinks, extractYouTubeId } from "@/lib/actions/glossary";
 import { GlossaryTerm } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -331,10 +331,4 @@ function ChevronRight({ size, className }: { size: number, className?: string })
     )
 }
 
-function extractYouTubeId(urlOrId: string) {
-    if (!urlOrId) return '';
-    // Handle standard watch URLs, shorts, embed, and mobile (youtu.be) links
-    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-    const match = urlOrId.match(regExp);
-    return (match && match[1].length === 11) ? match[1] : urlOrId;
-}
+
