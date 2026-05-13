@@ -15,7 +15,7 @@ import { repairJson } from '@/lib/utils';
 
 const HEADLINE_FORMULAS = ['PAS (Problem-Agitate-Solution)', 'AIDA (Attention-Interest-Desire-Action)', 'How-To', 'Curiosity Gap'];
 
-export default function UltimateAdvertorialBuilder({ affiliateOffers = [] }: { affiliateOffers?: any[] }) {
+export default function UltimateAdvertorialBuilder({ affiliateOffers = [], onStage }: { affiliateOffers?: any[], onStage?: (data: any) => void }) {
     // Scraper & Gen Inputs
     const [targetUrl, setTargetUrl] = useState('');
     const [competitorUrls, setCompetitorUrls] = useState('');
@@ -42,77 +42,97 @@ export default function UltimateAdvertorialBuilder({ affiliateOffers = [] }: { a
     const selectedOffer = affiliateOffers.find(o => o._id === selectedAffiliateId);
 
     const copyUltimatePrompt = () => {
-        const prompt = `You are an expert direct-response copywriter. Generate a high-converting advertorial following the ${headlineFormula} formula and a listicle format. 
-The content must balance educational value with promotional messaging. Ensure FTC compliance by including a clear 'Advertisement' disclosure.
+        const prompt = `You are a world-class Direct Response Copywriter, Conversion Rate Optimization (CRO) Expert, and Psychological Narrative Architect. 
+Your goal is to engineer a high-conversion advertorial for "${selectedOffer?.name || targetUrl}" following the ${headlineFormula} formula and the "Discovery-Discovery-Solution" narrative arc.
 
 ### INPUT DATA:
-- Target Product URL: ${targetUrl}
-- Competitor URLs: ${competitorUrls}
+- Primary Product: ${selectedOffer?.name || 'N/A'}
+- Target URL: ${targetUrl}
+- The Barrier (Friction): ${painPoint}
+- The Hook (Saving/Hack): ${offerDetails}
 - Target Audience: ${audience}
-- Primary Pain Point: ${painPoint}
-- Offer & Urgency: ${offerDetails}
-- Social Proof Sources: ${proofSources}
-- Affiliate Product Name: ${selectedOffer?.name || 'N/A'}
-- Custom Target URL: ${customTargetUrl || 'N/A'}
-- Hero Video Provided: ${heroVideoUrl ? 'YES (' + heroVideoUrl + ')' : 'NO'}
-- VSL Video Provided: ${vslVideoUrl ? 'YES (' + vslVideoUrl + ')' : 'NO'}
-- SAFT Compliance Required: ${isSaft ? 'YES' : 'NO'}
+- Competitor Context: ${competitorUrls}
+- Social Proof Context: ${proofSources}
+- Hero Video: ${heroVideoUrl || 'N/A'}
+- VSL Video: ${vslVideoUrl || 'N/A'}
 
-### SYSTEM DIRECTIVE:
-Generate a high-converting advertorial that bridges the gap between an advertisement and a product page. 
-Use the PAS (Problem-Agitate-Solution) formula and a numbered listicle format.
-If videos are provided, weave them naturally into the narrative.
+### SYSTEM DIRECTIVES:
+1. **Psychological Anchoring**: Start with a "Friction Reveal" that validates the audience's current frustration. 
+2. **The "Epiphany" Moment**: Transition to an "Editorial Pivot" where a new, better way (the hack) is discovered.
+3. **High-Fidelity Social Proof**: Generate realistic-sounding testimonials and comments with names and time-stamps.
+4. **Interactive Ratings**: Assign credible ratings (95-99%) for Ease of Use, Specifications, and Value for Money.
+5. **SAFT Compliance**: ${isSaft ? "Ensure the tone is strictly informative/educational to bypass platform sensitivity filters." : "Use aggressive, benefit-driven language."}
 
-### OUTPUT JSON SCHEMA:
+### OUTPUT JSON SCHEMA (STRICT):
 {
-  "title": "Compelling internal title",
+  "title": "A compelling, clickable internal title",
   "slug": "url-friendly-slug",
-  "category": "Niche category",
-  "template": "ultimate",
-  "ftc_disclosure": "Advertisement",
+  "category": "${category || 'Gadget Discovery'}",
+  "template": "discovery",
+  "ftcDisclosure": "This is an advertisement and not a news article",
   "affiliateOfferId": "${selectedAffiliateId}",
   "customTargetUrl": "${customTargetUrl}",
   "heroSection": {
-    "headline": "Magnetic Headline using ${headlineFormula}",
-    "boldClaim": "Bold credible claim upfront",
-    "imagePrompt": "Detailed AI image generation prompt for hero section",
+    "headline": "Magnetic headline using ${headlineFormula}",
+    "boldClaim": "Bold, credible claim in quotes",
+    "imageUrl": "Recommended AI Image Generation Prompt",
     "videoUrl": "${heroVideoUrl}"
   },
-  "vsl": {
-    "title": "${vslTitle || 'Watch This Before You Buy'}",
-    "videoUrl": "${vslVideoUrl}",
-    "description": "Short compelling reason to watch"
+  "narrative": {
+    "frictionReveal": "Powerful 2-3 paragraph section agitating the core pain point.",
+    "editorialPivot": "1-2 paragraph transition positioning the discovery as the unique solution."
+  },
+  "discovery": {
+    "author": {
+      "name": "Generated Persona (e.g. Mark Holler)",
+      "date": "Oct 19",
+      "readTime": "6 minute read",
+      "avatarUrl": ""
+    },
+    "ratings": {
+      "overall": "4.9/5",
+      "breakdown": [
+        { "label": "Ease Of Use", "value": 99 },
+        { "label": "Specifications", "value": 97 },
+        { "label": "Value For Money", "value": 98 }
+      ]
+    },
+    "painPoints": {
+      "title": "Why current solutions fail:",
+      "items": ["Problem 1", "Problem 2", "Problem 3"]
+    },
+    "comments": [
+      { "name": "Name 1", "time": "2 hours ago", "text": "Stunningly realistic positive comment." },
+      { "name": "Name 2", "time": "5 hours ago", "text": "Detailed review about the shipping or results." }
+    ]
   },
   "listicleItems": [
-    { "subheading": "Benefit-focused statement 1", "content": "Educational narrative leading to product" },
-    { "subheading": "Benefit-focused statement 2", "content": "..." }
+    { "subheading": "Benefit 1", "content": "Detailed educational paragraph." },
+    { "subheading": "Benefit 2", "content": "Detailed educational paragraph." }
   ],
   "comparisonData": {
-    "title": "How We Outperform The Rest",
+    "title": "How We Beat The Competition",
     "features": [
-      { "name": "Feature Name", "ourValue": "Our Benefit", "competitorValue": "Their Weakness", "isBetter": true }
+      { "name": "Feature X", "ourValue": "Superior", "competitorValue": "Inferior", "isBetter": true }
     ]
   },
   "socialProof": [
-    { "quote": "Real-sounding testimonial", "author": "Name/Initials", "source": "Amazon/Trustpilot" }
+    { "quote": "Major quote", "author": "R.S.", "source": "Verified Purchase" }
   ],
-  "conversionClose": {
-    "ctaText": "Primary CTA button text",
-    "urgencyText": "Countdown/Limited time text",
-    "guaranteeText": "Risk-free guarantee text"
+  "vsl": {
+    "title": "Watch the Full Discovery Video",
+    "videoUrl": "${vslVideoUrl}",
+    "description": "Why this video is going viral right now."
   },
-  "scraperInputs": {
-    "targetUrl": "${targetUrl}",
-    "competitorUrls": [${competitorUrls.split(',').map(u => `"${u.trim()}"`).join(', ')}],
-    "targetAudience": "${audience}",
-    "painPoint": "${painPoint}",
-    "headlineFormula": "${headlineFormula}",
-    "saftCompliance": ${isSaft}
+  "conversionClose": {
+    "ctaText": "Claim Your Discount Now",
+    "urgencyText": "Special offer ends today",
+    "guaranteeText": "30-Day Money Back Guarantee"
   }
 }
 
-### TONE:
-Educational, authoritative, peer-to-peer. Focus on the Narrative Arc from Pain Point to Lifestyle Improvement.`;
+### TONE: 
+Insightful, authoritative, investigative, and peer-to-peer. Avoid generic sales speak. Focus on "The Reveal."`;
 
         navigator.clipboard.writeText(prompt);
         setStatus({ type: 'success', message: 'Ultimate Framework Prompt copied!' });
@@ -352,8 +372,14 @@ Educational, authoritative, peer-to-peer. Focus on the Narrative Arc from Pain P
                                         try {
                                             const repaired = repairJson(jsonInput);
                                             const data = JSON.parse(repaired);
-                                            sessionStorage.setItem('staged_advertorial', JSON.stringify(Array.isArray(data) ? data[0] : data));
-                                            window.location.href = '/admin/articles/new?staged=true';
+                                            const stagedData = Array.isArray(data) ? data[0] : data;
+                                            
+                                            if (onStage) {
+                                                onStage(stagedData);
+                                            } else {
+                                                sessionStorage.setItem('staged_advertorial', JSON.stringify(stagedData));
+                                                window.location.href = '/admin/articles/new?staged=true';
+                                            }
                                         } catch (e) {
                                             alert('Invalid JSON format');
                                         }
@@ -361,7 +387,7 @@ Educational, authoritative, peer-to-peer. Focus on the Narrative Arc from Pain P
                                     disabled={isImporting || !jsonInput} 
                                     className="w-full bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-50 font-black h-14 rounded-xl transition-all gap-3 uppercase tracking-wider text-xs"
                                 >
-                                    <Edit size={20} /> Open in Editor
+                                    <Edit size={20} /> Stage to Editor
                                 </Button>
                             </div>
                         </div>

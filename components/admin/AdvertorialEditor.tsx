@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateAdvertorial, createAdvertorial } from '@/lib/actions/advertorial';
+import UltimateAdvertorialBuilder from './UltimateAdvertorialBuilder';
+import { Terminal, Sparkles } from 'lucide-react';
 
 interface AdvertorialEditorProps {
     advertorial: any;
@@ -50,6 +52,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
 
     const [formData, setFormData] = useState(safeAdvertorial);
     const [isSaving, setIsSaving] = useState(false);
+    const [showBuilder, setShowBuilder] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
     const router = useRouter();
 
@@ -124,6 +127,14 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                     <Button variant="ghost" size="icon" onClick={() => router.back()} className="hover:bg-slate-100 text-black">
                         <ArrowLeft size={20} />
                     </Button>
+                    <Button 
+                        variant="outline" 
+                        onClick={() => setShowBuilder(!showBuilder)}
+                        className={`gap-2 h-10 px-4 rounded-none border-black transition-all ${showBuilder ? 'bg-black text-white' : 'hover:bg-slate-50 text-black'}`}
+                    >
+                        {showBuilder ? <Terminal size={16} /> : <Sparkles size={16} />}
+                        {showBuilder ? 'Hide Architect' : 'Prompt Architect'}
+                    </Button>
                     <div>
                         <h1 className="text-xl font-bold uppercase tracking-widest text-black">{isNew ? 'Create New Advertorial' : 'Edit Advertorial'}</h1>
                         {!isNew && <p className="text-[10px] text-slate-400 font-mono">{advertorial._id}</p>}
@@ -142,6 +153,23 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                 <div className={`p-4 border-2 flex items-center gap-3 ${status.type === 'success' ? 'bg-white border-black text-black' : 'bg-white border-red-600 text-red-600'}`}>
                     {status.type === 'success' ? <Check size={20} /> : <AlertCircle size={20} />}
                     <p className="text-sm font-bold uppercase tracking-widest">{status.message}</p>
+                </div>
+            )}
+
+            {/* Collapsible Framework Architect */}
+            {showBuilder && (
+                <div className="border-2 border-black p-1 bg-black animate-in slide-in-from-top duration-300">
+                    <div className="bg-white">
+                        <UltimateAdvertorialBuilder 
+                            affiliateOffers={affiliateOffers} 
+                            onStage={(data) => {
+                                setFormData((prev: any) => ({ ...prev, ...data }));
+                                setShowBuilder(false);
+                                setStatus({ type: 'success', message: 'Framework data staged! Review below.' });
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                        />
+                    </div>
                 </div>
             )}
 
