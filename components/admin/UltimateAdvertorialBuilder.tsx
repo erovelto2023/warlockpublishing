@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { 
     Copy, Terminal, Send, Check, AlertCircle, FileJson, 
     RefreshCw, Globe, Users, Zap, Shield, Gift, MessageSquare,
-    ChevronDown, Layout
+    ChevronDown, Layout, Edit
 } from 'lucide-react';
 import { importAdvertorials } from '@/lib/actions/advertorial';
 import { repairJson } from '@/lib/utils';
@@ -337,14 +337,33 @@ Educational, authoritative, peer-to-peer. Focus on the Narrative Arc from Pain P
                                 placeholder="Paste the generated JSON here..."
                                 className="flex-grow min-h-[400px] font-mono text-xs rounded-xl border-slate-200 focus:border-indigo-500 bg-white shadow-inner p-4"
                             />
-                            <Button 
-                                onClick={handleImport} 
-                                disabled={isImporting || !jsonInput} 
-                                className="mt-4 w-full bg-slate-900 hover:bg-black text-white font-black h-14 rounded-xl transition-all gap-3 uppercase tracking-wider"
-                            >
-                                {isImporting ? <RefreshCw className="animate-spin" /> : <Send size={20} />}
-                                Build Advertorial App Page
-                            </Button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <Button 
+                                    onClick={handleImport} 
+                                    disabled={isImporting || !jsonInput} 
+                                    className="w-full bg-slate-900 hover:bg-black text-white font-black h-14 rounded-xl transition-all gap-3 uppercase tracking-wider text-xs"
+                                >
+                                    {isImporting ? <RefreshCw className="animate-spin" /> : <Send size={20} />}
+                                    Direct Build
+                                </Button>
+                                <Button 
+                                    onClick={async () => {
+                                        if (!jsonInput.trim()) return;
+                                        try {
+                                            const repaired = repairJson(jsonInput);
+                                            const data = JSON.parse(repaired);
+                                            sessionStorage.setItem('staged_advertorial', JSON.stringify(Array.isArray(data) ? data[0] : data));
+                                            window.location.href = '/admin/articles/new?staged=true';
+                                        } catch (e) {
+                                            alert('Invalid JSON format');
+                                        }
+                                    }} 
+                                    disabled={isImporting || !jsonInput} 
+                                    className="w-full bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-50 font-black h-14 rounded-xl transition-all gap-3 uppercase tracking-wider text-xs"
+                                >
+                                    <Edit size={20} /> Open in Editor
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

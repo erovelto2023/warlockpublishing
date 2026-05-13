@@ -54,6 +54,12 @@ function AdvertorialManager({ initialAdvertorials, affiliateOffers }: Advertoria
                     >
                         <Plus size={16} /> Framework Architect
                     </button>
+                    <button
+                        onClick={() => router.push('/admin/articles/new')}
+                        className="px-4 py-2 bg-black text-white rounded-lg text-sm font-bold transition-all flex items-center gap-2 hover:bg-slate-800"
+                    >
+                        <FileText size={16} /> Create From Scratch
+                    </button>
                 </div>
             </div>
 

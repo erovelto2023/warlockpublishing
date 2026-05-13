@@ -11,7 +11,7 @@ import {
     Share2, HelpCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { updateAdvertorial } from '@/lib/actions/advertorial';
+import { updateAdvertorial, createAdvertorial } from '@/lib/actions/advertorial';
 
 interface AdvertorialEditorProps {
     advertorial: any;
@@ -19,29 +19,58 @@ interface AdvertorialEditorProps {
 }
 
 export default function AdvertorialEditor({ advertorial, affiliateOffers }: AdvertorialEditorProps) {
+    const isNew = !advertorial || !advertorial._id;
+    
     // Ensure all possible fields have safe defaults to prevent crashes
     const safeAdvertorial = {
         title: '',
         slug: '',
         category: 'General',
-        template: 'industrial',
-        summaryBox: { title: '', bulletPoints: [], ctaText: '', targetUrl: '' },
-        narrative: { frictionReveal: '', editorialPivot: '' },
-        valueReinforcement: { priceAnchoring: '', steps: [] },
-        comparisonTable: { headers: [], rows: [] },
-        faq: [],
+        template: 'discovery',
+        isPublished: false,
+        ftcDisclosure: 'This is an advertisement and not a news article',
         heroSection: { headline: '', boldClaim: '', imageUrl: '', videoUrl: '' },
+        narrative: { frictionReveal: '', editorialPivot: '' },
         listicleItems: [],
-        comparisonData: { title: '', features: [] },
         socialProof: [],
-        conversionClose: { ctaText: '', urgencyText: '', guaranteeText: '' },
-        ...advertorial
+        vsl: { title: '', videoUrl: '', description: '' },
+        valueReinforcement: { priceAnchoring: '', benefits: [] },
+        comparisonData: { title: 'How We Outperform The Rest', features: [] },
+        conversionClose: { ctaText: 'Order Now', urgencyText: '', guaranteeText: '' },
+        discovery: {
+            author: { name: 'Mark Holler', date: 'Oct 19', readTime: '6 min read', avatarUrl: '' },
+            ratings: { overall: '4.9/5', breakdown: [{ label: 'Ease Of Use', value: 99 }, { label: 'Specifications', value: 97 }, { label: 'Value For Money', value: 99 }] },
+            comments: [],
+            painPoints: { title: 'Pain Points', items: [] }
+        },
+        ...advertorial,
+        affiliateOfferId: advertorial?.affiliateOfferId?._id || advertorial?.affiliateOfferId || '',
     };
 
     const [formData, setFormData] = useState(safeAdvertorial);
     const [isSaving, setIsSaving] = useState(false);
     const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
     const router = useRouter();
+
+    // Handle staged data from Importer/Builder
+    useEffect(() => {
+        if (isNew && typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('staged')) {
+                const staged = sessionStorage.getItem('staged_advertorial');
+                if (staged) {
+                    try {
+                        const parsed = JSON.parse(staged);
+                        setFormData((prev: any) => ({ ...prev, ...parsed }));
+                        // Clear after loading
+                        sessionStorage.removeItem('staged_advertorial');
+                    } catch (e) {
+                        console.error('Failed to parse staged data');
+                    }
+                }
+            }
+        }
+    }, [isNew]);
 
     const handleChange = (path: string, value: any) => {
         setFormData((prev: any) => {
@@ -61,10 +90,21 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
         setIsSaving(true);
         setStatus({ type: null, message: '' });
         try {
-            const res = await updateAdvertorial(advertorial._id, formData);
+            let res;
+            if (isNew) {
+                res = await createAdvertorial(formData);
+            } else {
+                res = await updateAdvertorial(advertorial._id, formData);
+            }
+            
             if (res) {
-                setStatus({ type: 'success', message: 'Advertorial updated successfully!' });
-                router.refresh();
+                setStatus({ type: 'success', message: isNew ? 'Advertorial created successfully!' : 'Advertorial updated successfully!' });
+                if (isNew) {
+                    router.push(`/admin`); 
+                    router.refresh();
+                } else {
+                    router.refresh();
+                }
             }
         } catch (e: any) {
             setStatus({ type: 'error', message: 'Failed to save: ' + e.message });
@@ -84,8 +124,8 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                         <ArrowLeft size={20} />
                     </Button>
                     <div>
-                        <h1 className="text-xl font-bold uppercase tracking-widest text-black">Edit Advertorial</h1>
-                        <p className="text-[10px] text-slate-400 font-mono">{advertorial._id}</p>
+                        <h1 className="text-xl font-bold uppercase tracking-widest text-black">{isNew ? 'Create New Advertorial' : 'Edit Advertorial'}</h1>
+                        {!isNew && <p className="text-[10px] text-slate-400 font-mono">{advertorial._id}</p>}
                     </div>
                 </div>
                 <Button 
@@ -93,7 +133,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                     disabled={isSaving}
                     className="bg-black hover:bg-slate-800 text-white font-bold h-10 px-8 rounded-none"
                 >
-                    {isSaving ? 'Saving...' : 'Save Changes'}
+                    {isSaving ? 'Saving...' : (isNew ? 'Create Page' : 'Save Changes')}
                 </Button>
             </header>
 
