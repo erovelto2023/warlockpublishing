@@ -29,6 +29,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
         template: 'discovery',
         isPublished: false,
         ftcDisclosure: 'This is an advertisement and not a news article',
+        summaryBox: { title: '', benefits: [], ctaText: 'Order Now', targetUrl: '' },
         heroSection: { headline: '', boldClaim: '', imageUrl: '', videoUrl: '' },
         narrative: { frictionReveal: '', editorialPivot: '' },
         listicleItems: [],
@@ -611,7 +612,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                             ))}
                         </select>
                         <Input className={inputStyles} value={formData.customTargetUrl || ''} onChange={e => handleChange('customTargetUrl', e.target.value)} placeholder="Custom Link URL" />
-                        <Input className={inputStyles} value={formData.summaryBox.ctaText} onChange={e => handleChange('summaryBox.ctaText', e.target.value)} placeholder="CTA Button Text" />
+                        <Input className={inputStyles} value={formData.summaryBox?.ctaText} onChange={e => handleChange('summaryBox.ctaText', e.target.value)} placeholder="CTA Button Text" />
                     </section>
 
                     {/* Urgency */}
