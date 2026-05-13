@@ -1,9 +1,10 @@
 import { getAdvertorialBySlug, trackAdvertorialView } from "@/lib/actions/advertorial";
 import { notFound } from "next/navigation";
-import IndustrialTemplate from "@/components/templates/advertorial/IndustrialTemplate";
-import MinimalistTemplate from "@/components/templates/advertorial/MinimalistTemplate";
-import MagazineTemplate from "@/components/templates/advertorial/MagazineTemplate";
-import UltimateTemplate from "@/components/templates/advertorial/UltimateTemplate";
+import IndustrialTemplate from "../../../../components/templates/advertorial/IndustrialTemplate";
+import MinimalistTemplate from "../../../../components/templates/advertorial/MinimalistTemplate";
+import MagazineTemplate from "../../../../components/templates/advertorial/MagazineTemplate";
+import UltimateTemplate from "../../../../components/templates/advertorial/UltimateTemplate";
+import DiscoveryTemplate from "../../../../components/templates/advertorial/DiscoveryTemplate";
 
 export default async function AdvertorialPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -24,6 +25,8 @@ export default async function AdvertorialPage({ params }: { params: Promise<{ sl
             return <MagazineTemplate advertorial={advertorial} />;
         case 'ultimate':
             return <UltimateTemplate advertorial={advertorial} />;
+        case 'discovery':
+            return <DiscoveryTemplate advertorial={advertorial} />;
         case 'industrial':
         default:
             return <IndustrialTemplate advertorial={advertorial} />;

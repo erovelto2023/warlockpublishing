@@ -37,7 +37,7 @@ export interface IAdvertorial extends Document {
         type: 'timer' | 'slots' | 'none';
         value: string;
     };
-    template: 'standard' | 'listicle' | 'comparison' | 'minimalist' | 'industrial' | 'magazine' | 'ultimate';
+    template: 'standard' | 'listicle' | 'comparison' | 'minimalist' | 'industrial' | 'magazine' | 'ultimate' | 'discovery';
     
     // New Framework Fields
     ftcDisclosure?: string;
@@ -76,6 +76,40 @@ export interface IAdvertorial extends Document {
         ctaText: string;
         urgencyText: string;
         guaranteeText: string;
+    };
+    discovery?: {
+        logoUrl?: string;
+        breadcrumbs?: string[];
+        author?: {
+            name: string;
+            date: string;
+            readTime: string;
+            avatarUrl: string;
+        };
+        ratings?: {
+            overall: string;
+            breakdown: {
+                label: string;
+                value: number;
+            }[];
+        };
+        imageGallery?: string[];
+        orderSteps?: {
+            step: string;
+            title: string;
+            linkText?: string;
+            linkUrl?: string;
+        }[];
+        comments?: {
+            name: string;
+            time: string;
+            text: string;
+            avatarUrl?: string;
+        }[];
+        painPoints?: {
+            title: string;
+            items: string[];
+        };
     };
     scraperInputs?: {
         targetUrl: string;

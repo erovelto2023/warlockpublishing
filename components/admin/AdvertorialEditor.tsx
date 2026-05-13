@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { 
     Save, ArrowLeft, Plus, Trash2, 
-    Link as LinkIcon, AlertCircle, Check, Target, Layout
+    Link as LinkIcon, AlertCircle, Check, Target, Layout,
+    Share2, HelpCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { updateAdvertorial } from '@/lib/actions/advertorial';
@@ -178,6 +179,178 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                             </div>
                         </div>
                     </section>
+
+                    {/* Discovery Features (High Conversion) */}
+                    {formData.template === 'discovery' && (
+                        <section className="space-y-8 pt-8 border-t-2 border-slate-100">
+                            <div className="flex items-center gap-2 text-blue-600">
+                                <Share2 size={16} />
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.2em]">Discovery Studio</h2>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-8">
+                                {/* Author & Bylines */}
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-bold text-slate-700">Author & Bylines</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold uppercase text-slate-400">Author Name</label>
+                                            <input 
+                                                type="text" 
+                                                className="w-full bg-slate-50 border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                                                value={formData.discovery?.author?.name || ""}
+                                                onChange={(e) => handleChange('discovery.author.name', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold uppercase text-slate-400">Read Time</label>
+                                            <input 
+                                                type="text" 
+                                                className="w-full bg-slate-50 border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                                                value={formData.discovery?.author?.readTime || ""}
+                                                onChange={(e) => handleChange('discovery.author.readTime', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-slate-400">Avatar URL</label>
+                                        <input 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                                            value={formData.discovery?.author?.avatarUrl || ""}
+                                            onChange={(e) => handleChange('discovery.author.avatarUrl', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Ratings & Breakdown */}
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-bold text-slate-700">Conversion Ratings</h3>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-slate-400">Overall Score (e.g. 4.9/5)</label>
+                                        <input 
+                                            type="text" 
+                                            className="w-full bg-slate-50 border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                                            value={formData.discovery?.ratings?.overall || ""}
+                                            onChange={(e) => handleChange('discovery.ratings.overall', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        {formData.discovery?.ratings?.breakdown?.map((rating: any, i: number) => (
+                                            <div key={i} className="flex items-center gap-3">
+                                                <input 
+                                                    type="text"
+                                                    placeholder="Label"
+                                                    className="flex-1 bg-white border border-slate-100 rounded-lg p-2 text-xs"
+                                                    value={rating.label}
+                                                    onChange={(e) => {
+                                                        const newBreakdown = [...formData.discovery.ratings.breakdown];
+                                                        newBreakdown[i].label = e.target.value;
+                                                        handleChange('discovery.ratings.breakdown', newBreakdown);
+                                                    }}
+                                                />
+                                                <input 
+                                                    type="number"
+                                                    placeholder="%"
+                                                    className="w-20 bg-white border border-slate-100 rounded-lg p-2 text-xs"
+                                                    value={rating.value}
+                                                    onChange={(e) => {
+                                                        const newBreakdown = [...formData.discovery.ratings.breakdown];
+                                                        newBreakdown[i].value = parseInt(e.target.value);
+                                                        handleChange('discovery.ratings.breakdown', newBreakdown);
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Comments Manager */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold text-slate-700">Testimonial Comments</h3>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        className="text-[10px] uppercase font-bold"
+                                        onClick={() => {
+                                            const newComments = [...(formData.discovery?.comments || []), { name: "New User", time: "Just now", text: "" }];
+                                            handleChange('discovery.comments', newComments);
+                                        }}
+                                    >
+                                        Add Comment
+                                    </Button>
+                                </div>
+                                <div className="grid gap-4">
+                                    {formData.discovery?.comments?.map((comment: any, i: number) => (
+                                        <div key={i} className="bg-slate-50 p-4 rounded-xl space-y-3">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Name"
+                                                    className="bg-white border-none rounded-lg p-2 text-xs"
+                                                    value={comment.name}
+                                                    onChange={(e) => {
+                                                        const newComments = [...formData.discovery.comments];
+                                                        newComments[i].name = e.target.value;
+                                                        handleChange('discovery.comments', newComments);
+                                                    }}
+                                                />
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Time"
+                                                    className="bg-white border-none rounded-lg p-2 text-xs"
+                                                    value={comment.time}
+                                                    onChange={(e) => {
+                                                        const newComments = [...formData.discovery.comments];
+                                                        newComments[i].time = e.target.value;
+                                                        handleChange('discovery.comments', newComments);
+                                                    }}
+                                                />
+                                            </div>
+                                            <textarea 
+                                                placeholder="Comment text..."
+                                                className="w-full bg-white border-none rounded-lg p-3 text-xs min-h-[60px]"
+                                                value={comment.text}
+                                                onChange={(e) => {
+                                                    const newComments = [...formData.discovery.comments];
+                                                    newComments[i].text = e.target.value;
+                                                    handleChange('discovery.comments', newComments);
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* HTML Importer Tool */}
+                            <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl space-y-4">
+                                <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2">
+                                    <HelpCircle size={16} />
+                                    Auto-Import from Groove HTML
+                                </h3>
+                                <p className="text-xs text-blue-600">Paste your raw GroovePages HTML block below to instantly populate discovery headlines, author info, ratings, and comments.</p>
+                                <textarea 
+                                    placeholder="Paste HTML here..."
+                                    className="w-full bg-white border-blue-200 rounded-xl p-4 text-[10px] font-mono min-h-[100px] focus:ring-blue-500"
+                                    onBlur={async (e) => {
+                                        if (e.target.value) {
+                                            const { importAdvertorialFromGroove } = await import('@/lib/actions/advertorial');
+                                            const importedData = await importAdvertorialFromGroove(e.target.value);
+                                            if (importedData) {
+                                                setFormData((prev: any) => ({
+                                                    ...prev,
+                                                    heroSection: { ...prev.heroSection, ...importedData.heroSection },
+                                                    discovery: { ...prev.discovery, ...importedData.discovery }
+                                                }));
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </section>
+                    )}
 
                     {/* Ultimate Framework (Hero, VSL, Listicle) */}
                     <section className="space-y-8 pt-8 border-t-2 border-slate-100">
@@ -379,6 +552,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                                 <option value="industrial" className="bg-white text-black">Industrial (White & Bold)</option>
                                 <option value="minimalist" className="bg-white text-black">Minimalist (Clean & Spaced)</option>
                                 <option value="magazine" className="bg-white text-black">Magazine (Serif & Multi-column)</option>
+                                <option value="discovery" className="bg-white text-black">Discovery (High Conversion - Groove)</option>
                             </select>
                         </div>
                     </section>
