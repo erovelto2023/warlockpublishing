@@ -66,22 +66,23 @@ Your goal is to engineer a high-conversion advertorial for "${selectedOffer?.nam
 
 ### OUTPUT JSON SCHEMA (STRICT):
 {
-  "title": "A compelling, clickable internal title",
+  "title": "A compelling, clickable internal title (01 Core Architecture)",
   "slug": "url-friendly-slug",
   "category": "${category || 'Gadget Discovery'}",
   "template": "discovery",
   "ftcDisclosure": "This is an advertisement and not a news article",
   "affiliateOfferId": "${selectedAffiliateId}",
   "customTargetUrl": "${customTargetUrl}",
-  "heroSection": {
-    "headline": "Magnetic headline using ${headlineFormula}",
-    "boldClaim": "Bold, credible claim in quotes",
-    "imageUrl": "Recommended AI Image Generation Prompt",
-    "videoUrl": "${heroVideoUrl}"
-  },
   "narrative": {
-    "frictionReveal": "Powerful 2-3 paragraph section agitating the core pain point.",
+    "frictionReveal": "Powerful 2-3 paragraph section (02 Narrative Arc) agitating the core pain point.",
     "editorialPivot": "1-2 paragraph transition positioning the discovery as the unique solution."
+  },
+  "valueReinforcement": {
+    "priceAnchoring": "Comparative value narrative (03 Value & Proof).",
+    "steps": [
+      { "title": "Step 1 Title", "description": "Step 1 Description" },
+      { "title": "Step 2 Title", "description": "Step 2 Description" }
+    ]
   },
   "discovery": {
     "author": {
@@ -98,37 +99,39 @@ Your goal is to engineer a high-conversion advertorial for "${selectedOffer?.nam
         { "label": "Value For Money", "value": 98 }
       ]
     },
-    "painPoints": {
-      "title": "Why current solutions fail:",
-      "items": ["Problem 1", "Problem 2", "Problem 3"]
-    },
     "comments": [
-      { "name": "Name 1", "time": "2 hours ago", "text": "Stunningly realistic positive comment." },
-      { "name": "Name 2", "time": "5 hours ago", "text": "Detailed review about the shipping or results." }
+      { "name": "Sarah M.", "time": "2 hours ago", "text": "Stunningly realistic positive comment." },
+      { "name": "David K.", "time": "5 hours ago", "text": "Detailed review about the shipping or results." }
     ]
   },
-  "listicleItems": [
-    { "subheading": "Benefit 1", "content": "Detailed educational paragraph." },
-    { "subheading": "Benefit 2", "content": "Detailed educational paragraph." }
-  ],
-  "comparisonData": {
-    "title": "How We Beat The Competition",
-    "features": [
-      { "name": "Feature X", "ourValue": "Superior", "competitorValue": "Inferior", "isBetter": true }
-    ]
+  "heroSection": {
+    "headline": "Magnetic headline (04 Ultimate Framework) using ${headlineFormula}",
+    "boldClaim": "Bold, credible claim in quotes",
+    "imageUrl": "Recommended AI Image Generation Prompt",
+    "videoUrl": "${heroVideoUrl}"
   },
-  "socialProof": [
-    { "quote": "Major quote", "author": "R.S.", "source": "Verified Purchase" }
-  ],
   "vsl": {
     "title": "Watch the Full Discovery Video",
     "videoUrl": "${vslVideoUrl}",
     "description": "Why this video is going viral right now."
   },
+  "listicleItems": [
+    { "subheading": "1. Silence the 'Always-On' Mental Noise", "content": "Detailed educational paragraph." },
+    { "subheading": "2. Transport Yourself...", "content": "Detailed educational paragraph." }
+  ],
+  "comparisonData": {
+    "title": "Why Enthusiasts Prefer ${selectedOffer?.name || 'This Product'}",
+    "features": [
+      { "name": "Feature X", "ourValue": "Superior", "competitorValue": "Inferior", "isBetter": true }
+    ]
+  },
+  "socialProof": [
+    { "quote": "Major quote...", "author": "R.S.", "source": "Verified Purchase" }
+  ],
   "conversionClose": {
-    "ctaText": "Claim Your Discount Now",
+    "ctaText": "Claim Your Copy Now",
     "urgencyText": "Special offer ends today",
-    "guaranteeText": "30-Day Money Back Guarantee"
+    "guaranteeText": "100% Satisfaction Guarantee"
   }
 }
 
