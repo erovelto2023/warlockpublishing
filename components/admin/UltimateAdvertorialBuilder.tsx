@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { 
     Copy, Terminal, Send, Check, AlertCircle, FileJson, 
     RefreshCw, Globe, Users, Zap, Shield, Gift, MessageSquare,
-    ChevronDown, Layout, Edit
+    ChevronDown, Layout, Edit, Target
 } from 'lucide-react';
 import { importAdvertorials } from '@/lib/actions/advertorial';
 import { repairJson } from '@/lib/utils';
@@ -23,6 +23,7 @@ export default function UltimateAdvertorialBuilder({ affiliateOffers = [], onSta
     const [painPoint, setPainPoint] = useState('');
     const [headlineFormula, setHeadlineFormula] = useState(HEADLINE_FORMULAS[0]);
     const [isSaft, setIsSaft] = useState(false);
+    const [category, setCategory] = useState('Marketing');
     const [offerDetails, setOfferDetails] = useState('');
     const [proofSources, setProofSources] = useState('');
     
@@ -257,6 +258,17 @@ Insightful, authoritative, investigative, and peer-to-peer. Avoid generic sales 
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
+                                    <Target size={14} /> Niche Category
+                                </label>
+                                <Input 
+                                    className="border-slate-200 focus:ring-2 focus:ring-indigo-500 transition-all" 
+                                    value={category} 
+                                    onChange={e => setCategory(e.target.value)} 
+                                    placeholder="e.g., Tech Deals, Health"
+                                />
+                            </div>
                             <div className="space-y-2">
                                 <label className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
                                     <Users size={14} /> Target Audience
