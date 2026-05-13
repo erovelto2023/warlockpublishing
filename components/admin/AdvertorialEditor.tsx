@@ -34,7 +34,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
         listicleItems: [],
         socialProof: [],
         vsl: { title: '', videoUrl: '', description: '' },
-        valueReinforcement: { priceAnchoring: '', benefits: [] },
+        valueReinforcement: { priceAnchoring: '', steps: [] },
         comparisonData: { title: 'How We Outperform The Rest', features: [] },
         conversionClose: { ctaText: 'Order Now', urgencyText: '', guaranteeText: '' },
         discovery: {
@@ -192,7 +192,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                             </div>
                             
                             <div className="space-y-4">
-                                {formData.valueReinforcement.steps.map((step: any, i: number) => (
+                                {formData.valueReinforcement?.steps?.map((step: any, i: number) => (
                                     <div key={i} className="p-6 border border-slate-100 space-y-4 relative group bg-white">
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs font-bold text-slate-300">Step {i + 1}</span>
@@ -606,7 +606,7 @@ export default function AdvertorialEditor({ advertorial, affiliateOffers }: Adve
                             onChange={e => handleChange('affiliateOfferId', e.target.value || null)}
                         >
                             <option value="" className="bg-white text-black">-- Catalog Offer --</option>
-                            {affiliateOffers.map(offer => (
+                            {affiliateOffers?.map(offer => (
                                 <option key={offer._id} value={offer._id} className="bg-white text-black">{offer.name || offer.title}</option>
                             ))}
                         </select>

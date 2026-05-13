@@ -19,7 +19,6 @@ const MarketplaceProductSchema = new Schema({
 }, { timestamps: true });
 
 MarketplaceProductSchema.index({ keyword: 'text', title: 'text', category: 'text' });
-MarketplaceProductSchema.index({ asin: 1 });
 
 const MarketplaceProduct = models.MarketplaceProduct || model('MarketplaceProduct', MarketplaceProductSchema);
 
