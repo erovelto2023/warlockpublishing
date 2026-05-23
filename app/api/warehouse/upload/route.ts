@@ -20,9 +20,16 @@ export async function POST(req: NextRequest) {
     try {
         // Authenticate manually because this route is excluded from middleware to allow large uploads
         const client = await clerkClient();
-        const { isAuthenticated, userId } = await client.authenticateRequest(req);
+        const authResult = await client.authenticateRequest(req);
         
-        if (!isAuthenticated || !userId) {
+        if (!authResult.isAuthenticated) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const authObject = authResult.toAuth();
+        const userId = authObject.userId;
+
+        if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
