@@ -7,6 +7,7 @@ import busboy from 'busboy';
 import { Readable } from 'stream';
 import { connectToDatabase } from '@/lib/db';
 import DigitalAsset from '@/lib/models/DigitalAsset';
+import { clerkClient } from '@clerk/nextjs/server';
 
 // Disabling standard body parser is not required/possible exactly like this in App Router 
 // but we consume the stream directly via req.body.
@@ -17,6 +18,22 @@ const WAREHOUSE_DIR = join(process.cwd(), '_warehouse_storage_');
 
 export async function POST(req: NextRequest) {
     try {
+        // Authenticate manually because this route is excluded from middleware to allow large uploads
+        const client = await clerkClient();
+        const { isAuthenticated, userId } = await client.authenticateRequest(req);
+        
+        if (!isAuthenticated || !userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Check if user is admin
+        const user = await client.users.getUser(userId);
+        const adminEmail = process.env.ADMIN_EMAIL;
+        
+        if (!adminEmail || !user.emailAddresses.some(email => email.emailAddress === adminEmail)) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
         await connectToDatabase();
         
         // Ensure warehouse directory exists

@@ -98,8 +98,14 @@ export default function AssetWarehouse() {
                     setSelectedFile(null);
                     fetchAssets();
                 } else {
-                    const error = JSON.parse(xhr.responseText);
-                    alert(`Upload failed: ${error.error || 'Unknown error'}`);
+                    let errorMessage = 'Unknown error';
+                    try {
+                        const error = JSON.parse(xhr.responseText);
+                        errorMessage = error.error || 'Unknown error';
+                    } catch (e) {
+                        errorMessage = `Server returned status ${xhr.status}`;
+                    }
+                    alert(`Upload failed: ${errorMessage}`);
                 }
                 setUploading(false);
             };
