@@ -3,7 +3,7 @@
 import { connectToDatabase } from '@/lib/db';
 import GlossaryTerm, { IGlossaryTerm } from '@/lib/models/GlossaryTerm';
 import { revalidatePath } from 'next/cache';
-import { extractYouTubeId } from '@/lib/utils';
+import { extractYouTubeId, escapeRegExp } from '@/lib/utils';
 
 // Helper to serialize Mongoose documents
 function serializeTerm(term: any) {
@@ -247,20 +247,15 @@ export async function importDetailedJson(data: any[]) {
         for (const item of data) {
             if (!item.term) continue;
             
-            const baseSlug = item.slug || item.term
+            const trimmedTerm = item.term.trim();
+            const rawSlugSource = item.slug || trimmedTerm;
+            const baseSlug = rawSlugSource
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '');
             
-            // ENSURE UNIQUE SLUG: Check if this slug is taken by another term
-            let slug = baseSlug;
-            let slugConflict = await GlossaryTerm.findOne({ slug, term: { $ne: item.term } });
-            let counter = 1;
-            while (slugConflict) {
-                slug = `${baseSlug}-${counter}`;
-                slugConflict = await GlossaryTerm.findOne({ slug, term: { $ne: item.term } });
-                counter++;
-            }
+            // Clean and extract the YouTube video ID directly without slow blocking network calls
+            const activeVideoId = extractYouTubeId(item.youtubeVideoId);
 
             // AUTO-FIX: Convert legacy string digitalDownloads to new object structure
             if (item.monetizationIdeas?.digitalDownloads && Array.isArray(item.monetizationIdeas.digitalDownloads)) {
@@ -277,42 +272,53 @@ export async function importDetailedJson(data: any[]) {
                 });
             }
 
-            // Validate YouTube Video if present
-            let activeVideoId = item.youtubeVideoId;
-            if (activeVideoId) {
-                const isActive = await isYouTubeVideoActive(activeVideoId);
-                if (!isActive) {
-                    console.warn(`[BulkImport] Deactivating invalid YouTube video for term: ${item.term} (${activeVideoId})`);
-                    // Try to find a replacement
-                    const replacement = await searchYouTubeVideo(item.term);
-                    if (replacement) {
-                        console.log(`[BulkImport] Found replacement for ${item.term}: ${replacement}`);
-                        activeVideoId = replacement;
-                    } else {
-                        activeVideoId = ""; // Clear if no replacement found
-                    }
-                }
+            // Case-insensitive term search or exact slug search to identify existing terms
+            const existingTerm = await GlossaryTerm.findOne({
+                $or: [
+                    { term: { $regex: new RegExp(`^${escapeRegExp(trimmedTerm)}$`, 'i') } },
+                    { slug: baseSlug }
+                ]
+            });
+
+            let slug = baseSlug;
+            let wasCollision = false;
+
+            if (existingTerm) {
+                // If it exists, update the existing document to prevent creating duplicates or colliding slugs
+                slug = existingTerm.slug; // Preserve existing slug
+                
+                await GlossaryTerm.findByIdAndUpdate(
+                    existingTerm._id,
+                    {
+                        ...item,
+                        term: item.term, // Update/normalize term casing
+                        slug,
+                        youtubeVideoId: activeVideoId,
+                        isPublished: true 
+                    },
+                    { new: true }
+                );
             } else {
-                // If no video ID was provided at all, try to find one
-                const autoVideo = await searchYouTubeVideo(item.term);
-                if (autoVideo) {
-                    console.log(`[BulkImport] Auto-populated video for ${item.term}: ${autoVideo}`);
-                    activeVideoId = autoVideo;
+                // ENSURE UNIQUE SLUG for brand new terms
+                let slugConflict = await GlossaryTerm.findOne({ slug });
+                let counter = 1;
+                while (slugConflict) {
+                    slug = `${baseSlug}-${counter}`;
+                    slugConflict = await GlossaryTerm.findOne({ slug });
+                    counter++;
                 }
-            }
 
-            const wasCollision = slug !== baseSlug;
+                wasCollision = slug !== baseSlug;
 
-            await GlossaryTerm.findOneAndUpdate(
-                { term: item.term },
-                { 
-                    ...item, 
+                await GlossaryTerm.create({
+                    ...item,
+                    term: trimmedTerm,
                     slug,
                     youtubeVideoId: activeVideoId,
-                    isPublished: true 
-                },
-                { upsert: true, new: true }
-            );
+                    isPublished: true
+                });
+            }
+
             count++;
             importedTerms.push({ 
                 term: item.term, 
@@ -321,9 +327,13 @@ export async function importDetailedJson(data: any[]) {
             } as any);
         }
         
-        revalidatePath('/glossary');
-        revalidatePath('/glossary/directory');
-        revalidatePath('/admin');
+        try {
+            revalidatePath('/glossary');
+            revalidatePath('/glossary/directory');
+            revalidatePath('/admin');
+        } catch (e) {
+            console.warn("revalidatePath skipped (running outside of Next.js server context)");
+        }
         
         const collisions = importedTerms.filter(t => t.wasCollision).length;
         
