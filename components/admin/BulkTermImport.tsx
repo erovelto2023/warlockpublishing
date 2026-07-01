@@ -310,44 +310,41 @@ The market demand data shows extreme Passion Scores (9.9+) for this niche.
             ? unifiedCatalog.map(o => `- [${o.name}](${o.url}) (Niche/Category: ${o.category}) [Source: ${o.source}]`).join('\n')
             : "No affiliate products available.";
 
-        const prompt = `Act as an Expert AI & SEO Content Architect for Warlock Publishing.
-You are designing the "Ultimate Authority Pipeline" for ${category}. 
+        const prompt = `System Role: You are an elite SEO Content Architect and UX Strategist for Warlock Publishing. Your mission is to convert raw database entries into "High-Value Authority Hubs" that rank on Page 1 of Google and drive consistent affiliate conversions.
+
+Task: Generate a valid JSON array for the given keywords. Each object must follow the "Solution-First" framework.
+
+CRITICAL JSON SAFETY RULES:
+1. Use double quotes (") for keys and values.
+2. Use single quotes (') for ALL HTML attributes/classes (e.g., <div class='hub-card'>). Never nest double quotes inside strings.
+3. No physical newlines; use \\n for all line breaks.
+4. Output ONLY the raw JSON array.
+
+REQUIRED SCHEMA:
+{
+  "term": "Main Keyword",
+  "slug": "url-friendly-slug",
+  "category": "${category}",
+  "seoMeta": { "title": "...", "description": "..." },
+  "pageHeader": { "hook": "High-impact sentence", "expertIntro": "Unique 150-word authority-building analysis" },
+  "pageBody": {
+    "htmlContent": "Use <h2>, <h3>, <ul>, and <strong>. Integrate affiliate recommendations naturally. USE SINGLE QUOTES FOR HTML ATTRS.",
+    "youtubeEmbedUrl": "..."
+  },
+  "conversionElement": { "ctaText": "...", "targetUrl": "...", "productName": "..." },
+  "seoSchema": {
+    "faq": [ { "question": "...", "answer": "..." } ],
+    "relatedSlugs": ["slug-1", "slug-2"]
+  }
+}
+
+INSTRUCTIONS FOR CONTENT QUALITY:
+1. Expert Analysis: Do not write generic definitions. Explain *why* this term matters and provide a specific, actionable insight for the reader.
+2. Contextual Monetization: For every entry, you MUST select the most relevant affiliate product from the provided list. Do not select randomly; match the niche.
+3. Conversion First: The <div class='resource-box'> in the htmlContent must clearly position the affiliate product as the *solution* to the reader's problem.
+4. SEO Rich Snippets: The faq section must answer 3 distinct 'People Also Ask' style questions.
 
 ${categorySpecificInstructions}
-
-Generate a valid JSON array of objects for the keywords below. 
-
-### CRITICAL: JSON SAFETY RULES (TO PREVENT ERRORS)
-1. Use DOUBLE QUOTES (") for JSON keys and values.
-2. STICK TO SINGLE QUOTES (') for ALL HTML attributes (e.g., <div class='fast-facts'>). NEVER use double quotes inside a string value.
-3. NO PHYSICAL NEWLINES inside string values. Use \\n for line breaks.
-4. Output ONLY the JSON array. No conversational text.
-5. Keep descriptions punchy. If the output is too long, it will be cut off and fail.
-
-### SIMPLIFIED SCHEMA:
-{
-  "term": "Main Term",
-  "snapshot": "1-sentence punchy summary.",
-  "definition": "Clear 2-sentence authoritative definition.",
-  "articleContent": "High-fidelity article with standard HTML. Use <div class='cnn-fast-facts'> for key points. Use <h2> for subheadings. Use <blockquote> for quotes. USE SINGLE QUOTES FOR ALL HTML CLASS/ATTRS.",
-  "category": "${category}",
-  "youtubeVideoId": "https://www.youtube.com/watch?v=...",
-  "monetizationIdeas": {
-    "affiliateProducts": ["[Product 1](URL)", "[Product 2](URL)"],
-    "courseTopics": ["Topic 1"]
-  },
-  "marketDemand": { "demandScore": "9/10", "passionScore": "10/10", "trendStatus": "Rising" },
-  "readerPsychology": { "whyWeCraveIt": "...", "emotionalPayoff": "..." },
-  "masterclass": {
-    "masterclassDesc": "...",
-    "threeActStructure": { "act1": "Hook", "act2": "Escalation", "act3": "Resolution" },
-    "profitBeats": [ { "title": "Beat 1", "description": "...", "timing": "15%" } ],
-    "technicalComponents": { "powerTitle": "...", "tropes": ["Trope 1"], "hook": "..." },
-    "profitabilityChecklist": ["Checklist Item 1"]
-  },
-  "marketingStrategy": { "viralHooks": ["Hook 1"], "contentPillars": ["Pillar 1"] },
-  "faqItems": [ { "question": "Q1?", "answer": "A1." }, { "question": "Q2?", "answer": "A2." }, { "question": "Q3?", "answer": "A3." } ]
-}
 
 AVAILABLE AFFILIATE CATALOG:
 ${affiliateCatalogStr}

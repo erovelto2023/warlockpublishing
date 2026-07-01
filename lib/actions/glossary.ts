@@ -255,7 +255,7 @@ export async function importDetailedJson(data: any[]) {
                 .replace(/(^-|-$)+/g, '');
             
             // Clean and extract the YouTube video ID directly without slow blocking network calls
-            const activeVideoId = extractYouTubeId(item.youtubeVideoId);
+            const activeVideoId = extractYouTubeId(item.pageBody?.youtubeEmbedUrl || item.youtubeVideoId);
 
             // AUTO-FIX: Convert legacy string digitalDownloads to new object structure
             if (item.monetizationIdeas?.digitalDownloads && Array.isArray(item.monetizationIdeas.digitalDownloads)) {

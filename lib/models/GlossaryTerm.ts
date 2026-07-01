@@ -111,6 +111,31 @@ export interface IGlossaryTerm extends Document {
     viewCount: number;
     createdAt: Date;
     updatedAt: Date;
+    // New Conversion Hub Fields
+    seoMeta?: {
+        title: string;
+        description: string;
+    };
+    pageHeader?: {
+        hook: string;
+        expertIntro: string;
+    };
+    pageBody?: {
+        htmlContent: string;
+        youtubeEmbedUrl: string;
+    };
+    conversionElement?: {
+        ctaText: string;
+        targetUrl: string;
+        productName: string;
+    };
+    seoSchema?: {
+        faq: {
+            question: string;
+            answer: string;
+        }[];
+        relatedSlugs: string[];
+    };
 }
 
 const GlossaryTermSchema: Schema = new Schema({
@@ -225,7 +250,33 @@ const GlossaryTermSchema: Schema = new Schema({
         marketingHookPrompt: { type: String },
         aiImagePrompt: { type: String }
     },
-    viewCount: { type: Number, default: 0 }
+    viewCount: { type: Number, default: 0 },
+    
+    // New Conversion Hub Fields
+    seoMeta: {
+        title: { type: String },
+        description: { type: String }
+    },
+    pageHeader: {
+        hook: { type: String },
+        expertIntro: { type: String }
+    },
+    pageBody: {
+        htmlContent: { type: String },
+        youtubeEmbedUrl: { type: String }
+    },
+    conversionElement: {
+        ctaText: { type: String },
+        targetUrl: { type: String },
+        productName: { type: String }
+    },
+    seoSchema: {
+        faq: [{
+            question: { type: String },
+            answer: { type: String }
+        }],
+        relatedSlugs: [{ type: String }]
+    }
 }, {
     timestamps: true
 });

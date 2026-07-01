@@ -331,7 +331,10 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 uppercase tracking-widest">
                                 v2.0.0 &bull; Secure Mode
                             </span>
-                            <a href="/" target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors">
+                            <a href="/hub" target="_blank" className="text-slate-400 hover:text-purple-600 transition-colors flex items-center gap-1 text-xs font-bold uppercase tracking-wider" title="View Affiliate Hub">
+                                <LinkIcon size={14} /> Hub
+                            </a>
+                            <a href="/" target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors" title="View Live Site">
                                 <ExternalLink size={18} />
                             </a>
                         </div>
@@ -351,8 +354,8 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                             { id: 'warehouse', label: 'Warehouse', icon: Package },
                             { id: 'messages', label: 'Inbox', icon: MessageSquare },
                             { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
-                            { id: 'glossary', label: 'Glossary', icon: BookOpen },
-                            { id: 'affiliate', label: 'Affiliate Hub', icon: LinkIcon },
+                            { id: 'glossary', label: 'Hub Articles', icon: BookOpen },
+                            { id: 'affiliate', label: 'Affiliate Links', icon: LinkIcon },
                             { id: 'advertorials', label: 'Advertorials', icon: FileText },
                             { id: 'cta_builder', label: 'CTA Builder', icon: Target },
                             { id: 'settings', label: 'Site Config', icon: Settings },
@@ -976,7 +979,7 @@ export default function UnifiedAdminDashboard({ products, penNames, blogPosts, m
                         <div className="space-y-6">
                         <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                                <BookOpen className="text-indigo-600" /> Ultimate Glossary
+                                <BookOpen className="text-indigo-600" /> Hub Articles (Glossary)
                             </h2>
                                 {selectedGlossaryTerms.length > 0 && (
                                     <button
